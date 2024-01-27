@@ -20,6 +20,30 @@ public class SolarNoonCalc {
      */
     public LocalTime getTime(long lat, long lon, int timezoneOffiset, Date date) {
         LocalTime result = null;
+
+        double solarTime = (720 - 4 * lon - getEquationOfTime() + timezoneOffiset * 60) / 1440;
+
         return result;
     }
+
+    private double getEquationOfTime() {
+        return 4 * Math.toDegrees(getVarY() * Math.sin(2 * Math.toRadians(getGeomMeanLongSun())) -2 * getEccentEarthOrbit() * Math.sin(Math.toRadians(getGeomMeanAnomSun())) + 4 * getEccentEarthOrbit() * getVarY() * Math.sin(Math.toRadians(getGeomMeanAnomSun())) * Math.cos(2 * Math.toRadians(getGeomMeanLongSun())) - 0.5 * getVarY() * getVarY() * Math.sin(4 * Math.toRadians(getGeomMeanLongSun())) - 1.25 * getEccentEarthOrbit() * getEccentEarthOrbit() * Math.sin(2 * Math.toRadians(getGeomMeanAnomSun())));
+    }
+
+    private long getVarY() {
+        throw new UnsupportedOperationException();
+    }
+
+    private long getGeomMeanLongSun() {
+        throw new UnsupportedOperationException();
+    }
+
+    private long getEccentEarthOrbit() {
+        throw new UnsupportedOperationException();
+    }
+
+    private long getGeomMeanAnomSun() {
+        throw new UnsupportedOperationException();
+    }
+
 }

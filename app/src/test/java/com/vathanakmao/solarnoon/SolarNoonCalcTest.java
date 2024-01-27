@@ -1,20 +1,11 @@
 package com.vathanakmao.solarnoon;
 
-import static junit.framework.TestCase.assertEquals;
-
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-import java.sql.Time;
 import java.time.LocalTime;
-import java.time.ZoneId;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TimeZone;
 
 public class SolarNoonCalcTest {
     public SolarNoonCalc calc = new SolarNoonCalc();
