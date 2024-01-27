@@ -21,10 +21,7 @@ public class SolarNoonCalcTest {
 
     @Test
     public void testGetTime() {
-        int[] years = new int[]{ 2010 };
-        Long[] latLonZoneOffsetList = new Long[] {40L, -105L, 7L}; // latitude, longitude, offsetFromUtc ("-7" means UTC-7)
-        LocalTime solarNoonTime = calc.getTime(latLonZoneOffsetList[0], latLonZoneOffsetList[1], latLonZoneOffsetList[2].intValue(), years[0], LocalTime.NOON);
-
+        LocalTime solarNoonTime = calc.getTime(40L, -105L, 7, new Date());
         assertTrue(solarNoonTime.getHour() == 12 && solarNoonTime.getMinute() == 3);
     }
 }
