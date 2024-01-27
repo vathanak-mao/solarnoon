@@ -26,12 +26,28 @@ public class SolarNoonCalc {
         return result;
     }
 
-    private double getEquationOfTime() {
+    private double getEquationOfTime() { // V column
         return 4 * Math.toDegrees(getVarY() * Math.sin(2 * Math.toRadians(getGeomMeanLongSun())) -2 * getEccentEarthOrbit() * Math.sin(Math.toRadians(getGeomMeanAnomSun())) + 4 * getEccentEarthOrbit() * getVarY() * Math.sin(Math.toRadians(getGeomMeanAnomSun())) * Math.cos(2 * Math.toRadians(getGeomMeanLongSun())) - 0.5 * getVarY() * getVarY() * Math.sin(4 * Math.toRadians(getGeomMeanLongSun())) - 1.25 * getEccentEarthOrbit() * getEccentEarthOrbit() * Math.sin(2 * Math.toRadians(getGeomMeanAnomSun())));
     }
 
-    private long getVarY() {
-        throw new UnsupportedOperationException();
+    private double getVarY() { // U column
+        return Math.tan(Math.toRadians(getObliqCorrInDegrees()/2)) * Math.tan(Math.toRadians(getObliqCorrInDegrees()/2));
+    }
+
+    private double getObliqCorrInDegrees() { // R column
+        return getMeanObliqEclipticInDegrees() + 0.00256 * Math.cos(Math.toRadians(125.04 - 1934.136 * getJulianCentury()));
+    }
+
+    private double getMeanObliqEclipticInDegrees() { // Q column
+        return 23 + (26 + ((21.448 - getJulianCentury() * (46.815 + getJulianCentury() * (0.00059 - getJulianCentury() * 0.001813)))) / 60) / 60;
+    }
+
+    private float getJulianCentury() { // G column
+        return (getJulianDay() - 2451545) / 36525;
+    }
+
+    private float getJulianDay() { // F column
+        return date + 2415018.5 + E121 - $B$5 / 24;
     }
 
     private long getGeomMeanLongSun() {
