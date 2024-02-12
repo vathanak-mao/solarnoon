@@ -9,6 +9,9 @@ import java.time.LocalTime;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
+/**
+ * All the test data should be from the excel file downloaded from https://gml.noaa.gov/grad/solcalc/.
+ */
 public class SolarNoonCalcTest {
     public SolarNoonCalc calc = SolarNoonCalc.getInstance();
 
@@ -19,15 +22,16 @@ public class SolarNoonCalcTest {
     }
 
     @Test
-    public void getNumOfDaysSince1900() {
-        GregorianCalendar feb122024 = new GregorianCalendar();
-        feb122024.set(2024, 1, 12);
+    public void testGetJulianDay() {
+        GregorianCalendar feb122024 = new GregorianCalendar(2024, 1, 12);
+        int timezoneOffsetFromUtc = 7;
+        assertEquals(2460352.21, calc.getJulianDay(feb122024, timezoneOffsetFromUtc), 1.0);
+    }
 
-        // In Excel, 2 more days are added when using functions such as DAY() and WEEKDAY().
-        // REFERENCES:
-        //      - https://calculat.io/en/date/how-many-until/1-january-1900
-        //      - https://www.epochconverter.com/seconds-days-since-y0#:~:text=There%20were%2045332%20days%20since%20January%201%2C%201900.
-        assertEquals(45332L, calc.getNumOfDaysSince1900(feb122024));
+    @Test
+    public void getNumOfDaysSince1900() {
+        GregorianCalendar feb122024 = new GregorianCalendar(2024, 1, 12);
+        assertEquals(45334L, calc.getNumOfDaysSince1900(feb122024));
     }
 
     @Test

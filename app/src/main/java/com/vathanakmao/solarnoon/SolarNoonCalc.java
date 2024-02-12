@@ -85,7 +85,17 @@ public class SolarNoonCalc {
     public long getNumOfDaysSince1900(GregorianCalendar date) {
         Calendar year1900 = new GregorianCalendar(1900,0,1);
         long numOfDaysInMillis = date.getTimeInMillis() - year1900.getTimeInMillis();
-        return numOfDaysInMillis / 1000 / 60 / 60 / 24;
+
+        // 1). Excel stores dates as sequential serial numbers so that they can be used in calculations.
+        // By default, January 1, 1900 is serial number 1, and January 1, 2008 is serial number 39448
+        // because it is 39447 days after January 1, 1900.
+        // 2). Excel thinks 1900 is a leap year (29 days in February) so the year had one more day.
+        // THEREFOR, if a cell stores the date February 12, 2024, its value in number is 45334 (45332 days after January 1, 1900),
+        // which is two days more than the result from any online calculators.
+        // Since I'm using data in the excel file downloaded from https://gml.noaa.gov/grad/solcalc/ to verify,
+        // I have to add two more days to the actual value.
+        final int EXCELL_DIFF = 2;
+        return EXCELL_DIFF + numOfDaysInMillis / 1000 / 60 / 60 / 24;
     }
 
     /**
