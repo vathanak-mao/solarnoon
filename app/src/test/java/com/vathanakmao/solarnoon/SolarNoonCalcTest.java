@@ -29,4 +29,9 @@ public class SolarNoonCalcTest {
         //      - https://www.epochconverter.com/seconds-days-since-y0#:~:text=There%20were%2045332%20days%20since%20January%201%2C%201900.
         assertEquals(45332L, calc.getNumOfDaysSince1900(feb122024));
     }
+
+    @Test
+    public void testGetTimePastLocalMidnight() {
+        assertEquals(0.00416666666666667, calc.getTimePastLocalMidnight(),0.000000001);
+    }
 }

@@ -93,7 +93,7 @@ public class SolarNoonCalc {
      * Then, the number of day past is 0.00416 (0.1/24) day.
      * @return
      */
-    private float getTimePastLocalMidnight() {
+    public float getTimePastLocalMidnight() {
         return 0.1F/24;
     }
 
