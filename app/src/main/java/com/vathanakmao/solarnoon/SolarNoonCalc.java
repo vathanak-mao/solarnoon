@@ -55,12 +55,16 @@ public class SolarNoonCalc {
     }
 
     /**
-     * Get Julian century
+     * Get the number of Julian centuries since the epoch J2000.
+     * Epoch means a specific period of time, an era, or a stage.
+     * Epoch J2000 is a standard point in time used as a reference in astronomy.
+     * Epoch J2000 is specified as Julian date 2451545.0 or 2000 January 1, 11:58:55.816 UTC.
+     *
      * @param date
      * @param timezoneOffsetFromUtc
      * @return
      */
-    private double getJulianCentury(GregorianCalendar date, double timezoneOffsetFromUtc) { // G column
+    public double getJulianCentury(GregorianCalendar date, double timezoneOffsetFromUtc) { // G column
         return (getJulianDay(date, timezoneOffsetFromUtc) - 2451545) / 36525;
     }
 

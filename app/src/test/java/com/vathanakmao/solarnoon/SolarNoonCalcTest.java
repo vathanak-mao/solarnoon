@@ -7,11 +7,12 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 import java.time.LocalTime;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
 /**
- * All the test data should be from the excel file downloaded from https://gml.noaa.gov/grad/solcalc/.
+ * All the test data is in the excel file downloaded from https://gml.noaa.gov/grad/solcalc/.
  */
 public class SolarNoonCalcTest {
     public SolarNoonCalc calc = SolarNoonCalc.getInstance();
@@ -20,6 +21,12 @@ public class SolarNoonCalcTest {
     public void testGetTime() {
         LocalTime solarNoonTime = calc.getTime(40L, -105L, 7, new GregorianCalendar());
         assertTrue(solarNoonTime.getHour() == 12 && solarNoonTime.getMinute() == 3);
+    }
+
+    @Test
+    public void testGetJulianCentury() {
+        final GregorianCalendar february122024 = new GregorianCalendar(2024, 1, 12);
+        assertEquals(0.24112834, calc.getJulianCentury(february122024, 7), 0.00000001);
     }
 
     @Test
