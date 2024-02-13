@@ -1,6 +1,7 @@
 package com.vathanakmao.solarnoon;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
@@ -25,7 +26,7 @@ public class SolarNoonCalcTest {
     public void testGetJulianDay() {
         GregorianCalendar feb122024 = new GregorianCalendar(2024, 1, 12);
         int timezoneOffsetFromUtc = 7;
-        assertEquals(2460352.21, calc.getJulianDay(feb122024, timezoneOffsetFromUtc), 1.0);
+        assertEquals(2460352.21, calc.getJulianDay(feb122024, timezoneOffsetFromUtc), 0.01);
     }
 
     @Test
@@ -37,5 +38,13 @@ public class SolarNoonCalcTest {
     @Test
     public void testGetTimePastLocalMidnight() {
         assertEquals(0.00416666666666667, calc.getTimePastLocalMidnight(),0.000000001);
+    }
+
+    @Test
+    public void test7DividedBy24() {
+        assertEquals(0, Double.valueOf(7 / 24), 0.00000000001);
+        assertNotEquals(0.291666666666667, 7F / 24, 0.000000000001);
+        assertEquals(0.291666666666667, 7D / 24, 0.000000000001);
+
     }
 }

@@ -30,7 +30,7 @@ public class SolarNoonCalc {
      * @param date - the date for the solar noon
      * @return the time of the solar noon
      */
-    public LocalTime getTime(long lat, long lon, int timezoneOffsetFromUtc, GregorianCalendar date) {
+    public LocalTime getTime(long lat, long lon, double timezoneOffsetFromUtc, GregorianCalendar date) {
         LocalTime result = null;
 
         double solarTime = (720 - 4 * lon - getEquationOfTime(date, timezoneOffsetFromUtc) + timezoneOffsetFromUtc * 60) / 1440;
@@ -38,19 +38,19 @@ public class SolarNoonCalc {
         return result;
     }
 
-    private double getEquationOfTime(GregorianCalendar date, int timezoneOffsetFromUtc) { // V column
+    private double getEquationOfTime(GregorianCalendar date, double timezoneOffsetFromUtc) { // V column
         return 4 * Math.toDegrees(getVarY(date, timezoneOffsetFromUtc) * Math.sin(2 * Math.toRadians(getGeomMeanLongSun())) -2 * getEccentEarthOrbit() * Math.sin(Math.toRadians(getGeomMeanAnomSun())) + 4 * getEccentEarthOrbit() * getVarY(date, timezoneOffsetFromUtc) * Math.sin(Math.toRadians(getGeomMeanAnomSun())) * Math.cos(2 * Math.toRadians(getGeomMeanLongSun())) - 0.5 * getVarY(date, timezoneOffsetFromUtc) * getVarY(date, timezoneOffsetFromUtc) * Math.sin(4 * Math.toRadians(getGeomMeanLongSun())) - 1.25 * getEccentEarthOrbit() * getEccentEarthOrbit() * Math.sin(2 * Math.toRadians(getGeomMeanAnomSun())));
     }
 
-    private double getVarY(GregorianCalendar date, int timezoneOffsetFromUtc) { // U column
+    private double getVarY(GregorianCalendar date, double timezoneOffsetFromUtc) { // U column
         return Math.tan(Math.toRadians(getObliqCorrInDegrees(date, timezoneOffsetFromUtc)/2)) * Math.tan(Math.toRadians(getObliqCorrInDegrees(date, timezoneOffsetFromUtc)/2));
     }
 
-    private double getObliqCorrInDegrees(GregorianCalendar date, int timezoneOffsetFromUtc) { // R column
+    private double getObliqCorrInDegrees(GregorianCalendar date, double timezoneOffsetFromUtc) { // R column
         return getMeanObliqEclipticInDegrees(date, timezoneOffsetFromUtc) + 0.00256 * Math.cos(Math.toRadians(125.04 - 1934.136 * getJulianCentury(date, timezoneOffsetFromUtc)));
     }
 
-    private double getMeanObliqEclipticInDegrees(GregorianCalendar date, int timezoneOffsetFromUtc) { // Q column
+    private double getMeanObliqEclipticInDegrees(GregorianCalendar date, double timezoneOffsetFromUtc) { // Q column
         return 23 + (26 + ((21.448 - getJulianCentury(date, timezoneOffsetFromUtc) * (46.815 + getJulianCentury(date, timezoneOffsetFromUtc) * (0.00059 - getJulianCentury(date, timezoneOffsetFromUtc) * 0.001813)))) / 60) / 60;
     }
 
@@ -60,7 +60,7 @@ public class SolarNoonCalc {
      * @param timezoneOffsetFromUtc
      * @return
      */
-    private double getJulianCentury(GregorianCalendar date, int timezoneOffsetFromUtc) { // G column
+    private double getJulianCentury(GregorianCalendar date, double timezoneOffsetFromUtc) { // G column
         return (getJulianDay(date, timezoneOffsetFromUtc) - 2451545) / 36525;
     }
 
@@ -71,9 +71,10 @@ public class SolarNoonCalc {
      * @param timezoneOffsetFromUtc E.g. Phnom Penh's timezone is UTC+7 then its value is 7.
      * @return Julian day number
      */
-    public double getJulianDay(GregorianCalendar date, int timezoneOffsetFromUtc) { // F column
-        // (45318 + 2415018.5) + (0.1/24) - (7/24)
-        return getNumOfDaysSince1900(date) + 2415018.5 + getTimePastLocalMidnight() - timezoneOffsetFromUtc / 24;
+    public double getJulianDay(GregorianCalendar date, double timezoneOffsetFromUtc) { // F column
+        // 2415018.5 is the number of days from the beginning of Julian period to December 30, 1900.
+        // timezoneOffsetFromUtc must be double to get more digits in fractional part of a decimal number (a floating-point number in programming).
+        return 2415018.5 + getNumOfDaysSince1900(date) + getTimePastLocalMidnight() - timezoneOffsetFromUtc / 24;
     }
 
     /**
