@@ -6,9 +6,34 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 
 /**
- * Solar noon calculator
+ * <p>Solar noon calculator.<br/><br/></p>
+ *
+ * <p>
+ *     - <b>Beginning of Julian period</b> is January 1, 4713 BC (Before Christ).<br/>
+ *     - <b>Epoch</b> means a specific period of time, an era, or a stage.
+ *      <b>Epoch J2000</b> is a standard point in time used as a reference in astronomy.
+ *      Epoch J2000 is standard point in time used as a reference in Astronomy,
+ *      which is expressed as 2000 January 1, 11:58:55.816 UTC.
+ * </p>
  */
 public class SolarNoonCalc {
+    /**
+     * The number of days from the beginning of Julian period to epoch J2000.
+     * Epoch J2000 is standard point in time used in Astronomy, which is expressed
+     * as 2000 January 1, 11:58:55.816 UTC.
+     */
+    public static final double JULIANDATE_FOR_EPOCHJ2000 = 2451545.0;
+
+    /**
+     * The number of days from the beginning of Julian period to December 30, 1900.
+     */
+    public static final double JULIANDATE_FOR_1900DEC30 = 2415018.5;
+
+    /**
+     * The number of Julian days per century (100 years).
+     */
+    public static final double JULIAN_DAYS_PER_CENTURY = 36525;
+
     private static SolarNoonCalc instance;
 
     protected SolarNoonCalc() {}
@@ -56,16 +81,14 @@ public class SolarNoonCalc {
 
     /**
      * Get the number of Julian centuries since the epoch J2000.
-     * Epoch means a specific period of time, an era, or a stage.
-     * Epoch J2000 is a standard point in time used as a reference in astronomy.
-     * Epoch J2000 is specified as Julian date 2451545.0 or 2000 January 1, 11:58:55.816 UTC.
+     * Check this class's documentation for what epoch J2000 is.
      *
      * @param date
      * @param timezoneOffsetFromUtc
      * @return
      */
     public double getJulianCentury(GregorianCalendar date, double timezoneOffsetFromUtc) { // G column
-        return (getJulianDay(date, timezoneOffsetFromUtc) - 2451545) / 36525;
+        return (getJulianDay(date, timezoneOffsetFromUtc) - JULIANDATE_FOR_EPOCHJ2000) / JULIAN_DAYS_PER_CENTURY;
     }
 
     /**
@@ -78,7 +101,7 @@ public class SolarNoonCalc {
     public double getJulianDay(GregorianCalendar date, double timezoneOffsetFromUtc) { // F column
         // 2415018.5 is the number of days from the beginning of Julian period to December 30, 1900.
         // timezoneOffsetFromUtc must be double to get more digits in fractional part of a decimal number (a floating-point number in programming).
-        return 2415018.5 + getNumOfDaysSince1900(date) + getTimePastLocalMidnight() - timezoneOffsetFromUtc / 24;
+        return JULIANDATE_FOR_1900DEC30 + getNumOfDaysSince1900(date) + getTimePastLocalMidnight() - timezoneOffsetFromUtc / 24;
     }
 
     /**
@@ -88,8 +111,8 @@ public class SolarNoonCalc {
      * @return the number of days
      */
     public long getNumOfDaysSince1900(GregorianCalendar date) {
-        Calendar year1900 = new GregorianCalendar(1900,0,1);
-        long numOfDaysInMillis = date.getTimeInMillis() - year1900.getTimeInMillis();
+        final Calendar year1900 = new GregorianCalendar(1900,0,1);
+        final long numOfDaysInMillis = date.getTimeInMillis() - year1900.getTimeInMillis();
 
         // 1). Excel stores dates as sequential serial numbers so that they can be used in calculations.
         // By default, January 1, 1900 is serial number 1, and January 1, 2008 is serial number 39448
@@ -99,8 +122,8 @@ public class SolarNoonCalc {
         // which is two days more than the result from any online calculators.
         // Since I'm using data in the excel file downloaded from https://gml.noaa.gov/grad/solcalc/ to verify,
         // I have to add two more days to the actual value.
-        final int EXCELL_DIFF = 2;
-        return EXCELL_DIFF + numOfDaysInMillis / 1000 / 60 / 60 / 24;
+        final int EXCEL_DIFF = 2;
+        return EXCEL_DIFF + numOfDaysInMillis / 1000 / 60 / 60 / 24;
     }
 
     /**
