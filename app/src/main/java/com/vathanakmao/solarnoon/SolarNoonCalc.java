@@ -99,7 +99,6 @@ public class SolarNoonCalc {
      * @return Julian day number
      */
     public double getJulianDay(GregorianCalendar date, double timezoneOffsetFromUtc) { // F column
-        // 2415018.5 is the number of days from the beginning of Julian period to December 30, 1900.
         // timezoneOffsetFromUtc must be double to get more digits in fractional part of a decimal number (a floating-point number in programming).
         return JULIANDATE_FOR_1900DEC30 + getNumOfDaysSince1900(date) + getTimePastLocalMidnight() - timezoneOffsetFromUtc / 24;
     }
