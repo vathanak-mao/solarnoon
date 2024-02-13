@@ -50,7 +50,7 @@ public class SolarNoonCalc {
      * that the sun is at its highest in the sky.
      *
      * @param lat - latitude of the location, for example, 11.566143 for Phnom Penh city, Cambodia.
-     * @param lon - lnogitude of the location, for example, 104.935913 for Phnom Penh city, Cambodia.
+     * @param lon - longitude of the location, for example, 104.935913 for Phnom Penh city, Cambodia.
      * @param timezoneOffsetFromUtc - timezone offset from UTC. For example, if timezone is UTC+7, then it's 7.
      * @param date - the date for the solar noon
      * @return the time of the solar noon
