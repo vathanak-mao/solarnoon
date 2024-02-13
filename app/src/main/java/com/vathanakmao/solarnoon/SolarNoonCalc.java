@@ -6,21 +6,25 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 
 /**
- * <p>Solar noon calculator.<br/><br/></p>
+ * <p>Solar noon calculator.<br/></p>
  *
- * <p>
- *     - <b>Beginning of Julian period</b> is January 1, 4713 BC (Before Christ).<br/>
- *     - <b>Epoch</b> means a specific period of time, an era, or a stage.
- *      <b>Epoch J2000</b> is a standard point in time used as a reference in astronomy.
- *      Epoch J2000 is standard point in time used as a reference in Astronomy,
- *      which is expressed as 2000 January 1, 11:58:55.816 UTC.
- * </p>
+ * <lu>
+ *     <li>
+ *          <b>Beginning of Julian period</b> is January 1, 4713 BC (Before Christ).<br/>
+ *     </li>
+ *     <li>
+ *          <b>Epoch</b> means a specific period of time, an era, or a stage.
+ *     </li>
+ *     <li>
+ *          <b>Epoch J2000</b> is a standard point in time used as a reference in astronomy,
+ *          which is expressed as 2000 January 1, 11:58:55.816 UTC.
+ *      </li>
+ * </lu>
  */
 public class SolarNoonCalc {
     /**
      * The number of days from the beginning of Julian period to epoch J2000.
-     * Epoch J2000 is standard point in time used in Astronomy, which is expressed
-     * as 2000 January 1, 11:58:55.816 UTC.
+     * Check this class's definition for what epoch j2000 is.
      */
     public static final double JULIANDATE_FOR_EPOCHJ2000 = 2451545.0;
 
