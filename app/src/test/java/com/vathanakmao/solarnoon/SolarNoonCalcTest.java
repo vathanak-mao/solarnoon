@@ -12,7 +12,8 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 
 /**
- * All the test data is in the excel file downloaded from https://gml.noaa.gov/grad/solcalc/.
+ * All the test data is in the excel file named NOAA_Solar_Calculations_day.ods,
+ * downloaded from https://gml.noaa.gov/grad/solcalc/.
  */
 public class SolarNoonCalcTest {
     public SolarNoonCalc calc = SolarNoonCalc.getInstance();
@@ -21,6 +22,12 @@ public class SolarNoonCalcTest {
     public void testGetTime() {
         LocalTime solarNoonTime = calc.getTime(40L, -105L, 7, new GregorianCalendar());
         assertTrue(solarNoonTime.getHour() == 12 && solarNoonTime.getMinute() == 3);
+    }
+
+    @Test
+    public void testGetEccentEarthOrbit() {
+        final GregorianCalendar february122024 = new GregorianCalendar(2024, 1, 12);
+        assertEquals(0.02, calc.getEccentEarthOrbit(february122024, 7), 0.01);
     }
 
     @Test

@@ -70,7 +70,22 @@ public class SolarNoonCalc {
     private double getEquationOfTime(GregorianCalendar date, double timezoneOffsetFromUtc) { // V column
         final double geomMeanLongSun = getGeomMeanLongSun(date, timezoneOffsetFromUtc);
         final double geomMeanAnomSun = getGeomMeanAnomSun(date, timezoneOffsetFromUtc);
-        return 4 * Math.toDegrees(getVarY(date, timezoneOffsetFromUtc) * Math.sin(2 * Math.toRadians(geomMeanLongSun)) -2 * getEccentEarthOrbit() * Math.sin(Math.toRadians(geomMeanAnomSun)) + 4 * getEccentEarthOrbit() * getVarY(date, timezoneOffsetFromUtc) * Math.sin(Math.toRadians(geomMeanAnomSun)) * Math.cos(2 * Math.toRadians(geomMeanLongSun)) - 0.5 * getVarY(date, timezoneOffsetFromUtc) * getVarY(date, timezoneOffsetFromUtc) * Math.sin(4 * Math.toRadians(geomMeanAnomSun)) - 1.25 * getEccentEarthOrbit() * getEccentEarthOrbit() * Math.sin(2 * Math.toRadians(geomMeanAnomSun)));
+        final double radiansOfGeomMeanLongSun = Math.toRadians(geomMeanLongSun);
+        final double radiansOfGeomMeanAnomSun= Math.toRadians(geomMeanAnomSun);
+        final double eccentEarthOrbit = getEccentEarthOrbit(date, timezoneOffsetFromUtc);
+        final double varY = getVarY(date, timezoneOffsetFromUtc);
+
+        return 4 * Math.toDegrees(
+                varY * Math.sin(2 * radiansOfGeomMeanLongSun)
+                - 2
+                * eccentEarthOrbit * Math.sin(radiansOfGeomMeanAnomSun)
+                + 4
+                * eccentEarthOrbit * varY * Math.sin(radiansOfGeomMeanAnomSun) * Math.cos(2 * radiansOfGeomMeanLongSun)
+                - 0.5
+                * varY * varY * Math.sin(4 * radiansOfGeomMeanAnomSun)
+                - 1.25
+                * eccentEarthOrbit * eccentEarthOrbit * Math.sin(2 * radiansOfGeomMeanAnomSun)
+                );
     }
 
     private double getVarY(GregorianCalendar date, double timezoneOffsetFromUtc) { // U column
@@ -141,16 +156,17 @@ public class SolarNoonCalc {
         return 0.1F/24;
     }
 
-    private double getGeomMeanLongSun(GregorianCalendar date, double timezoneOffsetFromUtc) { // column I
+    public double getGeomMeanLongSun(GregorianCalendar date, double timezoneOffsetFromUtc) { // column I
         final double julianCentury = getJulianCentury(date, timezoneOffsetFromUtc);
         return (280.46646 + julianCentury * (36000.76983 + julianCentury * 0.0003032)) % 360;
     }
 
-    private long getEccentEarthOrbit() {
-        throw new UnsupportedOperationException();
+    public double getEccentEarthOrbit(GregorianCalendar date, double timezoneOffsetFromUtc) {
+        final double julianCentury = getJulianCentury(date, timezoneOffsetFromUtc);
+        return 0.016708634 - julianCentury * (0.000042037 + 0.0000001267 * julianCentury);
     }
 
-    private double getGeomMeanAnomSun(GregorianCalendar date, double timezoneOffsetFromUtc) {
+    public double getGeomMeanAnomSun(GregorianCalendar date, double timezoneOffsetFromUtc) {
         final double julianCentury = getJulianCentury(date, timezoneOffsetFromUtc);
         return 357.52911 + julianCentury * (35999.05029 - 0.0001537 * julianCentury);
     }
