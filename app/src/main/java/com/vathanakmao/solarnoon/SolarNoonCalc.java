@@ -89,7 +89,8 @@ public class SolarNoonCalc {
     }
 
     public double getVarY(GregorianCalendar date, double timezoneOffsetFromUtc) { // U column
-        return Math.tan(Math.toRadians(getObliqCorrInDegrees(date, timezoneOffsetFromUtc)/2)) * Math.tan(Math.toRadians(getObliqCorrInDegrees(date, timezoneOffsetFromUtc)/2));
+        final double obliqCorrInDegrees = getObliqCorrInDegrees(date, timezoneOffsetFromUtc);
+        return Math.tan( Math.toRadians(obliqCorrInDegrees/2) ) * Math.tan( Math.toRadians(obliqCorrInDegrees/2) );
     }
 
     public double getObliqCorrInDegrees(GregorianCalendar date, double timezoneOffsetFromUtc) { // R column

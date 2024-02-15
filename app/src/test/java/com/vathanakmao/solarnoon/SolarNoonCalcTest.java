@@ -25,6 +25,12 @@ public class SolarNoonCalcTest {
     }
 
     @Test
+    public void testGetVarY() {
+        final GregorianCalendar february122024 = new GregorianCalendar(2024, 1, 12);
+        assertEquals(0.04, calc.getVarY(february122024, 7), 0.01);
+    }
+
+    @Test
     public void testGetObliqCorrInDegrees() {
         final GregorianCalendar february122024 = new GregorianCalendar(2024, 1, 12);
         assertEquals(23.44, calc.getObliqCorrInDegrees(february122024, 7), 0.01);
