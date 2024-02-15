@@ -31,6 +31,12 @@ public class SolarNoonCalcTest {
     }
 
     @Test
+    public void testGetGeomMeanAnomSun() {
+        final GregorianCalendar february122024 = new GregorianCalendar(2024, 1, 12);
+        assertEquals(9037.92, calc.getGeomMeanAnomSun(february122024, 7), 0.01);
+    }
+
+    @Test
     public void testGetEccentEarthOrbit() {
         final GregorianCalendar february122024 = new GregorianCalendar(2024, 1, 12);
         assertEquals(0.02, calc.getEccentEarthOrbit(february122024, 7), 0.01);
