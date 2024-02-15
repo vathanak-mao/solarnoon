@@ -25,6 +25,18 @@ public class SolarNoonCalcTest {
     }
 
     @Test
+    public void testGetObliqCorrInDegrees() {
+        final GregorianCalendar february122024 = new GregorianCalendar(2024, 1, 12);
+        assertEquals(23.44, calc.getObliqCorrInDegrees(february122024, 7), 0.01);
+    }
+
+    @Test
+    public void testGetMeanObliqEclipticInDegrees() {
+        final GregorianCalendar february122024 = new GregorianCalendar(2024, 1, 12);
+        assertEquals(23.44, calc.getMeanObliqEclipticInDegrees(february122024, 7), 0.01);
+    }
+
+    @Test
     public void testGetGeomMeanLongSun() {
         final GregorianCalendar february122024 = new GregorianCalendar(2024, 1, 12);
         assertEquals(321.27, calc.getGeomMeanLongSun(february122024, 7), 0.01);

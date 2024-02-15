@@ -88,15 +88,15 @@ public class SolarNoonCalc {
                 );
     }
 
-    private double getVarY(GregorianCalendar date, double timezoneOffsetFromUtc) { // U column
+    public double getVarY(GregorianCalendar date, double timezoneOffsetFromUtc) { // U column
         return Math.tan(Math.toRadians(getObliqCorrInDegrees(date, timezoneOffsetFromUtc)/2)) * Math.tan(Math.toRadians(getObliqCorrInDegrees(date, timezoneOffsetFromUtc)/2));
     }
 
-    private double getObliqCorrInDegrees(GregorianCalendar date, double timezoneOffsetFromUtc) { // R column
+    public double getObliqCorrInDegrees(GregorianCalendar date, double timezoneOffsetFromUtc) { // R column
         return getMeanObliqEclipticInDegrees(date, timezoneOffsetFromUtc) + 0.00256 * Math.cos(Math.toRadians(125.04 - 1934.136 * getJulianCentury(date, timezoneOffsetFromUtc)));
     }
 
-    private double getMeanObliqEclipticInDegrees(GregorianCalendar date, double timezoneOffsetFromUtc) { // Q column
+    public double getMeanObliqEclipticInDegrees(GregorianCalendar date, double timezoneOffsetFromUtc) { // Q column
         final double julianCentury = getJulianCentury(date, timezoneOffsetFromUtc);
         return 23 + (26 + ((21.448 - julianCentury * (46.815 + julianCentury * (0.00059 - julianCentury * 0.001813)))) / 60) / 60;
     }
