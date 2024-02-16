@@ -1,12 +1,17 @@
 package com.vathanakmao.solarnoon;
 
+import static android.webkit.ConsoleMessage.MessageLevel.LOG;
+
+import java.text.DecimalFormat;
 import java.time.LocalTime;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
 /**
- * <p>Solar noon calculator.<br/></p>
+ * <b>Solar noon calculator.</b><br/>
+ * All the calculations here are based on the Excel file NOAA_Solar_Calculations_day.ods,
+ * which can be downloaded from <a href>https://gml.noaa.gov/grad/solcalc/calcdetails.html</a>.
  *
  * <lu>
  *     <li>
@@ -67,7 +72,7 @@ public class SolarNoonCalc {
         return result;
     }
 
-    private double getEquationOfTime(GregorianCalendar date, double timezoneOffsetFromUtc) { // V column
+    public double getEquationOfTime(GregorianCalendar date, double timezoneOffsetFromUtc) { // V column
         final double geomMeanLongSun = getGeomMeanLongSun(date, timezoneOffsetFromUtc);
         final double geomMeanAnomSun = getGeomMeanAnomSun(date, timezoneOffsetFromUtc);
         final double radiansOfGeomMeanLongSun = Math.toRadians(geomMeanLongSun);
@@ -153,8 +158,27 @@ public class SolarNoonCalc {
      * Then, the number of day past is 0.00416 (0.1/24) day.
      * @return
      */
-    public float getTimePastLocalMidnight() {
-        return 0.1F/24;
+    public double getTimePastLocalMidnight() {
+        // SIGNIFICANT DIGITS: The number 0.0012345 has 5 significant digits,
+        // and the number 1.0012345 has 8 significant digits.
+
+        // The result is 0.004166666666666667,
+        // which has 16 significant digits (counts from digit 4 to 7)
+        // However, the result in Excel is 0.00416666666666667,
+        // which has 15 significant digits (counts from digit 4 to 7)
+        final double result = 0.1D/24;
+
+        // The result here should be the same as in the Excel file,
+        // which has 15 significant digits,
+        // so any calculations based on this method yield the exact same results as in the Excel file.
+        DecimalFormat df = new DecimalFormat("#.#################");
+        final String roundedResult = df.format(result);
+        try {
+            return Double.valueOf(roundedResult);
+        } catch (NullPointerException ex) {
+            ex.printStackTrace();
+            return result;
+        }
     }
 
     public double getGeomMeanLongSun(GregorianCalendar date, double timezoneOffsetFromUtc) { // column I

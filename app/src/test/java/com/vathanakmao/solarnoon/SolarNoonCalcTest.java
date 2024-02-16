@@ -25,9 +25,15 @@ public class SolarNoonCalcTest {
     }
 
     @Test
+    public void testGetEquationOfTime() {
+        final GregorianCalendar february122024 = new GregorianCalendar(2024, 1, 12);
+        assertEquals(-14.23, calc.getEquationOfTime(february122024, 7), 0.01);
+    }
+
+    @Test
     public void testGetVarY() {
         final GregorianCalendar february122024 = new GregorianCalendar(2024, 1, 12);
-        assertEquals(0.04, calc.getVarY(february122024, 7), 0.01);
+        assertEquals(0.04, calc.getVarY(february122024, 7), 0.000001);
     }
 
     @Test
@@ -70,7 +76,7 @@ public class SolarNoonCalcTest {
     public void testGetJulianDay() {
         GregorianCalendar feb122024 = new GregorianCalendar(2024, 1, 12);
         int timezoneOffsetFromUtc = 7;
-        assertEquals(2460352.21, calc.getJulianDay(feb122024, timezoneOffsetFromUtc), 0.01);
+        assertEquals(2460352.2125, calc.getJulianDay(feb122024, timezoneOffsetFromUtc), 0.00001);
     }
 
     @Test
@@ -81,7 +87,7 @@ public class SolarNoonCalcTest {
 
     @Test
     public void testGetTimePastLocalMidnight() {
-        assertEquals(0.00416666666666667, calc.getTimePastLocalMidnight(),0.000000001);
+        assertEquals(0.00416666666666667, calc.getTimePastLocalMidnight(),0.0000000000000000001);
     }
 
     @Test
