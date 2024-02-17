@@ -78,7 +78,7 @@ public class SolarNoonCalcTest {
     public void testGetJulianDay() {
         GregorianCalendar feb122024 = new GregorianCalendar(2024, 1, 12);
         int timezoneOffsetFromUtc = 7;
-        assertEquals(2460352.2125, calc.getJulianDay(feb122024, timezoneOffsetFromUtc), 0.00001);
+        assertEquals(2460352.2125, calc.getJulianDay(feb122024, timezoneOffsetFromUtc), ASSERTEQUAlS_DOUBLE_DELTA);
     }
 
     @Test

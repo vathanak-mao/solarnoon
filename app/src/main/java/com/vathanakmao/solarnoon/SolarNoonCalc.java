@@ -128,7 +128,8 @@ public class SolarNoonCalc {
      */
     public double getJulianDay(GregorianCalendar date, double timezoneOffsetFromUtc) { // F column
         // timezoneOffsetFromUtc must be double to get more digits in fractional part of a decimal number (a floating-point number in programming).
-        return JULIANDATE_FOR_1900DEC30 + getNumOfDaysSince1900(date) + getTimePastLocalMidnight() - timezoneOffsetFromUtc / 24;
+        final double result = JULIANDATE_FOR_1900DEC30 + getNumOfDaysSince1900(date) + getTimePastLocalMidnight() - timezoneOffsetFromUtc / 24;
+        return MathUtil.to15SignificantDigits(result);
     }
 
     /**
