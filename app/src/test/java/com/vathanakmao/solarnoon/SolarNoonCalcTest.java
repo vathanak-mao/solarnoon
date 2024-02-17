@@ -16,6 +16,8 @@ import java.util.GregorianCalendar;
  * downloaded from https://gml.noaa.gov/grad/solcalc/.
  */
 public class SolarNoonCalcTest {
+    public static final double ASSERTEQUAlS_DOUBLE_DELTA = 0.00000000000000001;
+
     public SolarNoonCalc calc = SolarNoonCalc.getInstance();
 
     @Test
@@ -63,13 +65,13 @@ public class SolarNoonCalcTest {
     @Test
     public void testGetEccentEarthOrbit() {
         final GregorianCalendar february122024 = new GregorianCalendar(2024, 1, 12);
-        assertEquals(0.02, calc.getEccentEarthOrbit(february122024, 7), 0.01);
+        assertEquals(0.0166984903214056, calc.getEccentEarthOrbit(february122024, 7), ASSERTEQUAlS_DOUBLE_DELTA);
     }
 
     @Test
     public void testGetJulianCentury() {
         final GregorianCalendar february122024 = new GregorianCalendar(2024, 1, 12);
-        assertEquals(0.24112834, calc.getJulianCentury(february122024, 7), 0.00000001);
+        assertEquals(0.24112834, calc.getJulianCentury(february122024, 7), ASSERTEQUAlS_DOUBLE_DELTA);
     }
 
     @Test
@@ -87,14 +89,12 @@ public class SolarNoonCalcTest {
 
     @Test
     public void testGetTimePastLocalMidnight() {
-        assertEquals(0.00416666666666667, calc.getTimePastLocalMidnight(),0.0000000000000000001);
+        assertEquals(0.00416666666666667, calc.getTimePastLocalMidnight(), ASSERTEQUAlS_DOUBLE_DELTA);
     }
 
     @Test
     public void test7DividedBy24() {
-        assertEquals(0, Double.valueOf(7 / 24), 0.00000000001);
-        assertNotEquals(0.291666666666667, 7F / 24, 0.000000000001);
-        assertEquals(0.291666666666667, 7D / 24, 0.000000000001);
-
+        assertEquals(0, Double.valueOf(7 / 24), ASSERTEQUAlS_DOUBLE_DELTA);
+        assertEquals(0.291666666666667, MathUtil.to15SignificantDigits(7D / 24), ASSERTEQUAlS_DOUBLE_DELTA);
     }
 }

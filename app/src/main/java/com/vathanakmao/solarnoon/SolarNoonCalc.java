@@ -171,24 +171,19 @@ public class SolarNoonCalc {
         // The result here should be the same as in the Excel file,
         // which has 15 significant digits,
         // so any calculations based on this method yield the exact same results as in the Excel file.
-        DecimalFormat df = new DecimalFormat("#.#################");
-        final String roundedResult = df.format(result);
-        try {
-            return Double.valueOf(roundedResult);
-        } catch (NullPointerException ex) {
-            ex.printStackTrace();
-            return result;
-        }
+        return MathUtil.to15SignificantDigits(result);
     }
 
     public double getGeomMeanLongSun(GregorianCalendar date, double timezoneOffsetFromUtc) { // column I
         final double julianCentury = getJulianCentury(date, timezoneOffsetFromUtc);
-        return (280.46646 + julianCentury * (36000.76983 + julianCentury * 0.0003032)) % 360;
+        final double result = (280.46646 + julianCentury * (36000.76983 + julianCentury * 0.0003032)) % 360;
+        return MathUtil.to15SignificantDigits(result);
     }
 
     public double getEccentEarthOrbit(GregorianCalendar date, double timezoneOffsetFromUtc) {
         final double julianCentury = getJulianCentury(date, timezoneOffsetFromUtc);
-        return 0.016708634 - julianCentury * (0.000042037 + 0.0000001267 * julianCentury);
+        final double result = 0.016708634 - julianCentury * (0.000042037 + 0.0000001267 * julianCentury);
+        return MathUtil.to15SignificantDigits(result);
     }
 
     public double getGeomMeanAnomSun(GregorianCalendar date, double timezoneOffsetFromUtc) {
