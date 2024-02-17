@@ -116,7 +116,8 @@ public class SolarNoonCalc {
      * @return
      */
     public double getJulianCentury(GregorianCalendar date, double timezoneOffsetFromUtc) { // G column
-        return (getJulianDay(date, timezoneOffsetFromUtc) - JULIANDATE_FOR_EPOCHJ2000) / JULIAN_DAYS_PER_CENTURY;
+        final double result = (getJulianDay(date, timezoneOffsetFromUtc) - JULIANDATE_FOR_EPOCHJ2000) / JULIAN_DAYS_PER_CENTURY;
+        return MathUtil.to8DecimalPlaces(result); // it was set in the Excel file
     }
 
     /**

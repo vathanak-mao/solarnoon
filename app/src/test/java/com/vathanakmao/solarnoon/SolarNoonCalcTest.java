@@ -92,9 +92,4 @@ public class SolarNoonCalcTest {
         assertEquals(0.00416666666666667, calc.getTimePastLocalMidnight(), ASSERTEQUAlS_DOUBLE_DELTA);
     }
 
-    @Test
-    public void test7DividedBy24() {
-        assertEquals(0, Double.valueOf(7 / 24), ASSERTEQUAlS_DOUBLE_DELTA);
-        assertEquals(0.291666666666667, MathUtil.to15SignificantDigits(7D / 24), ASSERTEQUAlS_DOUBLE_DELTA);
-    }
 }

@@ -22,10 +22,20 @@ public class MathUtil {
      * @return
      */
     public static double to15SignificantDigits(double num) {
-        final String result = String.format(Locale.US, "%."+15+"G", num);
+        final String result = String.format(Locale.US, "%.15G", num);
         try {
             return Double.valueOf(result);
-        } catch (NullPointerException ex) {
+        } catch (NumberFormatException ex) {
+            ex.printStackTrace();
+            return num;
+        }
+    }
+
+    public static double to8DecimalPlaces(double num) {
+        final String result = String.format(Locale.US, "%.8f", num);
+        try {
+            return Double.valueOf(result);
+        } catch (NumberFormatException ex) {
             ex.printStackTrace();
             return num;
         }
