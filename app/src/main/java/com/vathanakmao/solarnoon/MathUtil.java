@@ -9,7 +9,7 @@ import java.util.Locale;
 public class MathUtil {
 
     /**
-     * Round the given number to 15 significant digits.
+     * Round the given number to 15 significant digits (figures).
      * As the calculations here are based on the Excel file,
      * which allows only 15 significant digits,
      * any results must be rounded.
@@ -32,12 +32,16 @@ public class MathUtil {
     }
 
     public static double to8DecimalPlaces(double num) {
-        final String result = String.format(Locale.US, "%.8f", num);
+        return round(num, 8);
+    }
+
+    public static double round(double number, int n) {
+        final String result = String.format(Locale.US, "%."+n+"f", number);
         try {
             return Double.valueOf(result);
         } catch (NumberFormatException ex) {
             ex.printStackTrace();
-            return num;
+            return number;
         }
     }
 }

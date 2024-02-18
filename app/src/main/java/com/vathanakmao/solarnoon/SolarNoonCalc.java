@@ -43,6 +43,9 @@ public class SolarNoonCalc {
      */
     public static final double JULIAN_DAYS_PER_CENTURY = 36525;
 
+    public static final double TIMEPASTLOCALMIDNIGHT_00_06_00 = 0.1D/24;
+    public static final double TIMEPASTLOCALMIDNIGHT_00_12_00 = TIMEPASTLOCALMIDNIGHT_00_06_00 + 0.1D/24;
+
     private static SolarNoonCalc instance;
 
     protected SolarNoonCalc() {}
@@ -108,7 +111,11 @@ public class SolarNoonCalc {
     }
 
     public double getGeomMeanLongSun(GregorianCalendar date, double timezoneOffsetFromUtc) { // column I
-        final double julianCentury = getJulianCentury(date, timezoneOffsetFromUtc);
+        return getGeomMeanLongSun(date, timezoneOffsetFromUtc, TIMEPASTLOCALMIDNIGHT_00_06_00);
+    }
+
+    public double getGeomMeanLongSun(GregorianCalendar date, double timezoneOffsetFromUtc, double timePastLocalMidnight) { // column I
+        final double julianCentury = getJulianCentury(date, timezoneOffsetFromUtc, timePastLocalMidnight);
         final double result = (280.46646 + julianCentury * (36000.76983 + julianCentury * 0.0003032)) % 360;
         return MathUtil.to15SignificantDigits(result);
     }
@@ -125,7 +132,11 @@ public class SolarNoonCalc {
     }
 
     public double getJulianCentury(GregorianCalendar date, double timezoneOffsetFromUtc) { // G column
-        return getJulianCentury(date, timezoneOffsetFromUtc, false);
+        return getJulianCentury(date, timezoneOffsetFromUtc, TIMEPASTLOCALMIDNIGHT_00_06_00, false);
+    }
+
+    public double getJulianCentury(GregorianCalendar date, double timezoneOffsetFromUtc, double timePastLocalMidnight) { // G column
+        return getJulianCentury(date, timezoneOffsetFromUtc, timePastLocalMidnight, false);
     }
 
     /**
@@ -138,8 +149,12 @@ public class SolarNoonCalc {
      * @return
      */
     public double getJulianCentury(GregorianCalendar date, double timezoneOffsetFromUtc, boolean to8DecimalPlaces) { // G column
+        return getJulianCentury(date, timezoneOffsetFromUtc, TIMEPASTLOCALMIDNIGHT_00_06_00, to8DecimalPlaces);
+    }
+
+    public double getJulianCentury(GregorianCalendar date, double timezoneOffsetFromUtc, double timePastLocalMidnight, boolean to8DecimalPlaces) { // G column
         final boolean to15SignificantDigits = false; // need all precisions in calculation
-        final double result = (getJulianDay(date, timezoneOffsetFromUtc, to15SignificantDigits) - JULIANDATE_FOR_EPOCHJ2000) / JULIAN_DAYS_PER_CENTURY;
+        final double result = (getJulianDay(date, timezoneOffsetFromUtc, timePastLocalMidnight) - JULIANDATE_FOR_EPOCHJ2000) / JULIAN_DAYS_PER_CENTURY;
 
         // In the Excel file, each cell in the Julian Century column was formatted to display
         // its value only with 8 decimal places (e.g. 0.24112834).
@@ -149,9 +164,9 @@ public class SolarNoonCalc {
         return to8DecimalPlaces ? MathUtil.to8DecimalPlaces(result) : result;
     }
 
-    public double getJulianDay(GregorianCalendar date, double timezoneOffsetFromUtc) { // F column
-        return getJulianDay(date, timezoneOffsetFromUtc, true);
-    }
+//    public double getJulianDay(GregorianCalendar date, double timezoneOffsetFromUtc) { // F column
+//        return getJulianDay(date, timezoneOffsetFromUtc, false);
+//    }
 
     /**
      * Get Julian day number, which counts the number of days since noon on January 1, 4713 BC.
@@ -161,17 +176,22 @@ public class SolarNoonCalc {
      * @param to15SignificantDigits
      * @return
      */
-    public double getJulianDay(GregorianCalendar date, double timezoneOffsetFromUtc, boolean to15SignificantDigits) { // F column
+    public double getJulianDay(GregorianCalendar date, double timezoneOffsetFromUtc) { // F column
+        return getJulianDay(date, timezoneOffsetFromUtc, TIMEPASTLOCALMIDNIGHT_00_06_00);
+    }
+
+    public double getJulianDay(GregorianCalendar date, double timezoneOffsetFromUtc, double timePastLocalMidnight) { // F column
         // timezoneOffsetFromUtc must be double to get more digits in fractional part of a decimal number (a floating-point number in programming).
-        final double result = JULIANDATE_FOR_1900DEC30 + getNumOfDaysSince1900(date) + getTimePastLocalMidnight() - timezoneOffsetFromUtc / 24;
+        final double result = JULIANDATE_FOR_1900DEC30 + getNumOfDaysSince1900(date) + timePastLocalMidnight - timezoneOffsetFromUtc / 24;
 
         // In the Excel file, the value of each cell in Julian Day column
         // is formatted to display with only 2 decimal places (2 digits to the right of decimal point).
-        // But, its absolute with all available decimal points
-        // is used instead in the calculation of another cell referencing it.
+        // But, its value with all available decimal points
+        // is used instead by the calculation of another cell referencing it.
         // For example, its value displayed in a cell is 2460352.21 but
         // 2460352.2125 is used instead in the calculation of a cell in Julian Century column.
-        return to15SignificantDigits ? MathUtil.to15SignificantDigits(result) : result;
+//        return to15SignificantDigits ? MathUtil.to15SignificantDigits(result) : result;
+        return result;
     }
 
     /**
@@ -201,20 +221,20 @@ public class SolarNoonCalc {
      * Then, the number of day past is 0.00416 (0.1/24) day.
      * @return
      */
-    public double getTimePastLocalMidnight() {
-        // SIGNIFICANT DIGITS: The number 0.0012345 has 5 significant digits,
-        // and the number 1.0012345 has 8 significant digits.
-
-        // The result is 0.004166666666666667,
-        // which has 16 significant digits (counts from digit 4 to 7)
-        // However, the result in Excel is 0.00416666666666667,
-        // which has 15 significant digits (counts from digit 4 to 7)
-        final double result = 0.1D/24;
-
-        // The result here should be the same as in the Excel file,
-        // which has 15 significant digits,
-        // so any calculations based on this method yield the exact same results as in the Excel file.
-        return MathUtil.to15SignificantDigits(result);
-    }
+//    public double getTimePastLocalMidnight() {
+//        // SIGNIFICANT DIGITS: The number 0.0012345 has 5 significant digits,
+//        // and the number 1.0012345 has 8 significant digits.
+//
+//        // The result is 0.004166666666666667,
+//        // which has 16 significant digits (counts from digit 4 to 7)
+//        // However, the result in Excel is 0.00416666666666667,
+//        // which has 15 significant digits (counts from digit 4 to 7)
+//        final double result = 0.1D/24;
+//
+//        // The result here should be the same as in the Excel file,
+//        // which has 15 significant digits,
+//        // so any calculations based on this method yield the exact same results as in the Excel file.
+//        return MathUtil.to15SignificantDigits(result);
+//    }
 
 }

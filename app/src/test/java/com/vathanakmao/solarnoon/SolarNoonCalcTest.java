@@ -54,6 +54,7 @@ public class SolarNoonCalcTest {
     public void testGetGeomMeanLongSun() {
         final GregorianCalendar february122024 = new GregorianCalendar(2024, 1, 12);
         assertEquals(321.272228660055, calc.getGeomMeanLongSun(february122024, 7), ASSERTEQUAlS_DOUBLE_DELTA);
+        assertEquals(321.276335523815, calc.getGeomMeanLongSun(february122024, 7, SolarNoonCalc.TIMEPASTLOCALMIDNIGHT_00_12_00), ASSERTEQUAlS_DOUBLE_DELTA);
     }
 
     @Test
@@ -87,8 +88,15 @@ public class SolarNoonCalcTest {
         GregorianCalendar feb122024 = new GregorianCalendar(2024, 1, 12);
         int timezoneOffsetFromUtc = 7;
 
-        assertEquals(2460352.2125, calc.getJulianDay(feb122024, timezoneOffsetFromUtc), ASSERTEQUAlS_DOUBLE_DELTA);
-        assertEquals(2460352.2125, calc.getJulianDay(feb122024, timezoneOffsetFromUtc, true), ASSERTEQUAlS_DOUBLE_DELTA);
+        // Time Past Local Midnight: 00:06:00
+        assertEquals(2460352.2125000004, calc.getJulianDay(feb122024, timezoneOffsetFromUtc), ASSERTEQUAlS_DOUBLE_DELTA);
+        assertEquals(2460352.2125, MathUtil.to15SignificantDigits(calc.getJulianDay(feb122024, timezoneOffsetFromUtc)), ASSERTEQUAlS_DOUBLE_DELTA);
+        assertEquals(2460352.21, MathUtil.round(calc.getJulianDay(feb122024, timezoneOffsetFromUtc), 2), ASSERTEQUAlS_DOUBLE_DELTA);
+
+        // Time Past Local Midnight: 00:12:00
+        assertEquals(2460352.216666667, calc.getJulianDay(feb122024, timezoneOffsetFromUtc, SolarNoonCalc.TIMEPASTLOCALMIDNIGHT_00_12_00), ASSERTEQUAlS_DOUBLE_DELTA); // the scale of 2
+        assertEquals(2460352.21666667, MathUtil.to15SignificantDigits(calc.getJulianDay(feb122024, timezoneOffsetFromUtc, SolarNoonCalc.TIMEPASTLOCALMIDNIGHT_00_12_00)), ASSERTEQUAlS_DOUBLE_DELTA);
+        assertEquals(2460352.22, MathUtil.round(calc.getJulianDay(feb122024, timezoneOffsetFromUtc, SolarNoonCalc.TIMEPASTLOCALMIDNIGHT_00_12_00), 2), ASSERTEQUAlS_DOUBLE_DELTA); // the scale of 2
     }
 
     @Test
@@ -99,7 +107,8 @@ public class SolarNoonCalcTest {
 
     @Test
     public void testGetTimePastLocalMidnight() {
-        assertEquals(0.00416666666666667, calc.getTimePastLocalMidnight(), ASSERTEQUAlS_DOUBLE_DELTA);
+        assertEquals(0.00416666666666667, MathUtil.to15SignificantDigits(SolarNoonCalc.TIMEPASTLOCALMIDNIGHT_00_06_00), ASSERTEQUAlS_DOUBLE_DELTA);
+        assertEquals(0.00833333333333333, MathUtil.to15SignificantDigits(SolarNoonCalc.TIMEPASTLOCALMIDNIGHT_00_12_00), ASSERTEQUAlS_DOUBLE_DELTA);
     }
 
 }
