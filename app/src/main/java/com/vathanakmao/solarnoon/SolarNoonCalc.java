@@ -45,6 +45,7 @@ public class SolarNoonCalc {
 
     public static final double TIMEPASTLOCALMIDNIGHT_00_06_00 = 0.1D/24;
     public static final double TIMEPASTLOCALMIDNIGHT_00_12_00 = TIMEPASTLOCALMIDNIGHT_00_06_00 + 0.1D/24;
+    public static final double TIMEPASTLOCALMIDNIGHT_00_18_00 = TIMEPASTLOCALMIDNIGHT_00_12_00 + 0.1D/24;
 
     private static SolarNoonCalc instance;
 
@@ -65,23 +66,22 @@ public class SolarNoonCalc {
      * @param lon - longitude of the location, for example, 104.935913 for Phnom Penh city, Cambodia.
      * @param timezoneOffsetFromUtc - timezone offset from UTC. For example, if timezone is UTC+7, then it's 7.
      * @param date - the date for the solar noon
+     * @param timePastLocalMidnight
      * @return the time of the solar noon
      */
-    public LocalTime getTime(long lat, long lon, double timezoneOffsetFromUtc, GregorianCalendar date) {
+    public LocalTime getTime(long lat, long lon, double timezoneOffsetFromUtc, GregorianCalendar date, double timePastLocalMidnight) {
         LocalTime result = null;
-
-        double solarTime = (720 - 4 * lon - getEquationOfTime(date, timezoneOffsetFromUtc) + timezoneOffsetFromUtc * 60) / 1440;
-
+        double solarTime = (720 - 4 * lon - getEquationOfTime(date, timezoneOffsetFromUtc, timePastLocalMidnight) + timezoneOffsetFromUtc * 60) / 1440;
         return result;
     }
 
-    public double getEquationOfTime(GregorianCalendar date, double timezoneOffsetFromUtc) { // V column
-        final double geomMeanLongSun = getGeomMeanLongSun(date, timezoneOffsetFromUtc);
-        final double geomMeanAnomSun = getGeomMeanAnomSun(date, timezoneOffsetFromUtc);
-        final double radiansOfGeomMeanLongSun = Math.toRadians(geomMeanLongSun);
-        final double radiansOfGeomMeanAnomSun= Math.toRadians(geomMeanAnomSun);
-        final double eccentEarthOrbit = getEccentEarthOrbit(date, timezoneOffsetFromUtc);
-        final double varY = getVarY(date, timezoneOffsetFromUtc);
+    public double getEquationOfTime(GregorianCalendar date, double timezoneOffsetFromUtc, double timePastLocalMidnight) { // V column
+        final double geomMeanLongSun = MathUtil.to15SignificantDigits(getGeomMeanLongSun(date, timezoneOffsetFromUtc, timePastLocalMidnight));
+        final double geomMeanAnomSun = MathUtil.to15SignificantDigits(getGeomMeanAnomSun(date, timezoneOffsetFromUtc, timePastLocalMidnight));
+        final double radiansOfGeomMeanLongSun = MathUtil.to15SignificantDigits(Math.toRadians(geomMeanLongSun));
+        final double radiansOfGeomMeanAnomSun= MathUtil.to15SignificantDigits(Math.toRadians(geomMeanAnomSun));
+        final double eccentEarthOrbit = MathUtil.to15SignificantDigits(getEccentEarthOrbit(date, timezoneOffsetFromUtc, timePastLocalMidnight));
+        final double varY = MathUtil.round(getVarY(date, timezoneOffsetFromUtc, timePastLocalMidnight), 2);
 
         return 4 * Math.toDegrees(
                 varY * Math.sin(2 * radiansOfGeomMeanLongSun)
@@ -96,77 +96,54 @@ public class SolarNoonCalc {
                 );
     }
 
-    public double getVarY(GregorianCalendar date, double timezoneOffsetFromUtc) { // U column
-        final double obliqCorrInDegrees = getObliqCorrInDegrees(date, timezoneOffsetFromUtc);
+    public double getVarY(GregorianCalendar date, double timezoneOffsetFromUtc, double timePastLocalMidnight) { // U column
+        final double obliqCorrInDegrees = MathUtil.to15SignificantDigits(getObliqCorrInDegrees(date, timezoneOffsetFromUtc, timePastLocalMidnight));
         return Math.tan( Math.toRadians(obliqCorrInDegrees/2) ) * Math.tan( Math.toRadians(obliqCorrInDegrees/2) );
     }
 
-    public double getObliqCorrInDegrees(GregorianCalendar date, double timezoneOffsetFromUtc) { // R column
-        return getMeanObliqEclipticInDegrees(date, timezoneOffsetFromUtc) + 0.00256 * Math.cos(Math.toRadians(125.04 - 1934.136 * getJulianCentury(date, timezoneOffsetFromUtc)));
+    public double getObliqCorrInDegrees(GregorianCalendar date, double timezoneOffsetFromUtc, double timePastLocalMidnight) { // R column
+        final double julianCentury = MathUtil.to15SignificantDigits(getJulianCentury(date, timezoneOffsetFromUtc, timePastLocalMidnight));
+        return getMeanObliqEclipticInDegrees(date, timezoneOffsetFromUtc, timePastLocalMidnight) + 0.00256 * Math.cos(Math.toRadians(125.04 - 1934.136 * julianCentury));
     }
 
-    public double getMeanObliqEclipticInDegrees(GregorianCalendar date, double timezoneOffsetFromUtc) { // Q column
-        final double julianCentury = getJulianCentury(date, timezoneOffsetFromUtc);
+    public double getMeanObliqEclipticInDegrees(GregorianCalendar date, double timezoneOffsetFromUtc, double timePastLocalMidnight) { // Q column
+        final double julianCentury = MathUtil.to15SignificantDigits(getJulianCentury(date, timezoneOffsetFromUtc, timePastLocalMidnight));
         return 23 + (26 + ((21.448 - julianCentury * (46.815 + julianCentury * (0.00059 - julianCentury * 0.001813)))) / 60) / 60;
     }
 
-    public double getGeomMeanLongSun(GregorianCalendar date, double timezoneOffsetFromUtc) { // column I
-        return getGeomMeanLongSun(date, timezoneOffsetFromUtc, TIMEPASTLOCALMIDNIGHT_00_06_00);
-    }
-
     public double getGeomMeanLongSun(GregorianCalendar date, double timezoneOffsetFromUtc, double timePastLocalMidnight) { // column I
-        final double julianCentury = getJulianCentury(date, timezoneOffsetFromUtc, timePastLocalMidnight);
-        final double result = (280.46646 + julianCentury * (36000.76983 + julianCentury * 0.0003032)) % 360;
-        return MathUtil.to15SignificantDigits(result);
+        final double julianCentury = MathUtil.to15SignificantDigits(getJulianCentury(date, timezoneOffsetFromUtc, timePastLocalMidnight));
+        return (280.46646 + julianCentury * (36000.76983 + julianCentury * 0.0003032)) % 360;
     }
 
-    public double getEccentEarthOrbit(GregorianCalendar date, double timezoneOffsetFromUtc) {
-        final double julianCentury = getJulianCentury(date, timezoneOffsetFromUtc);
-        final double result = 0.016708634 - julianCentury * (0.000042037 + 0.0000001267 * julianCentury);
-        return MathUtil.to15SignificantDigits(result);
+    public double getEccentEarthOrbit(GregorianCalendar date, double timezoneOffsetFromUtc, double timePastLocalMidnight) {
+        final double julianCentury = MathUtil.to15SignificantDigits(getJulianCentury(date, timezoneOffsetFromUtc, timePastLocalMidnight));
+        return 0.016708634 - julianCentury * (0.000042037 + 0.0000001267 * julianCentury);
     }
 
-    public double getGeomMeanAnomSun(GregorianCalendar date, double timezoneOffsetFromUtc) {
-        final double julianCentury = getJulianCentury(date, timezoneOffsetFromUtc);
+    public double getGeomMeanAnomSun(GregorianCalendar date, double timezoneOffsetFromUtc, double timePastLocalMidnight) {
+        final double julianCentury = MathUtil.to15SignificantDigits(getJulianCentury(date, timezoneOffsetFromUtc, timePastLocalMidnight));
         return 357.52911 + julianCentury * (35999.05029 - 0.0001537 * julianCentury);
-    }
-
-    public double getJulianCentury(GregorianCalendar date, double timezoneOffsetFromUtc) { // G column
-        return getJulianCentury(date, timezoneOffsetFromUtc, TIMEPASTLOCALMIDNIGHT_00_06_00, false);
-    }
-
-    public double getJulianCentury(GregorianCalendar date, double timezoneOffsetFromUtc, double timePastLocalMidnight) { // G column
-        return getJulianCentury(date, timezoneOffsetFromUtc, timePastLocalMidnight, false);
-    }
-
-    public double getJulianCentury(GregorianCalendar date, double timezoneOffsetFromUtc, boolean to8DecimalPlaces) { // G column
-        return getJulianCentury(date, timezoneOffsetFromUtc, TIMEPASTLOCALMIDNIGHT_00_06_00, to8DecimalPlaces);
     }
 
     /**
      * Get the number of Julian centuries since the epoch J2000.
-     * Check this class's documentation for what epoch J2000 is.
+     * Check the Java doc on this class for what epoch J2000 is.
+     *
+     * In the Excel file, each cell in the Julian Century column was formatted to display
+     * its value only with 8 decimal places (8 digits to the right of the decimal point).
+     * But, when the other columns (e.g. Geom Mean Long Sun (deg)) referenced it,
+     * its value with all available decimal places, before formatting,
+     * (e.g. 0.241128336755644) was used in the calculation instead.
+     * This yielded different results in precisions.
      *
      * @param date
      * @param timezoneOffsetFromUtc
      * @param timePastLocalMidnight
-     * @param to8DecimalPlaces
      * @return
      */
-    public double getJulianCentury(GregorianCalendar date, double timezoneOffsetFromUtc, double timePastLocalMidnight, boolean to8DecimalPlaces) { // G column
-        final boolean to15SignificantDigits = false; // need all precisions in calculation
-        final double result = (getJulianDay(date, timezoneOffsetFromUtc, timePastLocalMidnight) - JULIANDATE_FOR_EPOCHJ2000) / JULIAN_DAYS_PER_CENTURY;
-
-        // In the Excel file, each cell in the Julian Century column was formatted to display
-        // its value only with 8 decimal places (e.g. 0.24112834).
-        // But, when the other columns (e.g. Geom Mean Long Sun (deg)) referenced it,
-        // its value with all available decimal places, before formatting, (e.g. 0.241128336755644) was used in the calculation instead.
-        // This yielded different results in precisions.
-        return to8DecimalPlaces ? MathUtil.to8DecimalPlaces(result) : result;
-    }
-
-    public double getJulianDay(GregorianCalendar date, double timezoneOffsetFromUtc) { // F column
-        return getJulianDay(date, timezoneOffsetFromUtc, TIMEPASTLOCALMIDNIGHT_00_06_00);
+    public double getJulianCentury(GregorianCalendar date, double timezoneOffsetFromUtc, double timePastLocalMidnight) { // G column
+        return (getJulianDay(date, timezoneOffsetFromUtc, timePastLocalMidnight) - JULIANDATE_FOR_EPOCHJ2000) / JULIAN_DAYS_PER_CENTURY;
     }
 
     /**
@@ -221,26 +198,5 @@ public class SolarNoonCalc {
         final int EXCEL_DIFF = 2;
         return EXCEL_DIFF + numOfDaysInMillis / 1000 / 60 / 60 / 24;
     }
-
-    /**
-     * Suppose the local time past midnight is 00:06:00.
-     * Then, the number of day past is 0.00416 (0.1/24) day.
-     * @return
-     */
-//    public double getTimePastLocalMidnight() {
-//        // SIGNIFICANT DIGITS: The number 0.0012345 has 5 significant digits,
-//        // and the number 1.0012345 has 8 significant digits.
-//
-//        // The result is 0.004166666666666667,
-//        // which has 16 significant digits (counts from digit 4 to 7)
-//        // However, the result in Excel is 0.00416666666666667,
-//        // which has 15 significant digits (counts from digit 4 to 7)
-//        final double result = 0.1D/24;
-//
-//        // The result here should be the same as in the Excel file,
-//        // which has 15 significant digits,
-//        // so any calculations based on this method yield the exact same results as in the Excel file.
-//        return MathUtil.to15SignificantDigits(result);
-//    }
 
 }

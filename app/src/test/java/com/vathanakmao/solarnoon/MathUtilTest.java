@@ -17,10 +17,10 @@ public class MathUtilTest {
     }
 
     @Test
-    public void testTo8DecimalPlaces() {
-        assertEquals(0.24112834, MathUtil.to8DecimalPlaces(0.241128336755644), ASSERTEQUAlS_DOUBLE_DELTA);
-        assertEquals(0.00000123, MathUtil.to8DecimalPlaces(0.0000012345), ASSERTEQUAlS_DOUBLE_DELTA);
-        assertEquals(1.12345679, MathUtil.to8DecimalPlaces(1.123456789), ASSERTEQUAlS_DOUBLE_DELTA);
-        assertEquals(12345678.12345679, MathUtil.to8DecimalPlaces(12345678.123456789), ASSERTEQUAlS_DOUBLE_DELTA);
+    public void testRoundTo8DecimalPlaces() {
+        assertEquals(0.24112834, MathUtil.roundTo8DecimalPlaces(0.241128336755644), ASSERTEQUAlS_DOUBLE_DELTA);
+        assertEquals(0.00000123, MathUtil.roundTo8DecimalPlaces(0.0000012345), ASSERTEQUAlS_DOUBLE_DELTA);
+        assertEquals(1.12345679, MathUtil.roundTo8DecimalPlaces(1.123456789), ASSERTEQUAlS_DOUBLE_DELTA);
+        assertEquals(12345678.12345679, MathUtil.roundTo8DecimalPlaces(12345678.123456789), ASSERTEQUAlS_DOUBLE_DELTA);
     }
 }

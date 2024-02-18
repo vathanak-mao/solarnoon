@@ -31,7 +31,7 @@ public class MathUtil {
         }
     }
 
-    public static double to8DecimalPlaces(double num) {
+    public static double roundTo8DecimalPlaces(double num) {
         return round(num, 8);
     }
 
