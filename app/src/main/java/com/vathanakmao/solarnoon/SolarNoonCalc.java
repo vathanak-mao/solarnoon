@@ -139,19 +139,20 @@ public class SolarNoonCalc {
         return getJulianCentury(date, timezoneOffsetFromUtc, timePastLocalMidnight, false);
     }
 
+    public double getJulianCentury(GregorianCalendar date, double timezoneOffsetFromUtc, boolean to8DecimalPlaces) { // G column
+        return getJulianCentury(date, timezoneOffsetFromUtc, TIMEPASTLOCALMIDNIGHT_00_06_00, to8DecimalPlaces);
+    }
+
     /**
      * Get the number of Julian centuries since the epoch J2000.
      * Check this class's documentation for what epoch J2000 is.
      *
      * @param date
      * @param timezoneOffsetFromUtc
+     * @param timePastLocalMidnight
      * @param to8DecimalPlaces
      * @return
      */
-    public double getJulianCentury(GregorianCalendar date, double timezoneOffsetFromUtc, boolean to8DecimalPlaces) { // G column
-        return getJulianCentury(date, timezoneOffsetFromUtc, TIMEPASTLOCALMIDNIGHT_00_06_00, to8DecimalPlaces);
-    }
-
     public double getJulianCentury(GregorianCalendar date, double timezoneOffsetFromUtc, double timePastLocalMidnight, boolean to8DecimalPlaces) { // G column
         final boolean to15SignificantDigits = false; // need all precisions in calculation
         final double result = (getJulianDay(date, timezoneOffsetFromUtc, timePastLocalMidnight) - JULIANDATE_FOR_EPOCHJ2000) / JULIAN_DAYS_PER_CENTURY;
@@ -164,34 +165,39 @@ public class SolarNoonCalc {
         return to8DecimalPlaces ? MathUtil.to8DecimalPlaces(result) : result;
     }
 
-//    public double getJulianDay(GregorianCalendar date, double timezoneOffsetFromUtc) { // F column
-//        return getJulianDay(date, timezoneOffsetFromUtc, false);
-//    }
-
-    /**
-     * Get Julian day number, which counts the number of days since noon on January 1, 4713 BC.
-     *
-     * @param date
-     * @param timezoneOffsetFromUtc
-     * @param to15SignificantDigits
-     * @return
-     */
     public double getJulianDay(GregorianCalendar date, double timezoneOffsetFromUtc) { // F column
         return getJulianDay(date, timezoneOffsetFromUtc, TIMEPASTLOCALMIDNIGHT_00_06_00);
     }
 
+    /**
+     * Get Julian day, which counts the number of days since noon on January 1, 4713 BC.
+     *
+     * The result returned from this method might be slightly different in precisions
+     * from the result displayed in the Excel file (this class is based on).
+     * <br/><br/>
+     * There are two reasons such as:
+     * <br/><br/>
+     * First, in the Excel file, the value of each cell in Julian Day column
+     * is formatted to display with only 2 decimal places (2 digits to the right of decimal point).
+     * But, its value including all precisions is used instead
+     * when another cell, referencing it, performs a calculation.
+     * For example, its value displayed in a cell is 2460352.21 but 2460352.2125
+     * is used instead when a cell in Julian Century column performs a calculation.
+     * <br/><br/>
+     * Second, Excel displays a number in 15 significant figures/digits,
+     * but it uses all available digits or precisions while performing a calculation.
+     * For example, its value displayed in the Excel file is 2460352.21666667,
+     * but 2460352.216666667 (one more digit in decimal place) is used instead by
+     * a cell in the Julian Century column while performing a calculation.
+     *
+     * @param date
+     * @param timezoneOffsetFromUtc
+     * @param timePastLocalMidnight
+     * @return
+     */
     public double getJulianDay(GregorianCalendar date, double timezoneOffsetFromUtc, double timePastLocalMidnight) { // F column
         // timezoneOffsetFromUtc must be double to get more digits in fractional part of a decimal number (a floating-point number in programming).
-        final double result = JULIANDATE_FOR_1900DEC30 + getNumOfDaysSince1900(date) + timePastLocalMidnight - timezoneOffsetFromUtc / 24;
-
-        // In the Excel file, the value of each cell in Julian Day column
-        // is formatted to display with only 2 decimal places (2 digits to the right of decimal point).
-        // But, its value with all available decimal points
-        // is used instead by the calculation of another cell referencing it.
-        // For example, its value displayed in a cell is 2460352.21 but
-        // 2460352.2125 is used instead in the calculation of a cell in Julian Century column.
-//        return to15SignificantDigits ? MathUtil.to15SignificantDigits(result) : result;
-        return result;
+        return JULIANDATE_FOR_1900DEC30 + getNumOfDaysSince1900(date) + timePastLocalMidnight - timezoneOffsetFromUtc / 24;
     }
 
     /**
