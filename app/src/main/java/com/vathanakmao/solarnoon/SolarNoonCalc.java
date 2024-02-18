@@ -107,30 +107,71 @@ public class SolarNoonCalc {
         return 23 + (26 + ((21.448 - julianCentury * (46.815 + julianCentury * (0.00059 - julianCentury * 0.001813)))) / 60) / 60;
     }
 
+    public double getGeomMeanLongSun(GregorianCalendar date, double timezoneOffsetFromUtc) { // column I
+        final double julianCentury = getJulianCentury(date, timezoneOffsetFromUtc);
+        final double result = (280.46646 + julianCentury * (36000.76983 + julianCentury * 0.0003032)) % 360;
+        return MathUtil.to15SignificantDigits(result);
+    }
+
+    public double getEccentEarthOrbit(GregorianCalendar date, double timezoneOffsetFromUtc) {
+        final double julianCentury = getJulianCentury(date, timezoneOffsetFromUtc);
+        final double result = 0.016708634 - julianCentury * (0.000042037 + 0.0000001267 * julianCentury);
+        return MathUtil.to15SignificantDigits(result);
+    }
+
+    public double getGeomMeanAnomSun(GregorianCalendar date, double timezoneOffsetFromUtc) {
+        final double julianCentury = getJulianCentury(date, timezoneOffsetFromUtc);
+        return 357.52911 + julianCentury * (35999.05029 - 0.0001537 * julianCentury);
+    }
+
+    public double getJulianCentury(GregorianCalendar date, double timezoneOffsetFromUtc) { // G column
+        return getJulianCentury(date, timezoneOffsetFromUtc, false);
+    }
+
     /**
      * Get the number of Julian centuries since the epoch J2000.
      * Check this class's documentation for what epoch J2000 is.
      *
      * @param date
      * @param timezoneOffsetFromUtc
+     * @param to8DecimalPlaces
      * @return
      */
-    public double getJulianCentury(GregorianCalendar date, double timezoneOffsetFromUtc) { // G column
-        final double result = (getJulianDay(date, timezoneOffsetFromUtc) - JULIANDATE_FOR_EPOCHJ2000) / JULIAN_DAYS_PER_CENTURY;
-        return MathUtil.to8DecimalPlaces(result); // it was set in the Excel file
+    public double getJulianCentury(GregorianCalendar date, double timezoneOffsetFromUtc, boolean to8DecimalPlaces) { // G column
+        final boolean to15SignificantDigits = false; // need all precisions in calculation
+        final double result = (getJulianDay(date, timezoneOffsetFromUtc, to15SignificantDigits) - JULIANDATE_FOR_EPOCHJ2000) / JULIAN_DAYS_PER_CENTURY;
+
+        // In the Excel file, each cell in the Julian Century column was formatted to display
+        // its value only with 8 decimal places (e.g. 0.24112834).
+        // But, when the other columns (e.g. Geom Mean Long Sun (deg)) referenced it,
+        // its value with all available decimal places, before formatting, (e.g. 0.241128336755644) was used in the calculation instead.
+        // This yielded different results in precisions.
+        return to8DecimalPlaces ? MathUtil.to8DecimalPlaces(result) : result;
+    }
+
+    public double getJulianDay(GregorianCalendar date, double timezoneOffsetFromUtc) { // F column
+        return getJulianDay(date, timezoneOffsetFromUtc, true);
     }
 
     /**
      * Get Julian day number, which counts the number of days since noon on January 1, 4713 BC.
      *
-     * @param date A given date
-     * @param timezoneOffsetFromUtc E.g. Phnom Penh's timezone is UTC+7 then its value is 7.
-     * @return Julian day number
+     * @param date
+     * @param timezoneOffsetFromUtc
+     * @param to15SignificantDigits
+     * @return
      */
-    public double getJulianDay(GregorianCalendar date, double timezoneOffsetFromUtc) { // F column
+    public double getJulianDay(GregorianCalendar date, double timezoneOffsetFromUtc, boolean to15SignificantDigits) { // F column
         // timezoneOffsetFromUtc must be double to get more digits in fractional part of a decimal number (a floating-point number in programming).
         final double result = JULIANDATE_FOR_1900DEC30 + getNumOfDaysSince1900(date) + getTimePastLocalMidnight() - timezoneOffsetFromUtc / 24;
-        return MathUtil.to15SignificantDigits(result);
+
+        // In the Excel file, the value of each cell in Julian Day column
+        // is formatted to display with only 2 decimal places (2 digits to the right of decimal point).
+        // But, its absolute with all available decimal points
+        // is used instead in the calculation of another cell referencing it.
+        // For example, its value displayed in a cell is 2460352.21 but
+        // 2460352.2125 is used instead in the calculation of a cell in Julian Century column.
+        return to15SignificantDigits ? MathUtil.to15SignificantDigits(result) : result;
     }
 
     /**
@@ -174,23 +215,6 @@ public class SolarNoonCalc {
         // which has 15 significant digits,
         // so any calculations based on this method yield the exact same results as in the Excel file.
         return MathUtil.to15SignificantDigits(result);
-    }
-
-    public double getGeomMeanLongSun(GregorianCalendar date, double timezoneOffsetFromUtc) { // column I
-        final double julianCentury = getJulianCentury(date, timezoneOffsetFromUtc);
-        final double result = (280.46646 + julianCentury * (36000.76983 + julianCentury * 0.0003032)) % 360;
-        return MathUtil.to15SignificantDigits(result);
-    }
-
-    public double getEccentEarthOrbit(GregorianCalendar date, double timezoneOffsetFromUtc) {
-        final double julianCentury = getJulianCentury(date, timezoneOffsetFromUtc);
-        final double result = 0.016708634 - julianCentury * (0.000042037 + 0.0000001267 * julianCentury);
-        return MathUtil.to15SignificantDigits(result);
-    }
-
-    public double getGeomMeanAnomSun(GregorianCalendar date, double timezoneOffsetFromUtc) {
-        final double julianCentury = getJulianCentury(date, timezoneOffsetFromUtc);
-        return 357.52911 + julianCentury * (35999.05029 - 0.0001537 * julianCentury);
     }
 
 }

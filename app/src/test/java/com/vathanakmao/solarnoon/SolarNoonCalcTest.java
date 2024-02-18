@@ -53,7 +53,7 @@ public class SolarNoonCalcTest {
     @Test
     public void testGetGeomMeanLongSun() {
         final GregorianCalendar february122024 = new GregorianCalendar(2024, 1, 12);
-        assertEquals(321.27, calc.getGeomMeanLongSun(february122024, 7), 0.01);
+        assertEquals(321.272228660055, calc.getGeomMeanLongSun(february122024, 7), ASSERTEQUAlS_DOUBLE_DELTA);
     }
 
     @Test
@@ -71,14 +71,24 @@ public class SolarNoonCalcTest {
     @Test
     public void testGetJulianCentury() {
         final GregorianCalendar february122024 = new GregorianCalendar(2024, 1, 12);
-        assertEquals(0.24112834, calc.getJulianCentury(february122024, 7), ASSERTEQUAlS_DOUBLE_DELTA);
+
+        // In the Excel file, each cell is formatted to display only 8 decimal places.
+        final boolean to8DecimalPlaces = true;
+        assertEquals(0.24112834, calc.getJulianCentury(february122024, 7, to8DecimalPlaces), ASSERTEQUAlS_DOUBLE_DELTA);
+
+        // But, its value with all available decimal places (or precisions)
+        // is used instead in the calculation of anther cell referencing it.
+        // For example, Geom Mean Long Sun (deg) column uses below value instead of the formatted one above.
+        assertEquals(0.241128336755657, calc.getJulianCentury(february122024, 7), ASSERTEQUAlS_DOUBLE_DELTA);
     }
 
     @Test
     public void testGetJulianDay() {
         GregorianCalendar feb122024 = new GregorianCalendar(2024, 1, 12);
         int timezoneOffsetFromUtc = 7;
+
         assertEquals(2460352.2125, calc.getJulianDay(feb122024, timezoneOffsetFromUtc), ASSERTEQUAlS_DOUBLE_DELTA);
+        assertEquals(2460352.2125, calc.getJulianDay(feb122024, timezoneOffsetFromUtc, true), ASSERTEQUAlS_DOUBLE_DELTA);
     }
 
     @Test
