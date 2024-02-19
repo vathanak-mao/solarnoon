@@ -2,6 +2,8 @@ package com.vathanakmao.solarnoon;
 
 import static junit.framework.TestCase.assertEquals;
 
+import android.health.connect.LocalTimeRangeFilter;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -23,4 +25,5 @@ public class MathUtilTest {
         assertEquals(1.12345679, MathUtil.roundTo8DecimalPlaces(1.123456789), ASSERTEQUAlS_DOUBLE_DELTA);
         assertEquals(12345678.12345679, MathUtil.roundTo8DecimalPlaces(12345678.123456789), ASSERTEQUAlS_DOUBLE_DELTA);
     }
+
 }

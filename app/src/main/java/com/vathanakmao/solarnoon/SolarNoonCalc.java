@@ -3,7 +3,6 @@ package com.vathanakmao.solarnoon;
 import static android.webkit.ConsoleMessage.MessageLevel.LOG;
 
 import java.text.DecimalFormat;
-import java.time.LocalTime;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -69,61 +68,73 @@ public class SolarNoonCalc {
      * @param timePastLocalMidnight
      * @return the time of the solar noon
      */
-    public LocalTime getTime(long lat, long lon, double timezoneOffsetFromUtc, GregorianCalendar date, double timePastLocalMidnight) {
-        LocalTime result = null;
-        double solarTime = (720 - 4 * lon - getEquationOfTime(date, timezoneOffsetFromUtc, timePastLocalMidnight) + timezoneOffsetFromUtc * 60) / 1440;
-        return result;
+    public LocalTime getTime(double lat, double lon, double timezoneOffsetFromUtc, GregorianCalendar date, double timePastLocalMidnight) {
+        final double solarTime = (720 - 4 * lon - getEquationOfTime(date, timezoneOffsetFromUtc, timePastLocalMidnight) + timezoneOffsetFromUtc * 60) / 1440;
+        return new LocalTime(solarTime);
     }
 
     public double getEquationOfTime(GregorianCalendar date, double timezoneOffsetFromUtc, double timePastLocalMidnight) { // V column
-        final double geomMeanLongSun = MathUtil.to15SignificantDigits(getGeomMeanLongSun(date, timezoneOffsetFromUtc, timePastLocalMidnight));
-        final double geomMeanAnomSun = MathUtil.to15SignificantDigits(getGeomMeanAnomSun(date, timezoneOffsetFromUtc, timePastLocalMidnight));
-        final double radiansOfGeomMeanLongSun = MathUtil.to15SignificantDigits(Math.toRadians(geomMeanLongSun));
-        final double radiansOfGeomMeanAnomSun= MathUtil.to15SignificantDigits(Math.toRadians(geomMeanAnomSun));
-        final double eccentEarthOrbit = MathUtil.to15SignificantDigits(getEccentEarthOrbit(date, timezoneOffsetFromUtc, timePastLocalMidnight));
-        final double varY = MathUtil.round(getVarY(date, timezoneOffsetFromUtc, timePastLocalMidnight), 2);
+        final double geomMeanLongSun = getGeomMeanLongSun(date, timezoneOffsetFromUtc, timePastLocalMidnight);
+//        final double geomMeanLongSun = MathUtil.to15SignificantDigits(getGeomMeanLongSun(date, timezoneOffsetFromUtc, timePastLocalMidnight));
+
+        final double geomMeanAnomSun = getGeomMeanAnomSun(date, timezoneOffsetFromUtc, timePastLocalMidnight);
+//        final double geomMeanAnomSun = MathUtil.to15SignificantDigits(getGeomMeanAnomSun(date, timezoneOffsetFromUtc, timePastLocalMidnight));
+
+        final double eccentEarthOrbit = getEccentEarthOrbit(date, timezoneOffsetFromUtc, timePastLocalMidnight);
+//        final double eccentEarthOrbit = MathUtil.to15SignificantDigits(getEccentEarthOrbit(date, timezoneOffsetFromUtc, timePastLocalMidnight));
+
+//        final double radiansOfGeomMeanLongSun = Math.toRadians(geomMeanLongSun);
+        final double radiansOfGeomMeanLongSun = Math.toRadians(geomMeanLongSun);
+
+//        final double radiansOfGeomMeanAnomSun= Math.toRadians(geomMeanAnomSun);
+        final double radiansOfGeomMeanAnomSun = Math.toRadians(geomMeanAnomSun);
+
+//        final double varY = MathUtil.to15SignificantDigits(getVarY(date, timezoneOffsetFromUtc, timePastLocalMidnight));
+        final double varY = getVarY(date, timezoneOffsetFromUtc, timePastLocalMidnight);
 
         return 4 * Math.toDegrees(
                 varY * Math.sin(2 * radiansOfGeomMeanLongSun)
-                - 2
-                * eccentEarthOrbit * Math.sin(radiansOfGeomMeanAnomSun)
-                + 4
-                * eccentEarthOrbit * varY * Math.sin(radiansOfGeomMeanAnomSun) * Math.cos(2 * radiansOfGeomMeanLongSun)
-                - 0.5
-                * varY * varY * Math.sin(4 * radiansOfGeomMeanAnomSun)
-                - 1.25
-                * eccentEarthOrbit * eccentEarthOrbit * Math.sin(2 * radiansOfGeomMeanAnomSun)
+                - 2 * eccentEarthOrbit * Math.sin(radiansOfGeomMeanAnomSun)
+                + 4 * eccentEarthOrbit * varY * Math.sin(radiansOfGeomMeanAnomSun) * Math.cos(2 * radiansOfGeomMeanLongSun)
+                - 0.5 * varY * varY * Math.sin(4 * radiansOfGeomMeanLongSun)
+                - 1.25 * eccentEarthOrbit * eccentEarthOrbit * Math.sin(2 * radiansOfGeomMeanAnomSun)
                 );
     }
 
     public double getVarY(GregorianCalendar date, double timezoneOffsetFromUtc, double timePastLocalMidnight) { // U column
-        final double obliqCorrInDegrees = MathUtil.to15SignificantDigits(getObliqCorrInDegrees(date, timezoneOffsetFromUtc, timePastLocalMidnight));
+        final double obliqCorrInDegrees = getObliqCorrInDegrees(date, timezoneOffsetFromUtc, timePastLocalMidnight);
+//        final double obliqCorrInDegrees = MathUtil.to15SignificantDigits(getObliqCorrInDegrees(date, timezoneOffsetFromUtc, timePastLocalMidnight));
         return Math.tan( Math.toRadians(obliqCorrInDegrees/2) ) * Math.tan( Math.toRadians(obliqCorrInDegrees/2) );
     }
 
     public double getObliqCorrInDegrees(GregorianCalendar date, double timezoneOffsetFromUtc, double timePastLocalMidnight) { // R column
-        final double julianCentury = MathUtil.to15SignificantDigits(getJulianCentury(date, timezoneOffsetFromUtc, timePastLocalMidnight));
+        final double julianCentury = getJulianCentury(date, timezoneOffsetFromUtc, timePastLocalMidnight);
+//        final double julianCentury = MathUtil.to15SignificantDigits(getJulianCentury(date, timezoneOffsetFromUtc, timePastLocalMidnight));
         return getMeanObliqEclipticInDegrees(date, timezoneOffsetFromUtc, timePastLocalMidnight) + 0.00256 * Math.cos(Math.toRadians(125.04 - 1934.136 * julianCentury));
     }
 
     public double getMeanObliqEclipticInDegrees(GregorianCalendar date, double timezoneOffsetFromUtc, double timePastLocalMidnight) { // Q column
-        final double julianCentury = MathUtil.to15SignificantDigits(getJulianCentury(date, timezoneOffsetFromUtc, timePastLocalMidnight));
+        final double julianCentury = getJulianCentury(date, timezoneOffsetFromUtc, timePastLocalMidnight);
+//        final double julianCentury = MathUtil.to15SignificantDigits(getJulianCentury(date, timezoneOffsetFromUtc, timePastLocalMidnight));
         return 23 + (26 + ((21.448 - julianCentury * (46.815 + julianCentury * (0.00059 - julianCentury * 0.001813)))) / 60) / 60;
     }
 
     public double getGeomMeanLongSun(GregorianCalendar date, double timezoneOffsetFromUtc, double timePastLocalMidnight) { // column I
-        final double julianCentury = MathUtil.to15SignificantDigits(getJulianCentury(date, timezoneOffsetFromUtc, timePastLocalMidnight));
+        final double julianCentury = getJulianCentury(date, timezoneOffsetFromUtc, timePastLocalMidnight);
+//        final double julianCentury = MathUtil.to15SignificantDigits(getJulianCentury(date, timezoneOffsetFromUtc, timePastLocalMidnight));
         return (280.46646 + julianCentury * (36000.76983 + julianCentury * 0.0003032)) % 360;
     }
 
-    public double getEccentEarthOrbit(GregorianCalendar date, double timezoneOffsetFromUtc, double timePastLocalMidnight) {
-        final double julianCentury = MathUtil.to15SignificantDigits(getJulianCentury(date, timezoneOffsetFromUtc, timePastLocalMidnight));
-        return 0.016708634 - julianCentury * (0.000042037 + 0.0000001267 * julianCentury);
+    public double getGeomMeanAnomSun(GregorianCalendar date, double timezoneOffsetFromUtc, double timePastLocalMidnight) {
+        final double julianCentury = getJulianCentury(date, timezoneOffsetFromUtc, timePastLocalMidnight);
+//        final double julianCentury = MathUtil.to15SignificantDigits(getJulianCentury(date, timezoneOffsetFromUtc, timePastLocalMidnight));
+        return 357.52911 + julianCentury * (35999.05029 - 0.0001537 * julianCentury);
     }
 
-    public double getGeomMeanAnomSun(GregorianCalendar date, double timezoneOffsetFromUtc, double timePastLocalMidnight) {
-        final double julianCentury = MathUtil.to15SignificantDigits(getJulianCentury(date, timezoneOffsetFromUtc, timePastLocalMidnight));
-        return 357.52911 + julianCentury * (35999.05029 - 0.0001537 * julianCentury);
+    public double getEccentEarthOrbit(GregorianCalendar date, double timezoneOffsetFromUtc, double timePastLocalMidnight) {
+        final double julianCentury = getJulianCentury(date, timezoneOffsetFromUtc, timePastLocalMidnight);
+//        final double julianCentury = MathUtil.to15SignificantDigits(getJulianCentury(date, timezoneOffsetFromUtc, timePastLocalMidnight));
+        return 0.016708634 - julianCentury * (0.000042037 + 0.0000001267 * julianCentury);
     }
 
     /**
