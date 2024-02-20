@@ -18,8 +18,7 @@ public class LocalTime {
             throw new IllegalArgumentException(String.format("The parameter time, %s, cannot be less than %s and greater than %s.", time, MIN_TIME_IN_DOUBLE, MAX_TIME_IN_DOUBLE));
         }
 
-        // For example, the time is 12:14:29 PM.
-        // Then, it's converted to number as 0.510060092502.
+        // For example, the time is 0.510060092502 (12:14:29 PM).
         final double hourInDouble = time * 24 / MAX_TIME_IN_DOUBLE; // hourInDouble is 12.241442220048
         hour = (int) hourInDouble; // hour is 12
 

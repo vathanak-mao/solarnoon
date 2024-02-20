@@ -29,8 +29,8 @@ public class SolarNoonCalcTest {
 
     @Test
     public void testGetEquationOfTime() {
-        // Compare only the first 10 digits of decimal places
-        // and the result of getTime() method is still correct.
+        // As long as the first 10 digits to the right of the decimal point
+        // are correct, the return value from the getTime() method is correct.
         final GregorianCalendar february122024 = new GregorianCalendar(2024, 1, 12);
         assertEquals(-14.2301766538485, MathUtil.to15SignificantDigits(calc.getEquationOfTime(february122024, 7, SolarNoonCalc.TIMEPASTLOCALMIDNIGHT_00_06_00)), ASSERTEQUAlS_DOUBLE_DELTA_SCALEOF10);
         assertEquals(-14.2301852029459, MathUtil.to15SignificantDigits(calc.getEquationOfTime(february122024, 7, SolarNoonCalc.TIMEPASTLOCALMIDNIGHT_00_12_00)), ASSERTEQUAlS_DOUBLE_DELTA_SCALEOF10);
@@ -63,8 +63,8 @@ public class SolarNoonCalcTest {
 
     @Test
     public void testGetGeomMeanLongSun() {
-        // Compare only the first 10 digits of decimal places
-        // and the result of getTime() method is still correct.
+        // As long as the first 10 digits to the right of the decimal point
+        // are correct, the return value from the getTime() method is correct.
         final GregorianCalendar february122024 = new GregorianCalendar(2024, 1, 12);
         assertEquals(321.272228660055, calc.getGeomMeanLongSun(february122024, 7, SolarNoonCalc.TIMEPASTLOCALMIDNIGHT_00_06_00), ASSERTEQUAlS_DOUBLE_DELTA_SCALEOF10);
         assertEquals(321.276335523815, calc.getGeomMeanLongSun(february122024, 7, SolarNoonCalc.TIMEPASTLOCALMIDNIGHT_00_12_00), ASSERTEQUAlS_DOUBLE_DELTA_SCALEOF10);
@@ -73,8 +73,8 @@ public class SolarNoonCalcTest {
 
     @Test
     public void testGetGeomMeanAnomSun() {
-        // Compare only the first 10 digits of decimal places
-        // and the result of getTime() method is still correct.
+        // As long as the first 10 digits to the right of the decimal point
+        // are correct, the return value from the getTime() method is correct.
         final GregorianCalendar february122024 = new GregorianCalendar(2024, 1, 12);
         assertEquals(9037.92022227439, MathUtil.to15SignificantDigits(calc.getGeomMeanAnomSun(february122024, 7, SolarNoonCalc.TIMEPASTLOCALMIDNIGHT_00_06_00)), ASSERTEQUAlS_DOUBLE_DELTA_SCALEOF10);
         assertEquals(9037.92432894197, MathUtil.to15SignificantDigits(calc.getGeomMeanAnomSun(february122024, 7, SolarNoonCalc.TIMEPASTLOCALMIDNIGHT_00_12_00)), ASSERTEQUAlS_DOUBLE_DELTA_SCALEOF10);
