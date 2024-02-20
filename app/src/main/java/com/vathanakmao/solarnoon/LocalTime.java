@@ -1,8 +1,8 @@
 package com.vathanakmao.solarnoon;
 
 public class LocalTime {
-    public static final double MAX_TIME_IN_DOUBLE = 0.999999999999999;
-    public static final double MIN_TIME_IN_DOUBLE = 0.000000000000001;
+    public static final double MAX_TIME_IN_DOUBLE = 0.999999999999999; // 23:59:59
+    public static final double MIN_TIME_IN_DOUBLE = 0.000000000000001; // 00:00:00
 
     private int hour;
     private int minute;
@@ -18,15 +18,16 @@ public class LocalTime {
             throw new IllegalArgumentException(String.format("The parameter time, %s, cannot be less than %s and greater than %s.", time, MIN_TIME_IN_DOUBLE, MAX_TIME_IN_DOUBLE));
         }
 
-        // 0.000000000000001 is converted to time as 12:00:00 AM (00:00:00).
-        // 0.999999999999999 is converted to time as 12:59:59 PM (23:59:59).
-        final double hourInDouble = time * 24 / MAX_TIME_IN_DOUBLE;
-        hour = (int) hourInDouble;
+        // For example, the time is 12:14:29 PM.
+        // Then, it's converted to number as 0.510060092502.
+        final double hourInDouble = time * 24 / MAX_TIME_IN_DOUBLE; // hourInDouble is 12.241442220048
+        hour = (int) hourInDouble; // hour is 12
 
-        final double minuteInDouble = (hourInDouble % hour) * 60 / MAX_TIME_IN_DOUBLE;
-        minute = (int) minuteInDouble;
+        final double minuteInDouble = (hourInDouble % hour) * 60 / MAX_TIME_IN_DOUBLE; // minuteInDouble is 14.48653320288
+        minute = (int) minuteInDouble; // minute is 14
 
-        second = (int) ((minuteInDouble % minute) * 60 / MAX_TIME_IN_DOUBLE);
+        final double secondInDouble = (minuteInDouble % minute) * 60 / MAX_TIME_IN_DOUBLE; // secondInDouble is 29.1919921728
+        second = (int) secondInDouble; // second is 29
     }
 
     public int getHour() {
