@@ -13,6 +13,7 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.TextView;
 
 import com.google.android.gms.location.CurrentLocationRequest;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -23,10 +24,14 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.OnTokenCanceledListener;
 import com.google.android.gms.tasks.Task;
 
+import java.time.ZonedDateTime;
+import java.util.GregorianCalendar;
+
 public class MainActivity extends AppCompatActivity implements ActivityCompat.OnRequestPermissionsResultCallback {
     public static final int MYPERMISSIONREQUESTCODE_GETCURRENTLOCATION = 1;
 
     private FusedLocationProviderClient fusedLocationProviderClient;
+    private SolarNoonCalc solarnoonCalc;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +39,7 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
         setContentView(R.layout.activity_main);
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+        solarnoonCalc = new SolarNoonCalc();
     }
 
     @Override
@@ -81,6 +87,14 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
 
                     if (location != null) {
                         Log.d(getLocalClassName(), "Location: lat=" + location.getLatitude() + ", lon=" + location.getLongitude());
+
+                        final double timezoneOffset = MathUtil.toHours(ZonedDateTime.now().getOffset().getTotalSeconds());
+                        final LocalTime solarnoonLocalTime = solarnoonCalc.getTime(location.getLatitude(), location.getLongitude(), timezoneOffset, new GregorianCalendar(), SolarNoonCalc.TIMEPASTLOCALMIDNIGHT_00_06_00);
+                        Log.d(getLocalClassName(), String.format("Solar noon: %s:%s:%s", solarnoonLocalTime.getHour(), solarnoonLocalTime.getMinute(), solarnoonLocalTime.getSecond()));
+
+                        TextView display = findViewById(R.id.solarnoonView);
+                        display.setText(String.format("Today, solar noon is at %s:%s", solarnoonLocalTime.getHour(), solarnoonLocalTime.getMinute()));
+
                     }
                 }
             });
