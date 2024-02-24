@@ -5,6 +5,8 @@ import org.junit.runner.RunWith;
 
 import static org.junit.Assert.*;
 
+import java.time.ZonedDateTime;
+
 /**
  * Example local unit test, which will execute on the development machine (host).
  *
@@ -17,4 +19,8 @@ public class ExampleUnitTest {
         assertEquals(4, 2 + 2);
     }
 
+    @Test
+    public void testGetTimezone() {
+        assertEquals(7, MathUtil.toHours(ZonedDateTime.now().getOffset().getTotalSeconds()), 0.01);
+    }
 }

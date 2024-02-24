@@ -47,4 +47,13 @@ public class MathUtil {
         }
     }
 
+    /**
+     * Convert seconds to hours
+     * @param seconds
+     * @return
+     */
+    public static double toHours(int seconds) {
+        final int intHours = seconds / 3600;
+        return intHours + (seconds % 3600D) / 3600D;
+    }
 }

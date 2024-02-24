@@ -43,7 +43,8 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
         if (ActivityCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION) != PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, ACCESS_COARSE_LOCATION) != PERMISSION_GRANTED) {
 
-            ActivityCompat.requestPermissions(this, new String[] {ACCESS_COARSE_LOCATION}, MYPERMISSIONREQUESTCODE_GETCURRENTLOCATION);
+            ActivityCompat.requestPermissions(this,
+                    new String[] {ACCESS_COARSE_LOCATION}, MYPERMISSIONREQUESTCODE_GETCURRENTLOCATION);
             Log.d(getLocalClassName(), "Permissions have been requested!");
         } else {
             Log.d(getLocalClassName(), "Permissions were already granted!");

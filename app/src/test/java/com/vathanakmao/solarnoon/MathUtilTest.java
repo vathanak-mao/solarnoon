@@ -26,4 +26,13 @@ public class MathUtilTest {
         assertEquals(12345678.12345679, MathUtil.roundTo8DecimalPlaces(12345678.123456789), ASSERTEQUAlS_DOUBLE_DELTA);
     }
 
+    @Test
+    public void secondsToHours_valid() {
+        assertEquals(-3.5, MathUtil.toHours(-12600), 0.01);
+        assertEquals(0, MathUtil.toHours(0), 0.01);
+        assertEquals(3.5, MathUtil.toHours(12600), 0.01);
+        assertEquals(7, MathUtil.toHours(25200), 0.01);
+        assertEquals(9.5, MathUtil.toHours(34200), 0.01);
+    }
+
 }

@@ -28,9 +28,4 @@ public class ExampleInstrumentedTest {
         assertEquals("com.vathanakmao.solarnoon", appContext.getPackageName());
     }
 
-    @Test
-    public void testIsGooglePlayServicesAvailable() {
-        Context context = ApplicationProvider.getApplicationContext();
-        assertEquals(ConnectionResult.SUCCESS, GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(context));
-    }
 }

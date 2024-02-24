@@ -2,9 +2,6 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
-      <entry key="ExampleInstrumentedTest">
-        <State />
-      </entry>
       <entry key="app">
         <State>
           <targetSelectedWithDropDown>
@@ -20,12 +17,6 @@
           </targetSelectedWithDropDown>
           <timeTargetWasSelectedWithDropDown value="2024-02-20T23:45:56.646098390Z" />
         </State>
-      </entry>
-      <entry key="testIsGooglePlayServicesAvailable()">
-        <State />
-      </entry>
-      <entry key="useAppContext()">
-        <State />
       </entry>
     </value>
   </component>
