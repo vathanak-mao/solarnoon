@@ -31,13 +31,9 @@ android {
         managedDevices {
             localDevices {
                 smallphoneapi30 {
-                    // Use device profiles you typically see in Android Studio.
                     device = "Small Phone"
-                    // Use only API levels 27 and higher.
                     apiLevel = 30
-                    // To include Google services, use "google".
                     systemImageSource = "google_apis_playstore"
-
                 }
             }
         }
@@ -49,23 +45,10 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.google.android.material:material:1.11.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-
-    // Import aar for native component compilation
-    implementation 'com.github.luben:zstd-jni:1.4.9-5@aar'
+    implementation 'com.github.luben:zstd-jni:1.4.9-5@aar' // Import aar for native component compilation
 
     testImplementation 'junit:junit:4.13.2'
 
-//    androidTestImplementation 'junit:junit:4.13.2'
-//    androidTestImplementation "androidx.test:core:1.5.0"
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
-//    androidTestImplementation "androidx.test:runner:1.5.2"
-//    androidTestImplementation "androidx.test:rules:1.5.0"
-
-    // Optional -- UI testing with Espresso
-    androidTestImplementation "androidx.test.espresso:espresso-core:3.5.1"
-    // Optional -- UI testing with UI Automator
-//    androidTestImplementation "androidx.test.uiautomator:uiautomator:2.2.0"
-    // Optional -- UI testing with Compose
-//    androidTestImplementation "androidx.compose.ui:ui-test-junit4:1.6.1"
-
+    androidTestImplementation "androidx.test.espresso:espresso-core:3.5.1" // Optional -- UI testing with Espresso
 }
