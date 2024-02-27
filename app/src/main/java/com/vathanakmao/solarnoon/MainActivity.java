@@ -8,7 +8,10 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
@@ -20,8 +23,11 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
+import java.io.IOException;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements ActivityCompat.OnRequestPermissionsResultCallback {
     public static final int MYPERMISSIONREQUESTCODE_GETCURRENTLOCATION = 1;
@@ -84,6 +90,8 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
                     if (location != null) {
                         Log.d(getLocalClassName(), "Location: lat=" + location.getLatitude() + ", lon=" + location.getLongitude());
 
+                        updateUI(location);
+
                         final double timezoneOffset = MathUtil.toHours(ZonedDateTime.now().getOffset().getTotalSeconds());
                         final LocalTime solarnoonLocalTime = solarnoonCalc.getTime(location.getLatitude(), location.getLongitude(), timezoneOffset, new GregorianCalendar(), SolarNoonCalc.TIMEPASTLOCALMIDNIGHT_00_06_00);
                         Log.d(getLocalClassName(), String.format("Solar noon: %s:%s:%s", solarnoonLocalTime.getHour(), solarnoonLocalTime.getMinute(), solarnoonLocalTime.getSecond()));
@@ -101,4 +109,46 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
             });
         }
     }
+
+    public void updateUI(Location location) {
+        Geocoder geocoder = new Geocoder(this);
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            List<Address> addresses = null;
+            try {
+                Log.d(getLocalClassName(), String.format("The API level of the running system is %s so falling back to the deprecated method Geocoder.getFromLocation(latitude, longitude, maxResults)", Build.VERSION.SDK_INT));
+
+                // this method is deprecated
+                addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+            } catch (IOException e) {
+                Log.e(getLocalClassName(), String.format("Error retrieving addresses for latitude %s and longitude %s. ", location.getLatitude(), location.getLongitude()), e);
+            }
+            set(findViewById(R.id.location), addresses);
+        } else {
+            try {
+                Log.d(getLocalClassName(), String.format("The API level of the running system is %s so calling Geocoder.getFromLocation(latitude, longitude, maxResults, Geocoder.GeocoderListeneer).", Build.VERSION.SDK_INT));
+
+                // this method is only supported by API level 34
+                geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1, new Geocoder.GeocodeListener() {
+                    @Override
+                    public void onGeocode(List<Address> addresses) {
+                        set(findViewById(R.id.location), addresses);
+                    }
+                });
+            } catch (IllegalArgumentException e) {
+                Log.e(getLocalClassName(), String.format("Error retrieving addresses based on latitude %s and longitude %. \n%s", location.getLatitude(), location.getLongitude(), e.getStackTrace().toString()));
+            }
+        }
+    }
+
+    private void set(TextView textView, @NonNull List<Address> addresses) {
+        if (addresses != null && !addresses.isEmpty()) {
+            textView.setText(addresses.get(0).getLocality() );
+
+            Log.d(getLocalClassName(), String.format("Set addresses<%s> to the textview <id=%s>", addresses.toString(), textView.getId()));
+        } else {
+            Log.e(getLocalClassName(), String.format("Unabled to set addresses <%s> for the text view <id=%s>", addresses, textView.getId()));
+        }
+    }
+
 }
