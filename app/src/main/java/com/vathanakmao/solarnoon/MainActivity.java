@@ -92,9 +92,8 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
                         final LocalTime solarnoonLocalTime = solarnoonCalc.getTime(location.getLatitude(), location.getLongitude(), timezoneOffset, new GregorianCalendar(), SolarNoonCalc.TIMEPASTLOCALMIDNIGHT_00_06_00);
                         Log.d(getLocalClassName(), String.format("Solar noon: %s:%s:%s", solarnoonLocalTime.getHour(), solarnoonLocalTime.getMinute(), solarnoonLocalTime.getSecond()));
 
-                        TextView display = findViewById(R.id.solarnoonView);
-                        display.setText(String.format("Today, solar noon is at %s:%s", solarnoonLocalTime.getHour(), solarnoonLocalTime.getMinute()));
-
+                        TextView display = findViewById(R.id.solarnoonTime);
+                        display.setText(String.format("%s:%s %s", solarnoonLocalTime.getHour(), solarnoonLocalTime.getMinute(), solarnoonLocalTime.getHour() < 12 ? "AM" : "PM"));
                     }
                 }
             });
