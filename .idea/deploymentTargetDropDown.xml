@@ -34,6 +34,9 @@
           <timeTargetWasSelectedWithDropDown value="2024-02-20T23:45:56.646098390Z" />
         </State>
       </entry>
+      <entry key="getAddressesBasedOnLocale()">
+        <State />
+      </entry>
     </value>
   </component>
 </project>
