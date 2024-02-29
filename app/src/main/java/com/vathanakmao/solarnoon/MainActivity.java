@@ -14,6 +14,9 @@ import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.google.android.gms.location.CurrentLocationRequest;
@@ -22,14 +25,19 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.vathanakmao.solarnoon.model.LocalTime;
+import com.vathanakmao.solarnoon.service.SolarNoonCalc;
+import com.vathanakmao.solarnoon.util.MathUtil;
 
 import java.io.IOException;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Locale;
 
-public class MainActivity extends AppCompatActivity implements ActivityCompat.OnRequestPermissionsResultCallback {
+public class MainActivity extends AppCompatActivity
+        implements ActivityCompat.OnRequestPermissionsResultCallback, AdapterView.OnItemSelectedListener {
+
     public static final int MYPERMISSIONREQUESTCODE_GETCURRENTLOCATION = 1;
 
     private FusedLocationProviderClient fusedLocationProviderClient;
@@ -42,6 +50,9 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         solarnoonCalc = new SolarNoonCalc();
+
+        Spinner supportedLanguages = findViewById(R.id.languages);
+        supportedLanguages.setOnItemSelectedListener(this);
     }
 
     @Override
@@ -58,6 +69,18 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
             Log.d(getLocalClassName(), "Permissions were already granted!");
             calculateSolarNoonTime();
         }
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        final String selectedLanguage = String.valueOf(parent.getSelectedItem());
+        Log.d(getLocalClassName(), "item=" + selectedLanguage);
+        getResources().getStringArray(R.array.supported_languages);
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+
     }
 
     @Override
@@ -111,7 +134,7 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
     }
 
     public void updateUI(Location location) {
-        Geocoder geocoder = new Geocoder(this);
+        Geocoder geocoder = new Geocoder(this, new Locale(Application.getPreferredLanguage(this)));
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             List<Address> addresses = null;
@@ -120,10 +143,10 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
 
                 // this method is deprecated
                 addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+                set(findViewById(R.id.location), addresses);
             } catch (IOException e) {
                 Log.e(getLocalClassName(), String.format("Error retrieving addresses for latitude %s and longitude %s. ", location.getLatitude(), location.getLongitude()), e);
             }
-            set(findViewById(R.id.location), addresses);
         } else {
             try {
                 Log.d(getLocalClassName(), String.format("The API level of the running system is %s so calling Geocoder.getFromLocation(latitude, longitude, maxResults, Geocoder.GeocoderListeneer).", Build.VERSION.SDK_INT));
@@ -150,5 +173,4 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
             Log.e(getLocalClassName(), String.format("Unabled to set addresses <%s> for the text view <id=%s>", addresses, textView.getId()));
         }
     }
-
 }

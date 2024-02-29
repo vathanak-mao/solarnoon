@@ -1,9 +1,10 @@
 package com.vathanakmao.solarnoon;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 import static org.junit.Assert.*;
+
+import com.vathanakmao.solarnoon.util.MathUtil;
 
 import java.time.ZonedDateTime;
 

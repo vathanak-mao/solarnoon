@@ -4,6 +4,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
+import com.vathanakmao.solarnoon.model.LocalTime;
+import com.vathanakmao.solarnoon.service.SolarNoonCalc;
+import com.vathanakmao.solarnoon.util.MathUtil;
+
 import org.junit.Test;
 
 import java.util.GregorianCalendar;
@@ -16,7 +20,7 @@ public class SolarNoonCalcTest {
     public static final double ASSERTEQUAlS_DOUBLE_DELTA_SCALEOF17 = 0.00000000000000001;
     public static final double ASSERTEQUAlS_DOUBLE_DELTA_SCALEOF10 = 0.0000000001;
 
-    public SolarNoonCalc calc = SolarNoonCalc.getInstance();
+    public SolarNoonCalc calc = new SolarNoonCalc();
 
     @Test
     public void testGetTime() {

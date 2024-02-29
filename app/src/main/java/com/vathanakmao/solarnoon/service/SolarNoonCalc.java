@@ -1,10 +1,8 @@
-package com.vathanakmao.solarnoon;
+package com.vathanakmao.solarnoon.service;
 
-import static android.webkit.ConsoleMessage.MessageLevel.LOG;
+import com.vathanakmao.solarnoon.model.LocalTime;
 
-import java.text.DecimalFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 
 /**
@@ -46,16 +44,16 @@ public class SolarNoonCalc {
     public static final double TIMEPASTLOCALMIDNIGHT_00_12_00 = TIMEPASTLOCALMIDNIGHT_00_06_00 + 0.1D/24;
     public static final double TIMEPASTLOCALMIDNIGHT_00_18_00 = TIMEPASTLOCALMIDNIGHT_00_12_00 + 0.1D/24;
 
-    private static SolarNoonCalc instance;
+//    private static SolarNoonCalc instance;
 
-    protected SolarNoonCalc() {}
+    public SolarNoonCalc() {}
 
-    public static SolarNoonCalc getInstance() {
-        if (instance == null) {
-            instance = new SolarNoonCalc();
-        }
-        return instance;
-    }
+//    public static SolarNoonCalc getInstance() {
+//        if (instance == null) {
+//            instance = new SolarNoonCalc();
+//        }
+//        return instance;
+//    }
 
     /**
      * Get the local time of the specified date and location

@@ -2,11 +2,12 @@ package com.vathanakmao.solarnoon;
 
 import static org.junit.Assert.assertEquals;
 
+import com.vathanakmao.solarnoon.util.MathUtil;
+
 import org.junit.Test;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.TimeZone;
 
 public class TimeZoneTest {
 

@@ -1,4 +1,4 @@
-package com.vathanakmao.solarnoon;
+package com.vathanakmao.solarnoon.model;
 
 public class LocalTime {
     public static final double MAX_TIME_IN_DOUBLE = 0.999999999999999; // 23:59:59

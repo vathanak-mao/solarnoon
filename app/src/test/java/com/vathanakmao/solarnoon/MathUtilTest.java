@@ -2,9 +2,8 @@ package com.vathanakmao.solarnoon;
 
 import static junit.framework.TestCase.assertEquals;
 
-import android.health.connect.LocalTimeRangeFilter;
+import com.vathanakmao.solarnoon.util.MathUtil;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 public class MathUtilTest {

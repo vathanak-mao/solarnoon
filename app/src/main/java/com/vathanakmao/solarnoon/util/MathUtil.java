@@ -1,4 +1,4 @@
-package com.vathanakmao.solarnoon;
+package com.vathanakmao.solarnoon.util;
 
 
 import android.health.connect.LocalTimeRangeFilter;

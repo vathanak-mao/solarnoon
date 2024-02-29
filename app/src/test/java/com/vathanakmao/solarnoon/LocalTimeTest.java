@@ -2,6 +2,8 @@ package com.vathanakmao.solarnoon;
 
 import static junit.framework.TestCase.assertEquals;
 
+import com.vathanakmao.solarnoon.model.LocalTime;
+
 import org.junit.Test;
 
 public class LocalTimeTest {
