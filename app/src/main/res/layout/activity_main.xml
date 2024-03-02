@@ -51,11 +51,13 @@
         app:layout_constraintTop_toBottomOf="@+id/time"
         app:layout_constraintVertical_bias="0.0" />
 
+
     <Spinner
         android:id="@+id/languages"
-        android:layout_width="104dp"
+        android:layout_width="48dp"
         android:layout_height="48dp"
-        android:entries="@array/supported_languages"
+        android:spinnerMode="dropdown"
+        android:background="@drawable/spinner_background"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"

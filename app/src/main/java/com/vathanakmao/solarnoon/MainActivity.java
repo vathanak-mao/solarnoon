@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
+import android.content.Context;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -16,6 +17,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -51,8 +53,7 @@ public class MainActivity extends AppCompatActivity
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         solarnoonCalc = new SolarNoonCalc();
 
-        Spinner supportedLanguages = findViewById(R.id.languages);
-        supportedLanguages.setOnItemSelectedListener(this);
+        initLanguageSpinner(this);
     }
 
     @Override
@@ -80,7 +81,6 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
-
     }
 
     @Override
@@ -100,6 +100,18 @@ public class MainActivity extends AppCompatActivity
                 return;
             }
         }
+    }
+
+    private void initLanguageSpinner(Context context) {
+        Spinner spinner = findViewById(R.id.languages);
+
+        final String[] languageCodes = getResources().getStringArray(R.array.supported_languages);
+        LanguageArrayAdapter adapter = new LanguageArrayAdapter(context, R.layout.list_item_layout, R.id.textView, languageCodes);
+//        ArrayAdapter adapter = ArrayAdapter.createFromResource(context, R.array.supported_languages, R.layout.);
+        adapter.setDropDownViewResource(androidx.appcompat.R.layout.support_simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+
+        spinner.setOnItemSelectedListener(this);
     }
 
     private void calculateSolarNoonTime() {

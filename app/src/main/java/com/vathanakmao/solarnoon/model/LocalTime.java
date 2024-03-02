@@ -15,7 +15,7 @@ public class LocalTime {
      */
     public LocalTime(double time) {
         if (time < MIN_TIME_IN_DOUBLE || time > MAX_TIME_IN_DOUBLE) {
-            throw new IllegalArgumentException(String.format("The parameter time, %s, cannot be less than %s and greater than %s.", time, MIN_TIME_IN_DOUBLE, MAX_TIME_IN_DOUBLE));
+//            throw new IllegalArgumentException(String.format("The parameter time, %s, cannot be less than %s and greater than %s.", time, MIN_TIME_IN_DOUBLE, MAX_TIME_IN_DOUBLE));
         }
 
         // For example, the time is 0.510060092502 (12:14:29 PM).
