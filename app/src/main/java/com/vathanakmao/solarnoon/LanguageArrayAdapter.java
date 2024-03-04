@@ -36,18 +36,6 @@ public class LanguageArrayAdapter extends ArrayAdapter {
         return null;
     }
 
-//    @Override
-//    public int getPosition(@Nullable Object item) {
-//        if (languageCodes != null) {
-//            for (int i = 0; i < languageCodes.length; i++) {
-//                if (languageCodes[i].equals(item)) {
-//                    return i;
-//                }
-//            }
-//        }
-//        return -1;
-//    }
-
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         if (convertView == null) {
@@ -56,19 +44,11 @@ public class LanguageArrayAdapter extends ArrayAdapter {
         }
 
         // Then the spinner only show the background image like an icon/button for users to click
-        TextView textviewDisplayText = (TextView) convertView.findViewById(R.id.textviewListItemDisplayText);
+        TextView textviewDisplayText = convertView.findViewById(R.id.textviewListItemDisplayText);
         textviewDisplayText.setText("");
 
         TextView textviewValue = convertView.findViewById(R.id.textviewListItemValue);
         textviewValue.setText(languageCodes[position]);
-//
-//        ImageView checkmark = (ImageView) convertView.findViewById(R.id.imageviewListItemCheckmark);
-//        if (languageCodes != null
-//                && languageCodes[position].equals(Application.getPreferredLanguage(context))) {
-//            checkmark.setVisibility(View.VISIBLE);
-//        } else {
-//            checkmark.setVisibility(View.INVISIBLE);
-//        }
 
         return convertView;
     }
@@ -80,13 +60,13 @@ public class LanguageArrayAdapter extends ArrayAdapter {
             convertView = inflater.inflate(R.layout.list_item, parent, false);
         }
 
-        TextView displayText = (TextView) convertView.findViewById(R.id.textviewListItemDisplayText);
+        TextView displayText = convertView.findViewById(R.id.textviewListItemDisplayText);
         displayText.setText(String.valueOf(getItem(position)));
 
-        TextView value = (TextView) convertView.findViewById(R.id.textviewListItemValue);
+        TextView value = convertView.findViewById(R.id.textviewListItemValue);
         value.setText(languageCodes[position]);
 
-        ImageView checkmark = (ImageView) convertView.findViewById(R.id.imageviewListItemCheckmark);
+        ImageView checkmark = convertView.findViewById(R.id.imageviewListItemCheckmark);
         if (languageCodes != null
                 && languageCodes[position].equals(Application.getPreferredLanguage(context))) {
             checkmark.setVisibility(View.VISIBLE);
