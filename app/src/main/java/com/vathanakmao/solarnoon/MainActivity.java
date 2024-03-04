@@ -17,7 +17,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -29,6 +28,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.vathanakmao.solarnoon.model.LocalTime;
 import com.vathanakmao.solarnoon.service.SolarNoonCalc;
+import com.vathanakmao.solarnoon.util.LocaleUtil;
 import com.vathanakmao.solarnoon.util.MathUtil;
 
 import java.io.IOException;
@@ -74,9 +74,9 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        final String selectedLanguage = String.valueOf(parent.getSelectedItem());
-        Log.d(getLocalClassName(), "item=" + selectedLanguage);
-        getResources().getStringArray(R.array.supported_languages);
+        final TextView selectedTextView = view.findViewById(R.id.textviewListItemValue);
+        final String selectedLangCode = String.valueOf(selectedTextView.getText());
+        Application.savePreferredLanguage(selectedLangCode, this);
     }
 
     @Override
@@ -103,15 +103,17 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void initLanguageSpinner(Context context) {
-        Spinner spinner = findViewById(R.id.languages);
-
         final String[] languageCodes = getResources().getStringArray(R.array.supported_languages);
-        LanguageArrayAdapter adapter = new LanguageArrayAdapter(context, R.layout.list_item_layout, R.id.textView, languageCodes);
-//        ArrayAdapter adapter = ArrayAdapter.createFromResource(context, R.array.supported_languages, R.layout.);
+        LanguageArrayAdapter adapter = new LanguageArrayAdapter(context, R.layout.list_item, R.id.textviewListItemDisplayText, languageCodes);
         adapter.setDropDownViewResource(androidx.appcompat.R.layout.support_simple_spinner_dropdown_item);
-        spinner.setAdapter(adapter);
 
+        Spinner spinner = findViewById(R.id.spinnerSupportedLanguages);
+        spinner.setAdapter(adapter);
         spinner.setOnItemSelectedListener(this);
+
+//        final String selectedItem = LocaleUtil.getDisplayName(Application.getPreferredLanguage(this), true);
+//        final int position = adapter.getPosition(selectedItem);
+//        spinner.setSelection(position);
     }
 
     private void calculateSolarNoonTime() {

@@ -15,10 +15,10 @@
               </deviceKey>
             </Target>
           </targetSelectedWithDropDown>
-          <timeTargetWasSelectedWithDropDown value="2024-02-20T23:45:56.646098390Z" />
+          <timeTargetWasSelectedWithDropDown value="2024-03-04T02:03:46.105589432Z" />
         </State>
       </entry>
-      <entry key="getAddressesBasedOnLocale()">
+      <entry key="clearSharedPreferences()">
         <State />
       </entry>
     </value>

@@ -30,7 +30,7 @@ public class SolarNoonCalcTest {
         assertEquals(14, solarNoonTime.getMinute());
         assertEquals(29, solarNoonTime.getSecond());
 
-        LocalTime solarNoonTime2 = calc.getTime(37.42342342342342, -122.08395287867832, -8, february122024, SolarNoonCalc.TIMEPASTLOCALMIDNIGHT_00_06_00);
+        LocalTime solarNoonTime2 = calc.getTime(37.4234234234234, -122.083952878678, -8, february122024, SolarNoonCalc.TIMEPASTLOCALMIDNIGHT_00_06_00);
         assertEquals(12, solarNoonTime2.getHour());
         assertEquals(22, solarNoonTime2.getMinute());
         assertEquals(37, solarNoonTime2.getSecond());

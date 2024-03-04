@@ -1,5 +1,5 @@
 <resources>
     <style name="SpinnerTheme" parent="android:Widget.Spinner">
-        <item name="android:background">@drawable/spinner_background</item>
+        <item name="android:background">@drawable/ic_language_background</item>
     </style>
 </resources>

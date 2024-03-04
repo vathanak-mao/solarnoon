@@ -53,11 +53,11 @@
 
 
     <Spinner
-        android:id="@+id/languages"
+        android:id="@+id/spinnerSupportedLanguages"
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:spinnerMode="dropdown"
-        android:background="@drawable/spinner_background"
+        android:background="@drawable/language_icon"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"

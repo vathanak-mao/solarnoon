@@ -21,12 +21,14 @@ public class LocaleTest {
 
     @Test
     public void createLocaleBasedOnLanguageName() {
-        final Locale fr = new Locale("French");
-        assertEquals("french", fr.getDisplayName());
-        assertEquals("french", fr.getDisplayName(fr));
-        assertEquals("french", fr.getLanguage());
-        assertEquals("french", fr.getDisplayLanguage());
-        assertEquals("french", fr.getDisplayLanguage(fr));
+        final Locale fr = Locale.forLanguageTag("English");
+        assertEquals("english", fr.getLanguage());
+
+        assertEquals("english", fr.getDisplayName());
+        assertEquals("english", fr.getDisplayName(fr));
+        assertEquals("english", fr.getLanguage());
+        assertEquals("english", fr.getDisplayLanguage());
+        assertEquals("english", fr.getDisplayLanguage(fr));
         assertEquals("", fr.getISO3Country());
     }
 }

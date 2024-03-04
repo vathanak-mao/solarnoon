@@ -4,7 +4,6 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
@@ -45,11 +44,12 @@ public class LanguageAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         if (convertView == null) {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = inflater.inflate(R.layout.custom_spinner_item, parent, false);
+            convertView = inflater.inflate(R.layout.list_item, parent, false);
         }
 
-        TextView text = (TextView) convertView.findViewById(R.id.textView);
+        TextView text = (TextView) convertView.findViewById(R.id.textviewListItemDisplayText);
         text.setText(String.valueOf(getItem(position)));
+
         return convertView;
     }
 }

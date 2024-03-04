@@ -1,6 +1,8 @@
 package com.vathanakmao.solarnoon;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,7 +15,7 @@ import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import java.util.Locale;
+import com.vathanakmao.solarnoon.util.LocaleUtil;
 
 public class LanguageArrayAdapter extends ArrayAdapter {
     private Context context;
@@ -29,42 +31,68 @@ public class LanguageArrayAdapter extends ArrayAdapter {
     @Override
     public Object getItem(int position) {
         if (languageCodes != null) {
-            Locale locale = new Locale(languageCodes[position]);
-            return locale.getDisplayName(locale);
+            return LocaleUtil.getDisplayName(languageCodes[position], true);
         }
         return null;
     }
+
+//    @Override
+//    public int getPosition(@Nullable Object item) {
+//        if (languageCodes != null) {
+//            for (int i = 0; i < languageCodes.length; i++) {
+//                if (languageCodes[i].equals(item)) {
+//                    return i;
+//                }
+//            }
+//        }
+//        return -1;
+//    }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         if (convertView == null) {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = inflater.inflate(R.layout.list_item_layout, parent, false);
+            convertView = inflater.inflate(R.layout.list_item, parent, false);
         }
 
-        TextView text = (TextView) convertView.findViewById(R.id.textView);
-//        text.setText(String.valueOf(getItem(position)));
-        text.setText("");
+        // Then the spinner only show the background image like an icon/button for users to click
+        TextView textviewDisplayText = (TextView) convertView.findViewById(R.id.textviewListItemDisplayText);
+        textviewDisplayText.setText("");
+
+        TextView textviewValue = convertView.findViewById(R.id.textviewListItemValue);
+        textviewValue.setText(languageCodes[position]);
+//
+//        ImageView checkmark = (ImageView) convertView.findViewById(R.id.imageviewListItemCheckmark);
+//        if (languageCodes != null
+//                && languageCodes[position].equals(Application.getPreferredLanguage(context))) {
+//            checkmark.setVisibility(View.VISIBLE);
+//        } else {
+//            checkmark.setVisibility(View.INVISIBLE);
+//        }
+
         return convertView;
     }
 
     @Override
     public View getDropDownView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-        // Inflate the layout for the dropdown item
-        View view = LayoutInflater.from(context).inflate(R.layout.list_item_layout, parent, false);
+        if (convertView == null) {
+            LayoutInflater inflater = LayoutInflater.from(context);
+            convertView = inflater.inflate(R.layout.list_item, parent, false);
+        }
 
-        TextView text = (TextView) view.findViewById(R.id.textView);
-        ImageView checkmark = (ImageView) view.findViewById(R.id.checkmark);
+        TextView displayText = (TextView) convertView.findViewById(R.id.textviewListItemDisplayText);
+        displayText.setText(String.valueOf(getItem(position)));
 
-//        MyData data = getItem(position);
+        TextView value = (TextView) convertView.findViewById(R.id.textviewListItemValue);
+        value.setText(languageCodes[position]);
 
-        text.setText(String.valueOf(getItem(position)));
-//        checkmark.setVisibility(data.isChecked() ? View.VISIBLE : View.GONE);
-
-        // Optional: Customize the view further for the dropdown
-        // - Set different background color or text style
-        // - Remove the checkmark if not desired
-
-        return view;
+        ImageView checkmark = (ImageView) convertView.findViewById(R.id.imageviewListItemCheckmark);
+        if (languageCodes != null
+                && languageCodes[position].equals(Application.getPreferredLanguage(context))) {
+            checkmark.setVisibility(View.VISIBLE);
+        } else {
+            checkmark.setVisibility(View.INVISIBLE);
+        }
+        return convertView;
     }
 }

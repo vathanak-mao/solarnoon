@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name" translatable="false">Solar Noon</string>
-    <string name="preference_file_key" translatable="false">com.vathanak.solarnoon.pref</string>
-    <string name="preferred_language_key" translatable="false">com.vathanak.solarnoon.preflang</string>
+    <string name="key_preferences_filename" translatable="false">com.vathanak.solarnoon.pref</string>
+    <string name="key_preferred_language" translatable="false">preflang</string>
     <string name="default_preferred_language" translatable="false">en</string>
 
     <string name="solarnoon_desc">Today\'s Solar Noon</string>
