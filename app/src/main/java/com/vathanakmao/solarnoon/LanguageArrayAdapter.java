@@ -37,6 +37,18 @@ public class LanguageArrayAdapter extends ArrayAdapter {
     }
 
     @Override
+    public int getPosition(@Nullable Object item) {
+        if (languageCodes != null) {
+            for (int i = 0; i < languageCodes.length; i++) {
+                if (LocaleUtil.getDisplayName(languageCodes[i], true).equals(LocaleUtil.getDisplayName(String.valueOf(item), true))) {
+                    return i;
+                }
+            }
+        }
+        return -1;
+    }
+
+    @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         if (convertView == null) {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -64,13 +76,14 @@ public class LanguageArrayAdapter extends ArrayAdapter {
         displayText.setText(String.valueOf(getItem(position)));
 
         TextView value = convertView.findViewById(R.id.textviewListItemValue);
-        value.setText(languageCodes[position]);
-
         ImageView checkmark = convertView.findViewById(R.id.imageviewListItemCheckmark);
         if (languageCodes != null
                 && languageCodes[position].equals(Application.getPreferredLanguage(context))) {
+
+            value.setText(Application.getPreferredLanguage(context));
             checkmark.setVisibility(View.VISIBLE);
         } else {
+            value.setText(languageCodes[position]);
             checkmark.setVisibility(View.INVISIBLE);
         }
         return convertView;
