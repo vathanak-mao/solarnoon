@@ -7,7 +7,7 @@ import android.util.Log;
 public class Application {
 
     /**
-     * Get saved language code from preferences.
+     * Get previously saved language code from preferences.
      *
      * @param context
      * @return

@@ -31,16 +31,25 @@ public class LanguageArrayAdapter extends ArrayAdapter {
     @Override
     public Object getItem(int position) {
         if (languageCodes != null) {
-            return LocaleUtil.getDisplayName(languageCodes[position], true);
+            return LocaleUtil.getDisplayName(languageCodes[position]);
         }
         return null;
     }
 
+    /**
+     * The given item is of type String at runtime,
+     * which is one of the language display names appeared in
+     * the dropdown such as "English" and "ខ្មែរ".
+     *
+     * @param item The item to retrieve the position of.
+     *
+     * @return the number starting from 0 for the first item appeared on top in the dropdown.
+     */
     @Override
     public int getPosition(@Nullable Object item) {
         if (languageCodes != null) {
             for (int i = 0; i < languageCodes.length; i++) {
-                if (LocaleUtil.getDisplayName(languageCodes[i], true).equals(LocaleUtil.getDisplayName(String.valueOf(item), true))) {
+                if (LocaleUtil.getDisplayName(languageCodes[i]).equals(LocaleUtil.getDisplayName(String.valueOf(item)))) {
                     return i;
                 }
             }

@@ -111,7 +111,7 @@ public class MainActivity extends AppCompatActivity
         spinner.setAdapter(adapter);
         spinner.setOnItemSelectedListener(this);
 
-        final String selectedItem = LocaleUtil.getDisplayName(Application.getPreferredLanguage(this), true);
+        final String selectedItem = LocaleUtil.getDisplayName(Application.getPreferredLanguage(this));
         final int position = adapter.getPosition(selectedItem);
         spinner.setSelection(position);
     }
