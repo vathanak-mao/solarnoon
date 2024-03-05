@@ -19,42 +19,10 @@ import com.vathanakmao.solarnoon.util.LocaleUtil;
 
 public class LanguageArrayAdapter extends ArrayAdapter {
     private Context context;
-    private String[] languageCodes;
 
     public LanguageArrayAdapter(Context context, @LayoutRes int resource, @IdRes int textViewResourceId , String[] languageCodes) {
         super(context, resource, textViewResourceId, languageCodes);
         this.context = context;
-        this.languageCodes = languageCodes;
-    }
-
-    @Nullable
-    @Override
-    public Object getItem(int position) {
-        if (languageCodes != null) {
-            return LocaleUtil.getDisplayName(languageCodes[position]);
-        }
-        return null;
-    }
-
-    /**
-     * The given item is of type String at runtime,
-     * which is one of the language display names appeared in
-     * the dropdown such as "English" and "ខ្មែរ".
-     *
-     * @param item The item to retrieve the position of.
-     *
-     * @return the number starting from 0 for the first item appeared on top in the dropdown.
-     */
-    @Override
-    public int getPosition(@Nullable Object item) {
-        if (languageCodes != null) {
-            for (int i = 0; i < languageCodes.length; i++) {
-                if (LocaleUtil.getDisplayName(languageCodes[i]).equals(LocaleUtil.getDisplayName(String.valueOf(item)))) {
-                    return i;
-                }
-            }
-        }
-        return -1;
     }
 
     @Override
@@ -69,7 +37,7 @@ public class LanguageArrayAdapter extends ArrayAdapter {
         textviewDisplayText.setText("");
 
         TextView textviewValue = convertView.findViewById(R.id.textviewListItemValue);
-        textviewValue.setText(languageCodes[position]);
+        textviewValue.setText(String.valueOf(getItem(position)));
 
         return convertView;
     }
@@ -81,19 +49,17 @@ public class LanguageArrayAdapter extends ArrayAdapter {
             convertView = inflater.inflate(R.layout.list_item, parent, false);
         }
 
-        TextView displayText = convertView.findViewById(R.id.textviewListItemDisplayText);
-        displayText.setText(String.valueOf(getItem(position)));
+        TextView itemDisplayText = convertView.findViewById(R.id.textviewListItemDisplayText);
+        itemDisplayText.setText(String.valueOf(getItem(position)));
 
-        TextView value = convertView.findViewById(R.id.textviewListItemValue);
-        ImageView checkmark = convertView.findViewById(R.id.imageviewListItemCheckmark);
-        if (languageCodes != null
-                && languageCodes[position].equals(Application.getPreferredLanguage(context))) {
-
-            value.setText(Application.getPreferredLanguage(context));
-            checkmark.setVisibility(View.VISIBLE);
+        TextView itemValue = convertView.findViewById(R.id.textviewListItemValue);
+        ImageView itemCheckmark = convertView.findViewById(R.id.imageviewListItemCheckmark);
+        if (String.valueOf(getItem(position)).equals(Application.getPreferredLanguage(context))) {
+            itemValue.setText(Application.getPreferredLanguage(context));
+            itemCheckmark.setVisibility(View.VISIBLE);
         } else {
-            value.setText(languageCodes[position]);
-            checkmark.setVisibility(View.INVISIBLE);
+            itemValue.setText(String.valueOf(getItem(position)));
+            itemCheckmark.setVisibility(View.INVISIBLE);
         }
         return convertView;
     }
