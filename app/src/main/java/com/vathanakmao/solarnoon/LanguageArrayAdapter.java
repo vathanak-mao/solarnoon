@@ -32,6 +32,7 @@ public class LanguageArrayAdapter extends ArrayAdapter {
             convertView = inflater.inflate(R.layout.list_item, parent, false);
         }
 
+
         // Then the spinner only show the background image like an icon/button for users to click
         TextView textviewDisplayText = convertView.findViewById(R.id.textviewListItemDisplayText);
         textviewDisplayText.setText("");

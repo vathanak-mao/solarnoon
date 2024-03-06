@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -76,6 +77,9 @@ public class MainActivity extends AppCompatActivity
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         final TextView selectedTextView = view.findViewById(R.id.textviewListItemValue);
         final String selectedLangCode = String.valueOf(selectedTextView.getText());
+
+//        updateUIComponents(preferredLocale);
+
         Application.savePreferredLanguage(selectedLangCode, this);
     }
 
@@ -104,13 +108,20 @@ public class MainActivity extends AppCompatActivity
 
     private void initLanguageSpinner(Context context) {
         final String[] languageCodes = getResources().getStringArray(R.array.supported_languages);
-        LanguageArrayAdapter adapter = new LanguageArrayAdapter(context, R.layout.list_item, R.id.textviewListItemDisplayText, languageCodes);
-        adapter.setDropDownViewResource(androidx.appcompat.R.layout.support_simple_spinner_dropdown_item);
+        LanguageArrayAdapter adapter = new LanguageArrayAdapter(context, R.layout.list_item, R.id.textviewListItemValue, languageCodes);
 
         Spinner spinner = findViewById(R.id.spinnerSupportedLanguages);
         spinner.setAdapter(adapter);
         spinner.setOnItemSelectedListener(this);
 
+        // By default, the spinner chooses the item at position 0 for selection when initializing,
+        // then the onSelectedItem() handler method will also be called
+        // and so the language at position (index) 0 would be saved in preferences
+        // whether or not there is already one there.
+        // After that, when a user clicks on the spinner for the first time,
+        // the first item will always be checked in the dropdown.
+        // Calling setSelection(position) method tells the spinner
+        // to select or check the item at the given position instead of position 0.
         final int position = adapter.getPosition(Application.getPreferredLanguage(this));
         spinner.setSelection(position);
     }
