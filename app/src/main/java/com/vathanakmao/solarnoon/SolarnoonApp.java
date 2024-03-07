@@ -2,9 +2,12 @@ package com.vathanakmao.solarnoon;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.util.Log;
 
-public class Application {
+import java.util.Locale;
+
+public class SolarnoonApp {
 
     /**
      * Get previously saved language code from preferences.
@@ -18,6 +21,10 @@ public class Application {
         return sharedPref.getString(context.getResources().getString(R.string.key_preferred_language), defaultLangCode);
     }
 
+    public static Locale getPreferredLocale(Context context) {
+        return new Locale(getPreferredLanguage(context));
+    }
+
     /**
      * Save language code in preferences.
      * @param languageCode e.g. 'en', 'km'
@@ -29,6 +36,6 @@ public class Application {
         editor.putString(context.getResources().getString(R.string.key_preferred_language), languageCode);
         editor.apply();
 
-        Log.d(Application.class.getSimpleName(), String.format("Saved language code '%s' in preferences.", languageCode));
+        Log.d(SolarnoonApp.class.getSimpleName(), String.format("Saved language code '%s' in preferences.", languageCode));
     }
 }

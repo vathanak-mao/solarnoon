@@ -1,8 +1,6 @@
 package com.vathanakmao.solarnoon;
 
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,8 +12,6 @@ import androidx.annotation.IdRes;
 import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-
-import com.vathanakmao.solarnoon.util.LocaleUtil;
 
 public class LanguageArrayAdapter extends ArrayAdapter {
     private Context context;
@@ -55,8 +51,8 @@ public class LanguageArrayAdapter extends ArrayAdapter {
 
         TextView itemValue = convertView.findViewById(R.id.textviewListItemValue);
         ImageView itemCheckmark = convertView.findViewById(R.id.imageviewListItemCheckmark);
-        if (String.valueOf(getItem(position)).equals(Application.getPreferredLanguage(context))) {
-            itemValue.setText(Application.getPreferredLanguage(context));
+        if (String.valueOf(getItem(position)).equals(SolarnoonApp.getPreferredLanguage(context))) {
+            itemValue.setText(SolarnoonApp.getPreferredLanguage(context));
             itemCheckmark.setVisibility(View.VISIBLE);
         } else {
             itemValue.setText(String.valueOf(getItem(position)));
