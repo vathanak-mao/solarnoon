@@ -77,7 +77,7 @@ public class MainActivity extends BaseActivity
         final String selectedLangCode = String.valueOf(selectedTextView.getText());
         translateUIComponents(selectedLangCode);
 
-        SolarnoonApp.savePreferredLanguage(selectedLangCode, this);
+        Settings.savePreferredLanguage(selectedLangCode, this);
     }
 
     @Override
@@ -118,7 +118,7 @@ public class MainActivity extends BaseActivity
         // the first item will always be checked in the dropdown.
         // Calling setSelection(position) method tells the spinner
         // to select or check the item at the given position instead of position 0.
-        final int position = adapter.getPosition(SolarnoonApp.getPreferredLanguage(this));
+        final int position = adapter.getPosition(Settings.getPreferredLanguage(this));
         spinner.setSelection(position);
         spinner.setOnItemSelectedListener(this);
 
@@ -135,7 +135,7 @@ public class MainActivity extends BaseActivity
                     if (location != null) {
                         Log.d(getLocalClassName(), "Location: lat=" + location.getLatitude() + ", lon=" + location.getLongitude());
 
-                        setCurrentLocation(findViewById(R.id.textviewLocation), SolarnoonApp.getPreferredLanguage(MainActivity.this), location.getLatitude(), location.getLongitude());
+                        setCurrentLocation(findViewById(R.id.textviewLocation), Settings.getPreferredLanguage(MainActivity.this), location.getLatitude(), location.getLongitude());
                         cacheCurrentLocation = location;
 
                         final double timezoneOffset = MathUtil.toHours(ZonedDateTime.now().getOffset().getTotalSeconds());

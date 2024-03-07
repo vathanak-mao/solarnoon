@@ -51,8 +51,8 @@ public class LanguageArrayAdapter extends ArrayAdapter {
 
         TextView itemValue = convertView.findViewById(R.id.textviewListItemValue);
         ImageView itemCheckmark = convertView.findViewById(R.id.imageviewListItemCheckmark);
-        if (String.valueOf(getItem(position)).equals(SolarnoonApp.getPreferredLanguage(context))) {
-            itemValue.setText(SolarnoonApp.getPreferredLanguage(context));
+        if (String.valueOf(getItem(position)).equals(Settings.getPreferredLanguage(context))) {
+            itemValue.setText(Settings.getPreferredLanguage(context));
             itemCheckmark.setVisibility(View.VISIBLE);
         } else {
             itemValue.setText(String.valueOf(getItem(position)));
