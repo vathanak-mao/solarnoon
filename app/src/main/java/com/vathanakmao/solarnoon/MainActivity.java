@@ -135,7 +135,7 @@ public class MainActivity extends BaseActivity
                     if (location != null) {
                         Log.d(getLocalClassName(), "Location: lat=" + location.getLatitude() + ", lon=" + location.getLongitude());
 
-                        setCurrentLocation(findViewById(R.id.textviewLocation), Settings.getPreferredLanguage(MainActivity.this), location.getLatitude(), location.getLongitude());
+                        setCurrentLocation(Settings.getPreferredLanguage(MainActivity.this), location.getLatitude(), location.getLongitude());
                         cacheCurrentLocation = location;
 
                         final double timezoneOffset = MathUtil.toHours(ZonedDateTime.now().getOffset().getTotalSeconds());
@@ -168,7 +168,7 @@ public class MainActivity extends BaseActivity
      * @param latitude
      * @param longitude
      */
-    private void setCurrentLocation(TextView textviewLocation, String langCode, double latitude, double longitude) {
+    private void setCurrentLocation(String langCode, double latitude, double longitude) {
         Geocoder geocoder = new Geocoder(this, new Locale(langCode));
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
@@ -216,7 +216,7 @@ public class MainActivity extends BaseActivity
         textviewDesc.setText(createContext(langCode).getString(R.string.solarnoon_desc));
 
         if (cacheCurrentLocation != null) {
-            setCurrentLocation(findViewById(R.id.textviewLocation), langCode, cacheCurrentLocation.getLatitude(), cacheCurrentLocation.getLongitude());
+            setCurrentLocation(langCode, cacheCurrentLocation.getLatitude(), cacheCurrentLocation.getLongitude());
         }
     }
 
