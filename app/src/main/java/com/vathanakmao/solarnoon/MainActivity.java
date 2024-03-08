@@ -53,20 +53,27 @@ public class MainActivity extends BaseActivity
         solarnoonCalc = new SolarNoonCalc();
 
         initLanguageSpinner(this);
+    }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        // In case that the activity comes back to the foreground (after losing focus or being minimized),
+        // the users expect to see their location and solarnoon time updated
+        // so this code snippet must be in onStart() method, not onCreated()
+        // because it's called both when the activity is first started and comes back to the foreground.
         if (Settings.isLocationServicesDisabled(this)) {
             Log.d(getLocalClassName(), "Location services disabled!");
         } else if (ActivityCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION) != PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, ACCESS_COARSE_LOCATION) != PERMISSION_GRANTED) {
 
-            ActivityCompat.requestPermissions(this,
-                    new String[] {ACCESS_COARSE_LOCATION}, MYPERMISSIONREQUESTCODE_GETCURRENTLOCATION);
+            ActivityCompat.requestPermissions(this, new String[] {ACCESS_COARSE_LOCATION}, MYPERMISSIONREQUESTCODE_GETCURRENTLOCATION);
             Log.d(getLocalClassName(), "Permissions have been requested!");
         } else {
             Log.d(getLocalClassName(), "Permissions were already granted!");
             initCurrentLocationAndSolarnoonTime();
         }
-
     }
 
     @Override
@@ -126,6 +133,8 @@ public class MainActivity extends BaseActivity
 //                || ActivityCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION) == PERMISSION_GRANTED) {
 
             Task<Location> task = fusedLocationProviderClient.getCurrentLocation(new CurrentLocationRequest.Builder().build(), null);
+            Log.d(getLocalClassName(), "fusedLocationProviderClient.getCurrentLocation() called.");
+
             task.addOnSuccessListener(new OnSuccessListener<Location>() {
                 @Override
                 public void onSuccess(Location location) {
@@ -141,6 +150,7 @@ public class MainActivity extends BaseActivity
                     }
                 }
             });
+
             task.addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception e) {
