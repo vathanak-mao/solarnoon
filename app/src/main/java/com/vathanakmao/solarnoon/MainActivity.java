@@ -233,6 +233,7 @@ public class MainActivity extends BaseActivity
 
         if (cacheCurrentLocation != null) {
             setCurrentLocation(cacheCurrentLocation, langCode);
+            setSolarnoonTime(cacheCurrentLocation, langCode);
         }
     }
 
