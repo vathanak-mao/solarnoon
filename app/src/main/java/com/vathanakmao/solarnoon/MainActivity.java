@@ -11,7 +11,6 @@ import android.content.Context;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
-import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -53,7 +52,9 @@ public class MainActivity extends BaseActivity
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         solarnoonCalc = new SolarNoonCalc();
 
-        if (Settings.isLocationServicesEnabled(this)) {
+        initLanguageSpinner(this);
+
+        if (Settings.isLocationServicesDisabled(this)) {
             Log.d(getLocalClassName(), "Location services disabled!");
         } else if (ActivityCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION) != PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, ACCESS_COARSE_LOCATION) != PERMISSION_GRANTED) {
@@ -65,14 +66,6 @@ public class MainActivity extends BaseActivity
             Log.d(getLocalClassName(), "Permissions were already granted!");
             initCurrentLocationAndSolarnoonTime();
         }
-
-        initLanguageSpinner(this);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-
 
     }
 
@@ -129,8 +122,8 @@ public class MainActivity extends BaseActivity
     }
 
     private void initCurrentLocationAndSolarnoonTime() {
-        if (ActivityCompat.checkSelfPermission(this, ACCESS_COARSE_LOCATION) == PERMISSION_GRANTED
-                || ActivityCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION) == PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(this, ACCESS_COARSE_LOCATION) == PERMISSION_GRANTED) {
+//                || ActivityCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION) == PERMISSION_GRANTED) {
 
             Task<Location> task = fusedLocationProviderClient.getCurrentLocation(new CurrentLocationRequest.Builder().build(), null);
             task.addOnSuccessListener(new OnSuccessListener<Location>() {

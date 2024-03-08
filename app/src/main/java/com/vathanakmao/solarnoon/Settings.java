@@ -45,12 +45,12 @@ public class Settings {
         Log.d(Settings.class.getSimpleName(), String.format("Saved language code '%s' in preferences.", languageCode));
     }
 
-    public static boolean isLocationServicesEnabled(Context context) {
+    public static boolean isLocationServicesDisabled(Context context) {
         LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            return locationManager.isLocationEnabled();
+            return !locationManager.isLocationEnabled();
         } else {
-            return !locationManager.getAllProviders().isEmpty();
+            return locationManager.getAllProviders().isEmpty();
         }
     }
 }
