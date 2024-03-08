@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name" translatable="false">Today's Solar Noon</string>
+    <string name="app_name" translatable="false">Today\'s Solar Noon</string>
     <string name="key_preferences_filename" translatable="false">solarnoon.pref</string>
     <string name="key_preferred_language" translatable="false">preflang</string>
     <string name="default_preferred_language" translatable="false">en</string>
