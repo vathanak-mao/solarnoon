@@ -67,7 +67,7 @@ public class MainActivity extends BaseActivity
             Log.d(getLocalClassName(), "Permissions have been requested!");
         } else {
             Log.d(getLocalClassName(), "Permissions were already granted!");
-            calculateSolarNoonTime();
+            initCurrentLocationAndSolarnoonTime();
         }
     }
 
@@ -94,7 +94,7 @@ public class MainActivity extends BaseActivity
             case MYPERMISSIONREQUESTCODE_GETCURRENTLOCATION: {
                 if (grantResults.length > 0 && grantResults[0] == PERMISSION_GRANTED) {
                     Log.d(getLocalClassName(), "Permissions have been granted!");
-                    calculateSolarNoonTime();
+                    initCurrentLocationAndSolarnoonTime();
                 } else {
                     Log.d(getLocalClassName(), "Permissions have been denied!");
                 }
@@ -121,10 +121,9 @@ public class MainActivity extends BaseActivity
         final int position = adapter.getPosition(Settings.getPreferredLanguage(this));
         spinner.setSelection(position);
         spinner.setOnItemSelectedListener(this);
-
     }
 
-    private void calculateSolarNoonTime() {
+    private void initCurrentLocationAndSolarnoonTime() {
         if (ActivityCompat.checkSelfPermission(this, ACCESS_COARSE_LOCATION) == PERMISSION_GRANTED) {
             Task<Location> task = fusedLocationProviderClient.getCurrentLocation(new CurrentLocationRequest.Builder().build(), null);
             task.addOnSuccessListener(new OnSuccessListener<Location>() {
@@ -135,15 +134,10 @@ public class MainActivity extends BaseActivity
                     if (location != null) {
                         Log.d(getLocalClassName(), "Location: lat=" + location.getLatitude() + ", lon=" + location.getLongitude());
 
-                        setCurrentLocation(Settings.getPreferredLanguage(MainActivity.this), location.getLatitude(), location.getLongitude());
+                        setCurrentLocation(location, Settings.getPreferredLanguage(MainActivity.this));
                         cacheCurrentLocation = location;
 
-                        final double timezoneOffset = MathUtil.toHours(ZonedDateTime.now().getOffset().getTotalSeconds());
-                        final LocalTime solarnoonTime = solarnoonCalc.getTime(location.getLatitude(), location.getLongitude(), timezoneOffset, new GregorianCalendar(), SolarNoonCalc.TIMEPASTLOCALMIDNIGHT_00_06_00);
-                        Log.d(getLocalClassName(), String.format("Solar noon: %s:%s:%s", solarnoonTime.getHour(), solarnoonTime.getMinute(), solarnoonTime.getSecond()));
-
-                        TextView display = findViewById(R.id.time);
-                        display.setText(String.format("%s:%s %s", solarnoonTime.getHour(), solarnoonTime.getMinute(), solarnoonTime.getHour() < 12 ? "AM" : "PM"));
+                        setSolarnoonTime(location, Settings.getPreferredLanguage(MainActivity.this));
                     }
                 }
             });
@@ -163,36 +157,34 @@ public class MainActivity extends BaseActivity
      * and if the locale is "en", it shows "Phnom Penh",
      * but if the locale is "km", it shows "ភ្នំពេញ".
      *
-     * @param textviewLocation
+     * @param location
      * @param langCode
-     * @param latitude
-     * @param longitude
      */
-    private void setCurrentLocation(String langCode, double latitude, double longitude) {
+    private void setCurrentLocation(Location location, String langCode) {
         Geocoder geocoder = new Geocoder(this, new Locale(langCode));
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             try {
                 Log.d(getLocalClassName(), String.format("The API level of the running system is %s so falling back to the deprecated method Geocoder.getFromLocation(latitude, longitude, maxResults)", Build.VERSION.SDK_INT));
 
-                final List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
+                final List<Address> addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
                 setLocationAddress(findViewById(R.id.textviewLocation), addresses);
             } catch (IOException e) {
-                Log.e(getLocalClassName(), String.format("Error retrieving addresses for latitude %s and longitude %s. ", latitude, longitude), e);
+                Log.e(getLocalClassName(), String.format("Error retrieving addresses for latitude %s and longitude %s. ", location.getLatitude(), location.getLongitude()), e);
             }
         } else {
             try {
                 Log.d(getLocalClassName(), String.format("The API level of the running system is %s so calling Geocoder.getFromLocation(latitude, longitude, maxResults, Geocoder.GeocoderListeneer).", Build.VERSION.SDK_INT));
 
                 // this method is only supported by API level 34
-                geocoder.getFromLocation(latitude, longitude, 1, new Geocoder.GeocodeListener() {
+                geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1, new Geocoder.GeocodeListener() {
                     @Override
                     public void onGeocode(List<Address> addresses) {
                         setLocationAddress(findViewById(R.id.textviewLocation), addresses);
                     }
                 });
             } catch (IllegalArgumentException e) {
-                Log.e(getLocalClassName(), String.format("Error retrieving addresses based on latitude %s and longitude %. \n%s", latitude, longitude, e.getStackTrace().toString()));
+                Log.e(getLocalClassName(), String.format("Error retrieving addresses based on latitude %s and longitude %. \n%s", location.getLatitude(), location.getLongitude(), e.getStackTrace().toString()));
             }
         }
     }
@@ -211,12 +203,37 @@ public class MainActivity extends BaseActivity
         }
     }
 
+    private void setSolarnoonTime(Location location, String langCode) {
+        final double timezoneOffset = MathUtil.toHours(ZonedDateTime.now().getOffset().getTotalSeconds());
+        final LocalTime solarnoonTime = solarnoonCalc.getTime(location.getLatitude(), location.getLongitude(), timezoneOffset, new GregorianCalendar(), SolarNoonCalc.TIMEPASTLOCALMIDNIGHT_00_06_00);
+        Log.d(getLocalClassName(), String.format("Solar noon: %s:%s:%s", solarnoonTime.getHour(), solarnoonTime.getMinute(), solarnoonTime.getSecond()));
+
+        TextView textviewSolarnoonTime = findViewById(R.id.textviewSolarnoonTime);
+        textviewSolarnoonTime.setText(String.format("%s:%s %s", translateNumbers(solarnoonTime.getHour(), langCode), translateNumbers(solarnoonTime.getMinute(), langCode), solarnoonTime.getHour() < 12 ? "AM" : "PM"));
+    }
+
+    private String translateNumbers(int number, String langCode) {
+        Context localizedContext = createContext(langCode);
+        final StringBuilder result = new StringBuilder();
+        final String[] digits = localizedContext.getResources().getStringArray(R.array.digits);
+
+        for (char digit : String.valueOf(number).toCharArray()) {
+            if (Character.isDigit(digit)) {
+                int index = Character.getNumericValue(digit);
+                result.append(digits[index]);
+            } else {
+                result.append(digit);
+            }
+        }
+        return result.toString();
+    }
+
     private void translateUIComponents(String langCode) {
         TextView textviewDesc = findViewById(R.id.textviewDesc);
         textviewDesc.setText(createContext(langCode).getString(R.string.solarnoon_desc));
 
         if (cacheCurrentLocation != null) {
-            setCurrentLocation(langCode, cacheCurrentLocation.getLatitude(), cacheCurrentLocation.getLongitude());
+            setCurrentLocation(cacheCurrentLocation, langCode);
         }
     }
 
