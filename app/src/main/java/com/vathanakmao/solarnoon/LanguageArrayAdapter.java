@@ -47,7 +47,7 @@ public class LanguageArrayAdapter extends ArrayAdapter {
         }
 
         TextView itemDisplayText = convertView.findViewById(R.id.textviewListItemDisplayText);
-        itemDisplayText.setText(String.valueOf(getItem(position)));
+        itemDisplayText.setText(Settings.getLanguageDisplayName(String.valueOf(getItem(position))));
 
         TextView itemValue = convertView.findViewById(R.id.textviewListItemValue);
         ImageView itemCheckmark = convertView.findViewById(R.id.imageviewListItemCheckmark);

@@ -20,6 +20,11 @@ public class Settings {
         return sharedPref.getString(context.getResources().getString(R.string.key_preferred_language), defaultLangCode);
     }
 
+    public static String getLanguageDisplayName(String langCode) {
+        Locale locale = new Locale(langCode);
+        return locale.getDisplayName(locale);
+    }
+
     public static Locale getPreferredLocale(Context context) {
         return new Locale(getPreferredLanguage(context));
     }
