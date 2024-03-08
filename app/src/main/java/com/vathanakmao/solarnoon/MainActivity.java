@@ -168,7 +168,7 @@ public class MainActivity extends BaseActivity
                 Log.d(getLocalClassName(), String.format("The API level of the running system is %s so falling back to the deprecated method Geocoder.getFromLocation(latitude, longitude, maxResults)", Build.VERSION.SDK_INT));
 
                 final List<Address> addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
-                setLocationAddress(findViewById(R.id.textviewLocation), addresses);
+                setCurrentLocationAddress(findViewById(R.id.textviewLocation), addresses);
             } catch (IOException e) {
                 Log.e(getLocalClassName(), String.format("Error retrieving addresses for latitude %s and longitude %s. ", location.getLatitude(), location.getLongitude()), e);
             }
@@ -180,7 +180,7 @@ public class MainActivity extends BaseActivity
                 geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1, new Geocoder.GeocodeListener() {
                     @Override
                     public void onGeocode(List<Address> addresses) {
-                        setLocationAddress(findViewById(R.id.textviewLocation), addresses);
+                        setCurrentLocationAddress(findViewById(R.id.textviewLocation), addresses);
                     }
                 });
             } catch (IllegalArgumentException e) {
@@ -189,7 +189,7 @@ public class MainActivity extends BaseActivity
         }
     }
 
-    private void setLocationAddress(TextView textView, @NonNull List<Address> addresses) {
+    private void setCurrentLocationAddress(TextView textView, @NonNull List<Address> addresses) {
         if (addresses != null && !addresses.isEmpty()) {
             if (addresses.get(0).getLocality() != null) {
                 textView.setText(addresses.get(0).getLocality()); // city name
