@@ -16,5 +16,5 @@
         <item>9</item>
     </string-array>
 
-    <string name="solarnoon_desc">Today\'s Solar Noon</string>
+    <string name="solarnoon_desc">Solar Noon</string>
 </resources>

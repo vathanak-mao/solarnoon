@@ -1,5 +1,5 @@
 <resources>
-    <string name="solarnoon_desc">ថ្ងៃនេះ ថ្ងៃត្រង់ម៉ោង</string>
+    <string name="solarnoon_desc">ថ្ងៃត្រង់ម៉ោង</string>
     <string-array name="digits">
         <item>០</item>
         <item>១</item>

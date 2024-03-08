@@ -206,10 +206,9 @@ public class MainActivity extends BaseActivity
     private void setSolarnoonTime(Location location, String langCode) {
         final double timezoneOffset = MathUtil.toHours(ZonedDateTime.now().getOffset().getTotalSeconds());
         final LocalTime solarnoonTime = solarnoonCalc.getTime(location.getLatitude(), location.getLongitude(), timezoneOffset, new GregorianCalendar(), SolarNoonCalc.TIMEPASTLOCALMIDNIGHT_00_06_00);
-        Log.d(getLocalClassName(), String.format("Solar noon: %s:%s:%s", solarnoonTime.getHour(), solarnoonTime.getMinute(), solarnoonTime.getSecond()));
 
         TextView textviewSolarnoonTime = findViewById(R.id.textviewSolarnoonTime);
-        textviewSolarnoonTime.setText(String.format("%s:%s %s", translateNumbers(solarnoonTime.getHour(), langCode), translateNumbers(solarnoonTime.getMinute(), langCode), solarnoonTime.getHour() < 12 ? "AM" : "PM"));
+        textviewSolarnoonTime.setText(String.format("%s:%s", translateNumbers(solarnoonTime.getHour(), langCode), translateNumbers(solarnoonTime.getMinute(), langCode)));
     }
 
     private String translateNumbers(int number, String langCode) {
