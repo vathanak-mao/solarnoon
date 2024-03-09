@@ -30,10 +30,11 @@ public class SolarNoonCalcTest {
         assertEquals(14, solarNoonTime.getMinute());
         assertEquals(29, solarNoonTime.getSecond());
 
-        LocalTime solarNoonTime2 = calc.getTime(37.4234234234234, -122.083952878678, -8, february122024, SolarNoonCalc.TIMEPASTLOCALMIDNIGHT_00_06_00);
+        final GregorianCalendar february292024 = new GregorianCalendar(2024, 1, 29);
+        LocalTime solarNoonTime2 = calc.getTime(37.4234234234234, -122.083952878678, -8, february292024, SolarNoonCalc.TIMEPASTLOCALMIDNIGHT_00_06_00);
         assertEquals(12, solarNoonTime2.getHour());
-        assertEquals(22, solarNoonTime2.getMinute());
-        assertEquals(37, solarNoonTime2.getSecond());
+        assertEquals(20, solarNoonTime2.getMinute());
+        assertEquals(46, solarNoonTime2.getSecond());
     }
 
     @Test

@@ -1,6 +1,7 @@
 package com.vathanakmao.solarnoon.service;
 
 import com.vathanakmao.solarnoon.model.LocalTime;
+import com.vathanakmao.solarnoon.util.MathUtil;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -81,11 +82,11 @@ public class SolarNoonCalc {
         final double eccentEarthOrbit = getEccentEarthOrbit(date, timezoneOffsetFromUtc, timePastLocalMidnight);
 //        final double eccentEarthOrbit = MathUtil.to15SignificantDigits(getEccentEarthOrbit(date, timezoneOffsetFromUtc, timePastLocalMidnight));
 
-//        final double radiansOfGeomMeanLongSun = Math.toRadians(geomMeanLongSun);
         final double radiansOfGeomMeanLongSun = Math.toRadians(geomMeanLongSun);
+//        final double radiansOfGeomMeanLongSun = Math.toRadians(geomMeanLongSun);
 
-//        final double radiansOfGeomMeanAnomSun= Math.toRadians(geomMeanAnomSun);
-        final double radiansOfGeomMeanAnomSun = Math.toRadians(geomMeanAnomSun);
+        final double radiansOfGeomMeanAnomSun= Math.toRadians(geomMeanAnomSun);
+//        final double radiansOfGeomMeanAnomSun = Math.toRadians(geomMeanAnomSun);
 
 //        final double varY = MathUtil.to15SignificantDigits(getVarY(date, timezoneOffsetFromUtc, timePastLocalMidnight));
         final double varY = getVarY(date, timezoneOffsetFromUtc, timePastLocalMidnight);
