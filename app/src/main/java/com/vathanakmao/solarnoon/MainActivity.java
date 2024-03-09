@@ -16,6 +16,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -216,6 +217,9 @@ public class MainActivity extends BaseActivity
     private void setSolarnoonTime(Location location, String langCode) {
         final double timezoneOffset = MathUtil.toHours(ZonedDateTime.now().getOffset().getTotalSeconds());
         final LocalTime solarnoonTime = solarnoonCalc.getTime(location.getLatitude(), location.getLongitude(), timezoneOffset, new GregorianCalendar(), SolarNoonCalc.TIMEPASTLOCALMIDNIGHT_00_06_00);
+
+        ImageView imageviewLoading = findViewById(R.id.imageviewLoading);
+        imageviewLoading.setVisibility(View.GONE);
 
         TextView textviewSolarnoonTime = findViewById(R.id.textviewSolarnoonTime);
         textviewSolarnoonTime.setText(String.format("%s:%s", translateNumbers(solarnoonTime.getHour(), langCode), translateNumbers(solarnoonTime.getMinute(), langCode)));

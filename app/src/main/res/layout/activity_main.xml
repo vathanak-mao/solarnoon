@@ -51,11 +51,21 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="1.0" />
 
+    <ImageView
+        android:id="@+id/imageviewLoading"
+        android:layout_width="70dp"
+        android:layout_height="50dp"
+        android:src="@drawable/loading_icon"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
     <TextView
         android:id="@+id/textviewSolarnoonTime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="12:00"
+        android:text=""
         android:textAlignment="center"
         android:textColor="#FFFFFF"
         android:textSize="70sp"
