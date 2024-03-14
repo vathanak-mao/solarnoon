@@ -30,6 +30,7 @@ import com.google.android.gms.tasks.Task;
 import com.vathanakmao.solarnoon.model.LocalTime;
 import com.vathanakmao.solarnoon.service.SolarNoonCalc;
 import com.vathanakmao.solarnoon.util.MathUtil;
+import com.vathanakmao.solarnoon.util.StringUtil;
 
 import java.io.IOException;
 import java.time.ZonedDateTime;
@@ -60,6 +61,7 @@ public class MainActivity extends BaseActivity
     @Override
     protected void onStart() {
         super.onStart();
+//        promptEnableLocationServices();
 
         // In case that the activity comes back to the foreground (after losing focus or being minimized),
         // the users expect to see their location and solarnoon time updated
@@ -67,6 +69,7 @@ public class MainActivity extends BaseActivity
         // because it's called both when the activity is first started and comes back to the foreground.
         if (Settings.isLocationServicesDisabled(this)) {
             Log.d(getLocalClassName(), "Location services disabled!");
+            promptEnableLocationServices();
         } else if (ActivityCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION) != PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, ACCESS_COARSE_LOCATION) != PERMISSION_GRANTED) {
 
@@ -227,15 +230,15 @@ public class MainActivity extends BaseActivity
         imageviewLoading.setVisibility(View.GONE);
 
         TextView textviewSolarnoonTime = findViewById(R.id.textviewSolarnoonTime);
-        textviewSolarnoonTime.setText(String.format("%s:%s", translateNumbers(solarnoonTime.getHour(), langCode), translateNumbers(solarnoonTime.getMinute(), langCode)));
+        textviewSolarnoonTime.setText(translateNumbers(StringUtil.prependZeroIfOneDigit(solarnoonTime.getHour()), langCode) + ":" + translateNumbers(StringUtil.prependZeroIfOneDigit(solarnoonTime.getMinute()), langCode));
     }
 
-    private String translateNumbers(int number, String langCode) {
+    private String translateNumbers(String number, String langCode) {
         Context localizedContext = createContext(langCode);
         final StringBuilder result = new StringBuilder();
         final String[] digits = localizedContext.getResources().getStringArray(R.array.digits);
 
-        for (char digit : String.valueOf(number).toCharArray()) {
+        for (char digit : number.toCharArray()) {
             if (Character.isDigit(digit)) {
                 int index = Character.getNumericValue(digit);
                 result.append(digits[index]);
