@@ -70,9 +70,7 @@ public class MainActivity extends BaseActivity
         if (Settings.isLocationServicesDisabled(this)) {
             Log.d(getLocalClassName(), "Location services disabled!");
             promptEnableLocationServices();
-        } else if (ActivityCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION) != PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(this, ACCESS_COARSE_LOCATION) != PERMISSION_GRANTED) {
-
+        } else if (ActivityCompat.checkSelfPermission(this, ACCESS_COARSE_LOCATION) != PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[] {ACCESS_COARSE_LOCATION}, MYPERMISSIONREQUESTCODE_GETCURRENTLOCATION);
             Log.d(getLocalClassName(), "Permissions have been requested!");
         } else {
@@ -135,8 +133,6 @@ public class MainActivity extends BaseActivity
 
     private void initCurrentLocationAndSolarnoonTime() {
         if (ActivityCompat.checkSelfPermission(this, ACCESS_COARSE_LOCATION) == PERMISSION_GRANTED) {
-//                || ActivityCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION) == PERMISSION_GRANTED) {
-
             Task<Location> task = fusedLocationProviderClient.getCurrentLocation(new CurrentLocationRequest.Builder().build(), null);
             Log.d(getLocalClassName(), "fusedLocationProviderClient.getCurrentLocation() called.");
 
@@ -158,7 +154,7 @@ public class MainActivity extends BaseActivity
             task.addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception e) {
-                    Log.d(getLocalClassName(), e.getStackTrace().toString());
+                    Log.d(getLocalClassName(), StringUtil.getStackTrace(e));
                 }
             });
         }

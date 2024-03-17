@@ -1,5 +1,8 @@
 package com.vathanakmao.solarnoon.util;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 public class StringUtil {
 
     public static final String prependZeroIfOneDigit(int number) {
@@ -16,5 +19,12 @@ public class StringUtil {
             }
         }
         return result.toString();
+    }
+
+    public static final String getStackTrace(Exception e) {
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        e.printStackTrace(pw);
+        return sw.toString();
     }
 }

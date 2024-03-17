@@ -41,11 +41,11 @@ android {
 }
 
 dependencies {
-    implementation 'com.google.android.gms:play-services-location:21.1.0'
+    implementation 'com.google.android.gms:play-services-location:21.2.0'
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.google.android.material:material:1.11.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-    implementation 'com.github.luben:zstd-jni:1.4.9-5@aar' // Import aar for native component compilation
+//    implementation 'com.github.luben:zstd-jni:1.4.9-5@aar' // Import aar for native component compilation
 
     testImplementation 'junit:junit:4.13.2'
 
