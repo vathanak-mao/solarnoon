@@ -49,7 +49,9 @@ import java.util.List;
 import java.util.Locale;
 
 public class MainActivity extends BaseActivity
-        implements ActivityCompat.OnRequestPermissionsResultCallback, AdapterView.OnItemSelectedListener {
+        implements ActivityCompat.OnRequestPermissionsResultCallback,
+        AdapterView.OnItemSelectedListener,
+        OnFailureListener, OnSuccessListener {
 
     public static final int MYPERMISSIONREQUESTCODE_GETCURRENTLOCATION = 1;
     public static final int REQUEST_CHECK_SETTINGS = 2;
@@ -73,82 +75,99 @@ public class MainActivity extends BaseActivity
     protected void onStart() {
         super.onStart();
 
-        createLocationRequest();
-    }
-    protected void createLocationRequest() {
+        // Check if Location Services enabled
         LocationRequest locationRequest = new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 10000).build();
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder().addLocationRequest(locationRequest);
         SettingsClient client = LocationServices.getSettingsClient(this);
         Task<LocationSettingsResponse> task = client.checkLocationSettings(builder.build());
+        task.addOnSuccessListener(this); // Check onSuccess()
+        task.addOnFailureListener(this); // Check onFailure()
+    }
 
-        task.addOnSuccessListener(this, new OnSuccessListener<LocationSettingsResponse>() {
-            @Override
-            public void onSuccess(LocationSettingsResponse locationSettingsResponse) {
-                Log.d(MainActivity.this.getLocalClassName(), String.format("onSuccess called for SettingsClient.checkLocationSettings() - LocationSettingsResponse=%s", locationSettingsResponse.getLocationSettingsStates().toString()));
-                // All location settings are satisfied. The client can initialize
-                // location requests here.
-                // ...
+    /**
+     * Handle result from SettingsClient.checkLocationSettings(),
+     * which checks if Location Services is enabled
+     * or Location settings are satisfied.
+     *
+     * @param response
+     */
+    @Override
+    public void onSuccess(Object response) {
+        if (response != null) {
+            // If Location Services is enabled
+            // or all location settings are satisfied
+            if (response instanceof LocationSettingsResponse) {
+                Log.d(MainActivity.this.getLocalClassName(), String.format("onSuccess called for SettingsClient.checkLocationSettings() - LocationSettingsResponse=%s", ((LocationSettingsResponse) response).getLocationSettingsStates().toString()));
+
+                // if no permission to access the user's location,
+                // request it (prompting the user).
                 if (ActivityCompat.checkSelfPermission(MainActivity.this, ACCESS_COARSE_LOCATION) != PERMISSION_GRANTED) {
                     ActivityCompat.requestPermissions(MainActivity.this, new String[] {ACCESS_COARSE_LOCATION}, MYPERMISSIONREQUESTCODE_GETCURRENTLOCATION);
                     Log.d(getLocalClassName(), "Permissions have been requested!");
                 } else {
+                    // Otherwise, retrieve the device's location (latitude & longitude)
+                    // then calculate the corresponding solar noon time
+                    // and display it.
                     Log.d(getLocalClassName(), "Permissions were already granted!");
                     initCurrentLocationAndSolarnoonTime();
                 }
             }
-        });
-
-        task.addOnFailureListener(this, new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.d(MainActivity.this.getLocalClassName(), String.format("onFailure() called for SettingsClient.checkLocationSettings() - ERROR: %s", StringUtil.getStackTrace(e)));
-
-                if (e instanceof ResolvableApiException) {
-                    // Location settings are not satisfied, but this can be fixed
-                    // by showing the user a dialog.
-                    try {
-                        // Show the dialog by calling startResolutionForResult(),
-                        // and check the result in onActivityResult().
-                        ResolvableApiException resolvable = (ResolvableApiException) e;
-                        resolvable.startResolutionForResult(MainActivity.this, REQUEST_CHECK_SETTINGS);
-
-                        Log.d(MainActivity.this.getLocalClassName(), "startResolutionForResult() called.");
-                    } catch (IntentSender.SendIntentException sendEx) {
-                        // Ignore the error.
-                    }
-                }
-            }
-        });
+        }
     }
 
+    @Override
+    public void onFailure(@NonNull Exception e) {
+        Log.d(MainActivity.this.getLocalClassName(), String.format("onFailure() called for SettingsClient.checkLocationSettings() - ERROR: %s", StringUtil.getStackTrace(e)));
+
+        if (e instanceof ResolvableApiException) {
+            // Location settings are not satisfied, but this can be fixed
+            // by showing the user a dialog.
+            try {
+                // Show the dialog by calling startResolutionForResult(),
+                // and check the result in onActivityResult().
+                ResolvableApiException resolvable = (ResolvableApiException) e;
+                resolvable.startResolutionForResult(MainActivity.this, REQUEST_CHECK_SETTINGS);
+
+                Log.d(MainActivity.this.getLocalClassName(), "startResolutionForResult() called.");
+            } catch (IntentSender.SendIntentException sendEx) {
+                // Ignore the error.
+            }
+        }
+    }
+
+    /**
+     * Handle result from ResolvableApiException.startResolutionForResult(MainActivity.this, REQUEST_CHECK_SETTINGS),
+     * which shows a dialog for a user to enable Location Service with one tap.
+     *
+     * @param requestCode The integer request code originally supplied to
+     *                    startActivityForResult(), allowing you to identify who this
+     *                    result came from.
+     * @param resultCode The integer result code returned by the child activity
+     *                   through its setResult().
+     * @param data An Intent, which can return result data to the caller
+     *               (various data can be attached to Intent "extras").
+     *
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
         Log.d(getLocalClassName(), String.format("onActivityResult() called: requestCode=%s, resultCode=%s", requestCode, resultCode));
 
+        // If the user has just enabled Location Services
         if (requestCode == REQUEST_CHECK_SETTINGS && resultCode == Activity.RESULT_OK) {
+            // If no permission to access the user's location, request it.
             if (ActivityCompat.checkSelfPermission(MainActivity.this, ACCESS_COARSE_LOCATION) != PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(MainActivity.this, new String[] {ACCESS_COARSE_LOCATION}, MYPERMISSIONREQUESTCODE_GETCURRENTLOCATION);
                 Log.d(getLocalClassName(), "Permissions have been requested!");
             } else {
+                // Otherwise, retrieve the user's location (latitude & longitude)
+                // then calculate the corresponding solar noon time
+                // and display it.
                 Log.d(getLocalClassName(), "Permissions were already granted!");
                 initCurrentLocationAndSolarnoonTime();
             }
         }
-    }
-
-    @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        final TextView selectedTextView = view.findViewById(R.id.textviewListItemValue);
-        final String selectedLangCode = String.valueOf(selectedTextView.getText());
-        translateUIComponents(selectedLangCode);
-
-        Settings.savePreferredLanguage(selectedLangCode, this);
-    }
-
-    @Override
-    public void onNothingSelected(AdapterView<?> parent) {
     }
 
     @Override
@@ -170,6 +189,10 @@ public class MainActivity extends BaseActivity
         }
     }
 
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+    }
+
     private void initLanguageSpinner(Context context) {
         final String[] languageCodes = getResources().getStringArray(R.array.supported_languages);
         LanguageArrayAdapter adapter = new LanguageArrayAdapter(context, R.layout.list_item, R.id.textviewListItemValue, languageCodes);
@@ -187,7 +210,16 @@ public class MainActivity extends BaseActivity
         // to select or check the item at the given position instead of position 0.
         final int position = adapter.getPosition(Settings.getPreferredLanguage(this));
         spinner.setSelection(position);
-        spinner.setOnItemSelectedListener(this);
+        spinner.setOnItemSelectedListener(this); // Check onItemSelected()
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        final TextView selectedTextView = view.findViewById(R.id.textviewListItemValue);
+        final String selectedLangCode = String.valueOf(selectedTextView.getText());
+        translateUIComponents(selectedLangCode);
+
+        Settings.savePreferredLanguage(selectedLangCode, this);
     }
 
     private void initCurrentLocationAndSolarnoonTime() {
