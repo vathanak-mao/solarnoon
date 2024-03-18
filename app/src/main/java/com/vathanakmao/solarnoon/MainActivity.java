@@ -84,18 +84,12 @@ public class MainActivity extends BaseActivity
         task.addOnFailureListener(this); // Check onFailure()
     }
 
-    /**
-     * Handle result from SettingsClient.checkLocationSettings(),
-     * which checks if Location Services is enabled
-     * or Location settings are satisfied.
-     *
-     * @param response
-     */
     @Override
     public void onSuccess(Object response) {
         if (response != null) {
-            // If Location Services is enabled
-            // or all location settings are satisfied
+            // If Location Services enabled
+            // or all location settings satisfied.
+            // Callback from SettingsClient.checkLocationSettings()
             if (response instanceof LocationSettingsResponse) {
                 Log.d(MainActivity.this.getLocalClassName(), String.format("onSuccess called for SettingsClient.checkLocationSettings() - LocationSettingsResponse=%s", ((LocationSettingsResponse) response).getLocationSettingsStates().toString()));
 
@@ -127,9 +121,11 @@ public class MainActivity extends BaseActivity
     public void onFailure(@NonNull Exception e) {
         Log.d(MainActivity.this.getLocalClassName(), String.format("onFailure() called for SettingsClient.checkLocationSettings() - ERROR: %s", StringUtil.getStackTrace(e)));
 
+        // Location Services disabled
+        // or Location settings not satisfied,
+        // but this can be fixed by showing the user a dialog.
+        // Callback from SettingsClient.checkLocationSettings()
         if (e instanceof ResolvableApiException) {
-            // Location settings are not satisfied, but this can be fixed
-            // by showing the user a dialog.
             try {
                 // Show the dialog by calling startResolutionForResult(),
                 // and check the result in onActivityResult().
@@ -145,9 +141,6 @@ public class MainActivity extends BaseActivity
         }
     }
 
-    /**
-     * Handle result from enable-location-services dialog.
-     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -173,9 +166,6 @@ public class MainActivity extends BaseActivity
         }
     }
 
-    /**
-     * Handle result from request-location-permissions dialog.
-     */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -184,6 +174,7 @@ public class MainActivity extends BaseActivity
 
         switch (requestCode) {
             case MYPERMISSIONREQUESTCODE_GETCURRENTLOCATION: {
+                // If a user has granted a permission to access current location
                 if (grantResults.length > 0 && grantResults[0] == PERMISSION_GRANTED) {
                     Log.d(getLocalClassName(), "Permissions have been granted!");
                     requestUserLocation();
