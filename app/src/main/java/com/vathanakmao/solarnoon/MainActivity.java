@@ -112,9 +112,10 @@ public class MainActivity extends BaseActivity
                     requestUserLocation();
                 }
             } else if (response instanceof Location) {
+                final Location location = (Location) response;
+
                 Log.d(getLocalClassName(), String.format("onSuccess() called for fusedLocationProviderClient.getCurrentLocation() - Location=%s", location));
 
-                Location location = (Location) response;
                 if (location != null) {
                     Log.d(getLocalClassName(), "Location: lat=" + location.getLatitude() + ", lon=" + location.getLongitude());
 
