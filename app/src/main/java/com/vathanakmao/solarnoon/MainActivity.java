@@ -111,18 +111,14 @@ public class MainActivity extends BaseActivity
                     Log.d(getLocalClassName(), "Permissions were already granted!");
                     requestUserLocation();
                 }
-            } else if (response instanceof Location) {
+            } else if (response instanceof Location) { // If getting current location successful
                 final Location location = (Location) response;
 
                 Log.d(getLocalClassName(), String.format("onSuccess() called for fusedLocationProviderClient.getCurrentLocation() - Location=%s", location));
 
-                if (location != null) {
-                    Log.d(getLocalClassName(), "Location: lat=" + location.getLatitude() + ", lon=" + location.getLongitude());
-
-                    userLocationCache = location;
-                    showUserLocation(location, Settings.getPreferredLanguage(MainActivity.this));
-                    showSolarnoonTime(location, Settings.getPreferredLanguage(MainActivity.this));
-                }
+                userLocationCache = location;
+                showUserLocation(location, Settings.getPreferredLanguage(MainActivity.this));
+                showSolarnoonTime(location, Settings.getPreferredLanguage(MainActivity.this));
             }
         }
     }
@@ -158,18 +154,21 @@ public class MainActivity extends BaseActivity
 
         Log.d(getLocalClassName(), String.format("onActivityResult() called: requestCode=%s, resultCode=%s", requestCode, resultCode));
 
-        // If the user has just enabled Location Services
-        if (requestCode == REQUEST_CHECK_SETTINGS && resultCode == Activity.RESULT_OK) {
-            // If no permission to access the user's location, request it.
-            if (ActivityCompat.checkSelfPermission(MainActivity.this, ACCESS_COARSE_LOCATION) != PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(MainActivity.this, new String[] {ACCESS_COARSE_LOCATION}, MYPERMISSIONREQUESTCODE_GETCURRENTLOCATION);
-                Log.d(getLocalClassName(), "Permissions have been requested!");
-            } else {
-                // Otherwise, retrieve the user's location (latitude & longitude)
-                // then calculate the corresponding solar noon time
-                // and display it.
-                Log.d(getLocalClassName(), "Permissions were already granted!");
-                requestUserLocation();
+        if (requestCode == REQUEST_CHECK_SETTINGS) {
+            if (resultCode == Activity.RESULT_OK) { // if resolution successful or location services enabled
+                // If no permission to access the user's location, request it.
+                if (ActivityCompat.checkSelfPermission(MainActivity.this, ACCESS_COARSE_LOCATION) != PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(MainActivity.this, new String[] {ACCESS_COARSE_LOCATION}, MYPERMISSIONREQUESTCODE_GETCURRENTLOCATION);
+                    Log.d(getLocalClassName(), "Permissions have been requested!");
+                } else {
+                    // Otherwise, retrieve the user's location (latitude & longitude)
+                    // then calculate the corresponding solar noon time
+                    // and display it.
+                    Log.d(getLocalClassName(), "Permissions were already granted!");
+                    requestUserLocation();
+                }
+            } else { // resolution failed or location services still disabled
+                Log.d(getLocalClassName(), "Location Services still disabled.");
             }
         }
     }
@@ -233,7 +232,10 @@ public class MainActivity extends BaseActivity
         Task<Location> task = fusedLocationProviderClient.getCurrentLocation(new CurrentLocationRequest.Builder().build(), null);
         Log.d(getLocalClassName(), "fusedLocationProviderClient.getCurrentLocation() called.");
 
+        // check onSuccess()
         task.addOnSuccessListener(this);
+
+        // check onFailure()
         task.addOnFailureListener(this, e -> {
             onFailure(new GetCurrentLocationException(e));
         });
