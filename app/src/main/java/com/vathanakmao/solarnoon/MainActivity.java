@@ -1,7 +1,6 @@
 package com.vathanakmao.solarnoon;
 
 import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
-import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 
 import androidx.annotation.NonNull;
@@ -37,6 +36,7 @@ import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.vathanakmao.solarnoon.exception.GetCurrentLocationException;
 import com.vathanakmao.solarnoon.model.LocalTime;
 import com.vathanakmao.solarnoon.service.SolarNoonCalc;
 import com.vathanakmao.solarnoon.util.MathUtil;
@@ -58,7 +58,7 @@ public class MainActivity extends BaseActivity
 
     private FusedLocationProviderClient fusedLocationProviderClient;
     private SolarNoonCalc solarnoonCalc;
-    private Location cacheCurrentLocation;
+    private Location userLocationCache;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,7 +109,18 @@ public class MainActivity extends BaseActivity
                     // then calculate the corresponding solar noon time
                     // and display it.
                     Log.d(getLocalClassName(), "Permissions were already granted!");
-                    initCurrentLocationAndSolarnoonTime();
+                    requestUserLocation();
+                }
+            } else if (response instanceof Location) {
+                Log.d(getLocalClassName(), String.format("onSuccess() called for fusedLocationProviderClient.getCurrentLocation() - Location=%s", location));
+
+                Location location = (Location) response;
+                if (location != null) {
+                    Log.d(getLocalClassName(), "Location: lat=" + location.getLatitude() + ", lon=" + location.getLongitude());
+
+                    userLocationCache = location;
+                    showUserLocation(location, Settings.getPreferredLanguage(MainActivity.this));
+                    showSolarnoonTime(location, Settings.getPreferredLanguage(MainActivity.this));
                 }
             }
         }
@@ -132,21 +143,13 @@ public class MainActivity extends BaseActivity
             } catch (IntentSender.SendIntentException sendEx) {
                 // Ignore the error.
             }
+        } else if (e instanceof GetCurrentLocationException) {
+            Log.e(getLocalClassName(), String.format("Error getting current location. Cause: %s", StringUtil.getStackTrace(e)));
         }
     }
 
     /**
-     * Handle result from ResolvableApiException.startResolutionForResult(MainActivity.this, REQUEST_CHECK_SETTINGS),
-     * which shows a dialog for a user to enable Location Service with one tap.
-     *
-     * @param requestCode The integer request code originally supplied to
-     *                    startActivityForResult(), allowing you to identify who this
-     *                    result came from.
-     * @param resultCode The integer result code returned by the child activity
-     *                   through its setResult().
-     * @param data An Intent, which can return result data to the caller
-     *               (various data can be attached to Intent "extras").
-     *
+     * Handle result from enable-location-services dialog.
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -165,11 +168,14 @@ public class MainActivity extends BaseActivity
                 // then calculate the corresponding solar noon time
                 // and display it.
                 Log.d(getLocalClassName(), "Permissions were already granted!");
-                initCurrentLocationAndSolarnoonTime();
+                requestUserLocation();
             }
         }
     }
 
+    /**
+     * Handle result from request-location-permissions dialog.
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -180,7 +186,7 @@ public class MainActivity extends BaseActivity
             case MYPERMISSIONREQUESTCODE_GETCURRENTLOCATION: {
                 if (grantResults.length > 0 && grantResults[0] == PERMISSION_GRANTED) {
                     Log.d(getLocalClassName(), "Permissions have been granted!");
-                    initCurrentLocationAndSolarnoonTime();
+                    requestUserLocation();
                 } else {
                     Log.d(getLocalClassName(), "Permissions have been denied!");
                 }
@@ -222,33 +228,14 @@ public class MainActivity extends BaseActivity
         Settings.savePreferredLanguage(selectedLangCode, this);
     }
 
-    private void initCurrentLocationAndSolarnoonTime() {
-        if (ActivityCompat.checkSelfPermission(this, ACCESS_COARSE_LOCATION) == PERMISSION_GRANTED) {
-            Task<Location> task = fusedLocationProviderClient.getCurrentLocation(new CurrentLocationRequest.Builder().build(), null);
-            Log.d(getLocalClassName(), "fusedLocationProviderClient.getCurrentLocation() called.");
+    private void requestUserLocation() throws SecurityException {
+        Task<Location> task = fusedLocationProviderClient.getCurrentLocation(new CurrentLocationRequest.Builder().build(), null);
+        Log.d(getLocalClassName(), "fusedLocationProviderClient.getCurrentLocation() called.");
 
-            task.addOnSuccessListener(new OnSuccessListener<Location>() {
-                @Override
-                public void onSuccess(Location location) {
-                    Log.d(getLocalClassName(), String.format("onSuccess() called for fusedLocationProviderClient.getCurrentLocation() - Location=%s", location));
-
-                    if (location != null) {
-                        Log.d(getLocalClassName(), "Location: lat=" + location.getLatitude() + ", lon=" + location.getLongitude());
-
-                        cacheCurrentLocation = location;
-                        setCurrentLocation(location, Settings.getPreferredLanguage(MainActivity.this));
-                        setSolarnoonTime(location, Settings.getPreferredLanguage(MainActivity.this));
-                    }
-                }
-            });
-
-            task.addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    Log.d(getLocalClassName(), String.format("onFailure called for fusedLocationProviderClient.getCurrentLocation() - ERROR: %s", StringUtil.getStackTrace(e)));
-                }
-            });
-        }
+        task.addOnSuccessListener(this);
+        task.addOnFailureListener(this, e -> {
+            onFailure(new GetCurrentLocationException(e));
+        });
     }
 
     /**
@@ -261,7 +248,7 @@ public class MainActivity extends BaseActivity
      * @param location
      * @param langCode
      */
-    private void setCurrentLocation(Location location, String langCode) {
+    private void showUserLocation(Location location, String langCode) {
         Geocoder geocoder = new Geocoder(this, new Locale(langCode));
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
@@ -309,7 +296,7 @@ public class MainActivity extends BaseActivity
         }
     }
 
-    private void setSolarnoonTime(Location location, String langCode) {
+    private void showSolarnoonTime(Location location, String langCode) {
         final double timezoneOffset = MathUtil.toHours(ZonedDateTime.now().getOffset().getTotalSeconds());
         final LocalTime solarnoonTime = solarnoonCalc.getTime(location.getLatitude(), location.getLongitude(), timezoneOffset, new GregorianCalendar(), SolarNoonCalc.TIMEPASTLOCALMIDNIGHT_00_06_00);
 
@@ -340,9 +327,9 @@ public class MainActivity extends BaseActivity
         TextView textviewDesc = findViewById(R.id.textviewDesc);
         textviewDesc.setText(createContext(langCode).getString(R.string.solarnoon_desc));
 
-        if (cacheCurrentLocation != null) {
-            setCurrentLocation(cacheCurrentLocation, langCode);
-            setSolarnoonTime(cacheCurrentLocation, langCode);
+        if (userLocationCache != null) {
+            showUserLocation(userLocationCache, langCode);
+            showSolarnoonTime(userLocationCache, langCode);
         }
     }
 
