@@ -40,6 +40,7 @@ import com.google.android.gms.tasks.Task;
 import com.vathanakmao.solarnoon.exception.GetCurrentLocationException;
 import com.vathanakmao.solarnoon.model.LocalTime;
 import com.vathanakmao.solarnoon.service.SolarNoonCalc;
+import com.vathanakmao.solarnoon.util.DialogFactory;
 import com.vathanakmao.solarnoon.util.MathUtil;
 import com.vathanakmao.solarnoon.util.StringUtil;
 
@@ -70,9 +71,15 @@ public class MainActivity extends BaseActivity
         solarnoonCalc = new SolarNoonCalc();
 
         initLanguageSpinner(this);
+    }
 
-        // Check if Location Services enabled
-        // or location settings satisfied.
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        // Check if Location Services enabled or location settings satisfied
+        // This must be checked in onStart() to make sure
+        // it runs everytime the activity comes back to the foreground.
         LocationRequest locationRequest = new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 10000).build();
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder().addLocationRequest(locationRequest);
         SettingsClient client = LocationServices.getSettingsClient(this);
@@ -94,23 +101,31 @@ public class MainActivity extends BaseActivity
                 // request it (prompting the user).
                 if (ActivityCompat.checkSelfPermission(MainActivity.this, ACCESS_COARSE_LOCATION) != PERMISSION_GRANTED) {
                     ActivityCompat.requestPermissions(MainActivity.this, new String[] {ACCESS_COARSE_LOCATION}, MYPERMISSIONREQUESTCODE_GETCURRENTLOCATION);
-                    Log.d(getLocalClassName(), "Permissions have been requested!");
+                    Log.d(getLocalClassName(), "Permissions have been requested.");
                 } else {
                     // Otherwise, retrieve the device's location (latitude & longitude)
                     // then calculate the corresponding solar noon time
                     // and display it.
-                    Log.d(getLocalClassName(), "Permissions were already granted!");
+                    Log.d(getLocalClassName(), "Permissions were already granted.");
+//                    DialogFactory.showNewInfoDialog("Permissions were already granted.", this);
                     requestUserLocation();
                 }
             } else if (response instanceof Location) { // If getting current location successful
                 final Location location = (Location) response;
 
                 Log.d(getLocalClassName(), String.format("onSuccess() called for fusedLocationProviderClient.getCurrentLocation() - Location=%s", location));
+//                DialogFactory.showNewInfoDialog(String.format("[onSuccess()] location=%s", location), this);
 
                 userLocationCache = location;
                 showUserLocation(location, Settings.getPreferredLanguage(MainActivity.this));
                 showSolarnoonTime(location, Settings.getPreferredLanguage(MainActivity.this));
+            } else {
+                Log.d(getLocalClassName(), String.format("[onSuccess()] response is unknown <%s>.", response));
+//                DialogFactory.showNewInfoDialog(String.format("[onSuccess()] response is unknown <%s>.", response) , this);
             }
+        } else {
+            Log.d(getLocalClassName(), "[onSuccess] response is null.");
+//            DialogFactory.showNewInfoDialog("[onSuccess()] response is null.", this);
         }
     }
 
@@ -157,17 +172,20 @@ public class MainActivity extends BaseActivity
             if (resultCode == Activity.RESULT_OK) { // if resolution successful or location services enabled
                 // If no permission to access the user's location, request it.
                 if (ActivityCompat.checkSelfPermission(MainActivity.this, ACCESS_COARSE_LOCATION) != PERMISSION_GRANTED) {
+                    // Check onRequestPermissionsResult() for response
                     ActivityCompat.requestPermissions(MainActivity.this, new String[] {ACCESS_COARSE_LOCATION}, MYPERMISSIONREQUESTCODE_GETCURRENTLOCATION);
-                    Log.d(getLocalClassName(), "Permissions have been requested!");
+                    Log.d(getLocalClassName(), "Permissions have been requested.");
                 } else {
                     // Otherwise, retrieve the user's location (latitude & longitude)
                     // then calculate the corresponding solar noon time
                     // and display it.
-                    Log.d(getLocalClassName(), "Permissions were already granted!");
+                    Log.d(getLocalClassName(), "Permissions were already granted.");
+//                    DialogFactory.showNewInfoDialog("[onActivityResult()] Permissions were already granted.", this);
                     requestUserLocation();
                 }
             } else { // resolution failed or location services still disabled
                 Log.d(getLocalClassName(), "Location Services still disabled.");
+//                DialogFactory.showNewInfoDialog("[onActivityResult()] Location Services still disabled.", this);
             }
         }
     }
@@ -183,8 +201,10 @@ public class MainActivity extends BaseActivity
                 // If a user has granted a permission to access current location
                 if (grantResults.length > 0 && grantResults[0] == PERMISSION_GRANTED) {
                     Log.d(getLocalClassName(), "Permissions have been granted!");
+//                    DialogFactory.showNewInfoDialog("[onRequestPermissionsResult()] Permissions have been granted.", this);
                     requestUserLocation();
                 } else {
+//                    DialogFactory.showNewInfoDialog("[onRequestPermissionsResult()] Permissions have been denied.", this);
                     Log.d(getLocalClassName(), "Permissions have been denied!");
                 }
                 return;
