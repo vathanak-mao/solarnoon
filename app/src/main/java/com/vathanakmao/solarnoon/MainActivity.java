@@ -8,6 +8,7 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -69,13 +70,9 @@ public class MainActivity extends BaseActivity
         solarnoonCalc = new SolarNoonCalc();
 
         initLanguageSpinner(this);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
 
         // Check if Location Services enabled
+        // or location settings satisfied.
         LocationRequest locationRequest = new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 10000).build();
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder().addLocationRequest(locationRequest);
         SettingsClient client = LocationServices.getSettingsClient(this);
@@ -126,18 +123,27 @@ public class MainActivity extends BaseActivity
         // but this can be fixed by showing the user a dialog.
         // Callback from SettingsClient.checkLocationSettings()
         if (e instanceof ResolvableApiException) {
-            try {
-                // Show the dialog by calling startResolutionForResult(),
-                // and check the result in onActivityResult().
-                ResolvableApiException resolvable = (ResolvableApiException) e;
-                resolvable.startResolutionForResult(MainActivity.this, REQUEST_CHECK_SETTINGS);
-
-                Log.d(MainActivity.this.getLocalClassName(), "startResolutionForResult() called.");
-            } catch (IntentSender.SendIntentException sendEx) {
-                // Ignore the error.
-            }
+            new AlertDialog.Builder(this)
+                    .setTitle("Location Services needed!")
+                    .setMessage("Location Services must be enabled to get solar noon's time based on your current location. Please grant access to continue.")
+                    .setPositiveButton("Grant Acccess", (dialog, which) -> startResolution(e))
+                    .setNegativeButton("Dismiss", (dialog, which) -> dialog.dismiss())
+                    .create().show();
         } else if (e instanceof GetCurrentLocationException) {
             Log.e(getLocalClassName(), String.format("Error getting current location. Cause: %s", StringUtil.getStackTrace(e)));
+        }
+    }
+
+    private void startResolution(Exception e) {
+        try {
+            // Show the dialog by calling startResolutionForResult(),
+            // and check the result in onActivityResult().
+            ResolvableApiException resolvable = (ResolvableApiException) e;
+            resolvable.startResolutionForResult(MainActivity.this, REQUEST_CHECK_SETTINGS);
+
+            Log.d(MainActivity.this.getLocalClassName(), "startResolutionForResult() called.");
+        } catch (IntentSender.SendIntentException sendEx) {
+            // Ignore the error.
         }
     }
 
