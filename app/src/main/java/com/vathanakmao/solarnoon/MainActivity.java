@@ -40,7 +40,6 @@ import com.google.android.gms.tasks.Task;
 import com.vathanakmao.solarnoon.exception.GetCurrentLocationException;
 import com.vathanakmao.solarnoon.model.LocalTime;
 import com.vathanakmao.solarnoon.service.SolarNoonCalc;
-import com.vathanakmao.solarnoon.util.DialogFactory;
 import com.vathanakmao.solarnoon.util.MathUtil;
 import com.vathanakmao.solarnoon.util.StringUtil;
 
@@ -97,19 +96,7 @@ public class MainActivity extends BaseActivity
             if (response instanceof LocationSettingsResponse) {
                 Log.d(MainActivity.this.getLocalClassName(), String.format("onSuccess called for SettingsClient.checkLocationSettings() - LocationSettingsResponse=%s", ((LocationSettingsResponse) response).getLocationSettingsStates().toString()));
 
-                // if no permission to access the user's location,
-                // request it (prompting the user).
-                if (ActivityCompat.checkSelfPermission(MainActivity.this, ACCESS_COARSE_LOCATION) != PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(MainActivity.this, new String[] {ACCESS_COARSE_LOCATION}, MYPERMISSIONREQUESTCODE_GETCURRENTLOCATION);
-                    Log.d(getLocalClassName(), "Permissions have been requested.");
-                } else {
-                    // Otherwise, retrieve the device's location (latitude & longitude)
-                    // then calculate the corresponding solar noon time
-                    // and display it.
-                    Log.d(getLocalClassName(), "Permissions were already granted.");
-//                    DialogFactory.showNewInfoDialog("Permissions were already granted.", this);
-                    requestUserLocation();
-                }
+                requestUserPermissionsAndCurrentLocation();
             } else if (response instanceof Location) { // If getting current location successful
                 final Location location = (Location) response;
 
@@ -168,25 +155,29 @@ public class MainActivity extends BaseActivity
 
         Log.d(getLocalClassName(), String.format("onActivityResult() called: requestCode=%s, resultCode=%s", requestCode, resultCode));
 
-        if (requestCode == REQUEST_CHECK_SETTINGS) {
-            if (resultCode == Activity.RESULT_OK) { // if resolution successful or location services enabled
-                // If no permission to access the user's location, request it.
-                if (ActivityCompat.checkSelfPermission(MainActivity.this, ACCESS_COARSE_LOCATION) != PERMISSION_GRANTED) {
-                    // Check onRequestPermissionsResult() for response
-                    ActivityCompat.requestPermissions(MainActivity.this, new String[] {ACCESS_COARSE_LOCATION}, MYPERMISSIONREQUESTCODE_GETCURRENTLOCATION);
-                    Log.d(getLocalClassName(), "Permissions have been requested.");
-                } else {
-                    // Otherwise, retrieve the user's location (latitude & longitude)
-                    // then calculate the corresponding solar noon time
-                    // and display it.
-                    Log.d(getLocalClassName(), "Permissions were already granted.");
-//                    DialogFactory.showNewInfoDialog("[onActivityResult()] Permissions were already granted.", this);
-                    requestUserLocation();
-                }
+        if (requestCode == REQUEST_CHECK_SETTINGS) { // If callback from ResolvableApiException.startResolutionResult().
+            if (resultCode == Activity.RESULT_OK) { // If resolution successful or location services enabled
+                requestUserPermissionsAndCurrentLocation();
             } else { // resolution failed or location services still disabled
                 Log.d(getLocalClassName(), "Location Services still disabled.");
 //                DialogFactory.showNewInfoDialog("[onActivityResult()] Location Services still disabled.", this);
             }
+        }
+    }
+
+    private void requestUserPermissionsAndCurrentLocation() {
+        // If location enabled but no permission to access the user's location, request it.
+        if (ActivityCompat.checkSelfPermission(MainActivity.this, ACCESS_COARSE_LOCATION) != PERMISSION_GRANTED) {
+            // Check onRequestPermissionsResult() for response
+            ActivityCompat.requestPermissions(MainActivity.this, new String[] {ACCESS_COARSE_LOCATION}, MYPERMISSIONREQUESTCODE_GETCURRENTLOCATION);
+            Log.d(getLocalClassName(), "Permissions have been requested.");
+        } else {
+            // Otherwise, retrieve the user's location (latitude & longitude)
+            // then calculate the corresponding solar noon time
+            // and display it.
+            Log.d(getLocalClassName(), "Permissions were already granted.");
+//                    DialogFactory.showNewInfoDialog("[onActivityResult()] Permissions were already granted.", this);
+            requestUserLocation();
         }
     }
 
