@@ -54,8 +54,8 @@ public class MainActivity extends BaseActivity
         AdapterView.OnItemSelectedListener,
         OnFailureListener, OnSuccessListener {
 
-    public static final int MYPERMISSIONREQUESTCODE_GETCURRENTLOCATION = 1;
-    public static final int REQUEST_CHECK_SETTINGS = 2;
+    public static final int REQUESTCODE_GETCURRENTLOCATION = 1;
+    public static final int REQUEST_ENABLE_LOCATION_SERVICES = 2;
 
     private FusedLocationProviderClient fusedLocationProviderClient;
     private SolarNoonCalc solarnoonCalc;
@@ -104,8 +104,8 @@ public class MainActivity extends BaseActivity
 //                DialogFactory.showNewInfoDialog(String.format("[onSuccess()] location=%s", location), this);
 
                 userLocationCache = location;
-                showUserLocation(location, Settings.getPreferredLanguage(MainActivity.this));
-                showSolarnoonTime(location, Settings.getPreferredLanguage(MainActivity.this));
+                showUserLocation(location, Settings.getPreferredLanguage(this));
+                showSolarnoonTime(location, Settings.getPreferredLanguage(this));
             } else {
                 Log.d(getLocalClassName(), String.format("[onSuccess()] response is unknown <%s>.", response));
 //                DialogFactory.showNewInfoDialog(String.format("[onSuccess()] response is unknown <%s>.", response) , this);
@@ -141,7 +141,7 @@ public class MainActivity extends BaseActivity
             // Show the dialog by calling startResolutionForResult(),
             // and check the result in onActivityResult().
             ResolvableApiException resolvable = (ResolvableApiException) e;
-            resolvable.startResolutionForResult(MainActivity.this, REQUEST_CHECK_SETTINGS);
+            resolvable.startResolutionForResult(MainActivity.this, REQUEST_ENABLE_LOCATION_SERVICES);
 
             Log.d(MainActivity.this.getLocalClassName(), "startResolutionForResult() called.");
         } catch (IntentSender.SendIntentException sendEx) {
@@ -155,7 +155,7 @@ public class MainActivity extends BaseActivity
 
         Log.d(getLocalClassName(), String.format("onActivityResult() called: requestCode=%s, resultCode=%s", requestCode, resultCode));
 
-        if (requestCode == REQUEST_CHECK_SETTINGS) { // If callback from ResolvableApiException.startResolutionResult().
+        if (requestCode == REQUEST_ENABLE_LOCATION_SERVICES) { // If callback from ResolvableApiException.startResolutionResult().
             if (resultCode == Activity.RESULT_OK) { // If resolution successful or location services enabled
                 requestUserPermissionsAndCurrentLocation();
             } else { // resolution failed or location services still disabled
@@ -167,9 +167,9 @@ public class MainActivity extends BaseActivity
 
     private void requestUserPermissionsAndCurrentLocation() {
         // If location enabled but no permission to access the user's location, request it.
-        if (ActivityCompat.checkSelfPermission(MainActivity.this, ACCESS_COARSE_LOCATION) != PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(this, ACCESS_COARSE_LOCATION) != PERMISSION_GRANTED) {
             // Check onRequestPermissionsResult() for response
-            ActivityCompat.requestPermissions(MainActivity.this, new String[] {ACCESS_COARSE_LOCATION}, MYPERMISSIONREQUESTCODE_GETCURRENTLOCATION);
+            ActivityCompat.requestPermissions(this, new String[] {ACCESS_COARSE_LOCATION}, REQUESTCODE_GETCURRENTLOCATION);
             Log.d(getLocalClassName(), "Permissions have been requested.");
         } else {
             // Otherwise, retrieve the user's location (latitude & longitude)
@@ -188,7 +188,7 @@ public class MainActivity extends BaseActivity
         Log.d(getLocalClassName(), "onRequestPermissionResult() called");
 
         switch (requestCode) {
-            case MYPERMISSIONREQUESTCODE_GETCURRENTLOCATION: {
+            case REQUESTCODE_GETCURRENTLOCATION: {
                 // If a user has granted a permission to access current location
                 if (grantResults.length > 0 && grantResults[0] == PERMISSION_GRANTED) {
                     Log.d(getLocalClassName(), "Permissions have been granted!");
