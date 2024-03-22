@@ -18,6 +18,7 @@ import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.PersistableBundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -25,6 +26,7 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.CurrentLocationRequest;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -54,8 +56,8 @@ public class MainActivity extends BaseActivity
         AdapterView.OnItemSelectedListener,
         OnFailureListener, OnSuccessListener {
 
-    public static final int REQUESTCODE_GETCURRENTLOCATION = 1;
-    public static final int REQUEST_ENABLE_LOCATION_SERVICES = 2;
+    public static final int REQUESTCODE__GET_CURRENT_LOCATION = 1;
+    public static final int REQUESTCODE__ENABLE_LOCATION_SERVICES = 2;
 
     private FusedLocationProviderClient fusedLocationProviderClient;
     private SolarNoonCalc solarnoonCalc;
@@ -70,16 +72,23 @@ public class MainActivity extends BaseActivity
         solarnoonCalc = new SolarNoonCalc();
 
         initLanguageSpinner(this);
+        initLoadingImage();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
 
+        try {
+            Thread.sleep(5000);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         // Check if Location Services enabled or location settings satisfied
         // This must be checked in onStart() to make sure
         // it runs everytime the activity comes back to the foreground.
-        LocationRequest locationRequest = new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 10000).build();
+        LocationRequest locationRequest = new LocationRequest.Builder(Priority.PRIORITY_BALANCED_POWER_ACCURACY, 60*60*1000).build();
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder().addLocationRequest(locationRequest);
         SettingsClient client = LocationServices.getSettingsClient(this);
         Task<LocationSettingsResponse> task = client.checkLocationSettings(builder.build());
@@ -141,7 +150,7 @@ public class MainActivity extends BaseActivity
             // Show the dialog by calling startResolutionForResult(),
             // and check the result in onActivityResult().
             ResolvableApiException resolvable = (ResolvableApiException) e;
-            resolvable.startResolutionForResult(MainActivity.this, REQUEST_ENABLE_LOCATION_SERVICES);
+            resolvable.startResolutionForResult(MainActivity.this, REQUESTCODE__ENABLE_LOCATION_SERVICES);
 
             Log.d(MainActivity.this.getLocalClassName(), "startResolutionForResult() called.");
         } catch (IntentSender.SendIntentException sendEx) {
@@ -155,7 +164,7 @@ public class MainActivity extends BaseActivity
 
         Log.d(getLocalClassName(), String.format("onActivityResult() called: requestCode=%s, resultCode=%s", requestCode, resultCode));
 
-        if (requestCode == REQUEST_ENABLE_LOCATION_SERVICES) { // If callback from ResolvableApiException.startResolutionResult().
+        if (requestCode == REQUESTCODE__ENABLE_LOCATION_SERVICES) { // If callback from ResolvableApiException.startResolutionResult().
             if (resultCode == Activity.RESULT_OK) { // If resolution successful or location services enabled
                 requestUserPermissionsAndCurrentLocation();
             } else { // resolution failed or location services still disabled
@@ -169,7 +178,7 @@ public class MainActivity extends BaseActivity
         // If location enabled but no permission to access the user's location, request it.
         if (ActivityCompat.checkSelfPermission(this, ACCESS_COARSE_LOCATION) != PERMISSION_GRANTED) {
             // Check onRequestPermissionsResult() for response
-            ActivityCompat.requestPermissions(this, new String[] {ACCESS_COARSE_LOCATION}, REQUESTCODE_GETCURRENTLOCATION);
+            ActivityCompat.requestPermissions(this, new String[] {ACCESS_COARSE_LOCATION}, REQUESTCODE__GET_CURRENT_LOCATION);
             Log.d(getLocalClassName(), "Permissions have been requested.");
         } else {
             // Otherwise, retrieve the user's location (latitude & longitude)
@@ -188,7 +197,7 @@ public class MainActivity extends BaseActivity
         Log.d(getLocalClassName(), "onRequestPermissionResult() called");
 
         switch (requestCode) {
-            case REQUESTCODE_GETCURRENTLOCATION: {
+            case REQUESTCODE__GET_CURRENT_LOCATION: {
                 // If a user has granted a permission to access current location
                 if (grantResults.length > 0 && grantResults[0] == PERMISSION_GRANTED) {
                     Log.d(getLocalClassName(), "Permissions have been granted!");
@@ -225,6 +234,13 @@ public class MainActivity extends BaseActivity
         final int position = adapter.getPosition(Settings.getPreferredLanguage(this));
         spinner.setSelection(position);
         spinner.setOnItemSelectedListener(this); // Check onItemSelected()
+    }
+
+    public void initLoadingImage() {
+        ImageView imageviewLoading = findViewById(R.id.imageviewLoading);
+        Glide.with(this)
+                .load(R.drawable.loading_icon)
+                .into(imageviewLoading);
     }
 
     @Override
