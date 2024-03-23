@@ -8,17 +8,14 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentSender;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.PersistableBundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -27,20 +24,16 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.CurrentLocationRequest;
 import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.LocationSettingsRequest;
-import com.google.android.gms.location.LocationSettingsResponse;
 import com.google.android.gms.location.Priority;
-import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.vathanakmao.solarnoon.exception.GetCurrentLocationException;
 import com.vathanakmao.solarnoon.model.LocalTime;
+import com.vathanakmao.solarnoon.service.LocationServicesClient;
 import com.vathanakmao.solarnoon.service.SolarNoonCalc;
 import com.vathanakmao.solarnoon.util.MathUtil;
 import com.vathanakmao.solarnoon.util.StringUtil;
@@ -62,6 +55,7 @@ public class MainActivity extends BaseActivity
     private FusedLocationProviderClient fusedLocationProviderClient;
     private SolarNoonCalc solarnoonCalc;
     private Location userLocationCache;
+    private LocationServicesClient locationServiceClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +64,7 @@ public class MainActivity extends BaseActivity
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         solarnoonCalc = new SolarNoonCalc();
+        locationServiceClient = new LocationServicesClient(this, Priority.PRIORITY_BALANCED_POWER_ACCURACY, 60*60*1000, new String[]{ACCESS_COARSE_LOCATION});
 
         initLanguageSpinner(this);
         initLoadingImage();
@@ -79,21 +74,45 @@ public class MainActivity extends BaseActivity
     protected void onStart() {
         super.onStart();
 
-        try {
-            Thread.sleep(5000);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
         // Check if Location Services enabled or location settings satisfied
         // This must be checked in onStart() to make sure
         // it runs everytime the activity comes back to the foreground.
-        LocationRequest locationRequest = new LocationRequest.Builder(Priority.PRIORITY_BALANCED_POWER_ACCURACY, 60*60*1000).build();
-        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder().addLocationRequest(locationRequest);
-        SettingsClient client = LocationServices.getSettingsClient(this);
-        Task<LocationSettingsResponse> task = client.checkLocationSettings(builder.build());
-        task.addOnSuccessListener(this); // Check onSuccess()
-        task.addOnFailureListener(this); // Check onFailure()
+        locationServiceClient.enableLocationSettingsAndGrantPermissions(REQUESTCODE__ENABLE_LOCATION_SERVICES, REQUESTCODE__GET_CURRENT_LOCATION);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+//        Log.d(getLocalClassName(), String.format("onActivityResult() called: requestCode=%s, resultCode=%s", requestCode, resultCode));
+
+        if (requestCode == REQUESTCODE__ENABLE_LOCATION_SERVICES) { // If callback from ResolvableApiException.startResolutionResult().
+            if (resultCode == Activity.RESULT_OK) { // If resolution successful or location services enabled
+                requestUserPermissionsAndCurrentLocation();
+            } else { // resolution failed or location services still disabled
+                Log.d(getLocalClassName(), "Location Services still disabled.");
+            }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        Log.d(getLocalClassName(), "onRequestPermissionResult() called");
+
+        switch (requestCode) {
+            case REQUESTCODE__GET_CURRENT_LOCATION: {
+                // If a user has granted a permission to access current location
+                if (grantResults.length > 0 && grantResults[0] == PERMISSION_GRANTED) {
+                    Log.d(getLocalClassName(), "Permissions have been granted!");
+                    requestUserLocation();
+                } else {
+                    Log.d(getLocalClassName(), "Permissions have been denied!");
+                }
+                return;
+            }
+        }
     }
 
     @Override
@@ -102,11 +121,12 @@ public class MainActivity extends BaseActivity
             // If Location Services enabled
             // or all location settings satisfied.
             // Callback from SettingsClient.checkLocationSettings()
-            if (response instanceof LocationSettingsResponse) {
-                Log.d(MainActivity.this.getLocalClassName(), String.format("onSuccess called for SettingsClient.checkLocationSettings() - LocationSettingsResponse=%s", ((LocationSettingsResponse) response).getLocationSettingsStates().toString()));
-
-                requestUserPermissionsAndCurrentLocation();
-            } else if (response instanceof Location) { // If getting current location successful
+//            if (response instanceof LocationSettingsResponse) {
+//                Log.d(MainActivity.this.getLocalClassName(), String.format("onSuccess called for SettingsClient.checkLocationSettings() - LocationSettingsResponse=%s", ((LocationSettingsResponse) response).getLocationSettingsStates().toString()));
+//
+//                requestUserPermissionsAndCurrentLocation();
+//            } else
+            if (response instanceof Location) { // If getting current location successful
                 final Location location = (Location) response;
 
                 Log.d(getLocalClassName(), String.format("onSuccess() called for fusedLocationProviderClient.getCurrentLocation() - Location=%s", location));
@@ -133,82 +153,47 @@ public class MainActivity extends BaseActivity
         // or Location settings not satisfied,
         // but this can be fixed by showing the user a dialog.
         // Callback from SettingsClient.checkLocationSettings()
-        if (e instanceof ResolvableApiException) {
-            new AlertDialog.Builder(this)
-                    .setTitle("Location Services needed!")
-                    .setMessage("Location Services must be enabled to get solar noon's time based on your current location. Please grant access to continue.")
-                    .setPositiveButton("Grant Acccess", (dialog, which) -> startResolution(e))
-                    .setNegativeButton("Dismiss", (dialog, which) -> dialog.dismiss())
-                    .create().show();
-        } else if (e instanceof GetCurrentLocationException) {
+//        if (e instanceof ResolvableApiException) {
+//            new AlertDialog.Builder(this)
+//                    .setTitle("Location Services needed!")
+//                    .setMessage("Location Services must be enabled to get solar noon's time based on your current location. Please grant access to continue.")
+//                    .setPositiveButton("Grant Acccess", (dialog, which) -> startResolution(e))
+//                    .setNegativeButton("Dismiss", (dialog, which) -> dialog.dismiss())
+//                    .create().show();
+//        } else
+        if (e instanceof GetCurrentLocationException) {
             Log.e(getLocalClassName(), String.format("Error getting current location. Cause: %s", StringUtil.getStackTrace(e)));
         }
     }
 
-    private void startResolution(Exception e) {
-        try {
-            // Show the dialog by calling startResolutionForResult(),
-            // and check the result in onActivityResult().
-            ResolvableApiException resolvable = (ResolvableApiException) e;
-            resolvable.startResolutionForResult(MainActivity.this, REQUESTCODE__ENABLE_LOCATION_SERVICES);
-
-            Log.d(MainActivity.this.getLocalClassName(), "startResolutionForResult() called.");
-        } catch (IntentSender.SendIntentException sendEx) {
-            // Ignore the error.
-        }
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        Log.d(getLocalClassName(), String.format("onActivityResult() called: requestCode=%s, resultCode=%s", requestCode, resultCode));
-
-        if (requestCode == REQUESTCODE__ENABLE_LOCATION_SERVICES) { // If callback from ResolvableApiException.startResolutionResult().
-            if (resultCode == Activity.RESULT_OK) { // If resolution successful or location services enabled
-                requestUserPermissionsAndCurrentLocation();
-            } else { // resolution failed or location services still disabled
-                Log.d(getLocalClassName(), "Location Services still disabled.");
-//                DialogFactory.showNewInfoDialog("[onActivityResult()] Location Services still disabled.", this);
-            }
-        }
-    }
+//    private void startResolution(Exception e) {
+//        try {
+//            // Show the dialog by calling startResolutionForResult(),
+//            // and check the result in onActivityResult().
+//            ResolvableApiException resolvable = (ResolvableApiException) e;
+//            resolvable.startResolutionForResult(MainActivity.this, REQUESTCODE__ENABLE_LOCATION_SERVICES);
+//
+//            Log.d(MainActivity.this.getLocalClassName(), "startResolutionForResult() called.");
+//        } catch (IntentSender.SendIntentException sendEx) {
+//            // Ignore the error.
+//        }
+//    }
 
     private void requestUserPermissionsAndCurrentLocation() {
         // If location enabled but no permission to access the user's location, request it.
-        if (ActivityCompat.checkSelfPermission(this, ACCESS_COARSE_LOCATION) != PERMISSION_GRANTED) {
-            // Check onRequestPermissionsResult() for response
-            ActivityCompat.requestPermissions(this, new String[] {ACCESS_COARSE_LOCATION}, REQUESTCODE__GET_CURRENT_LOCATION);
-            Log.d(getLocalClassName(), "Permissions have been requested.");
+//        if (ActivityCompat.checkSelfPermission(this, ACCESS_COARSE_LOCATION) != PERMISSION_GRANTED) {
+//            // Check onRequestPermissionsResult() for response
+//            ActivityCompat.requestPermissions(this, new String[] {ACCESS_COARSE_LOCATION}, REQUESTCODE__GET_CURRENT_LOCATION);
+//            Log.d(getLocalClassName(), "Permissions have been requested.");
+//        }
+        if (locationServiceClient.permissionsGranted()) {
+            locationServiceClient.promptUserForPermissions(REQUESTCODE__GET_CURRENT_LOCATION);
         } else {
             // Otherwise, retrieve the user's location (latitude & longitude)
             // then calculate the corresponding solar noon time
             // and display it.
             Log.d(getLocalClassName(), "Permissions were already granted.");
-//                    DialogFactory.showNewInfoDialog("[onActivityResult()] Permissions were already granted.", this);
             requestUserLocation();
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-        Log.d(getLocalClassName(), "onRequestPermissionResult() called");
-
-        switch (requestCode) {
-            case REQUESTCODE__GET_CURRENT_LOCATION: {
-                // If a user has granted a permission to access current location
-                if (grantResults.length > 0 && grantResults[0] == PERMISSION_GRANTED) {
-                    Log.d(getLocalClassName(), "Permissions have been granted!");
-//                    DialogFactory.showNewInfoDialog("[onRequestPermissionsResult()] Permissions have been granted.", this);
-                    requestUserLocation();
-                } else {
-//                    DialogFactory.showNewInfoDialog("[onRequestPermissionsResult()] Permissions have been denied.", this);
-                    Log.d(getLocalClassName(), "Permissions have been denied!");
-                }
-                return;
-            }
         }
     }
 
@@ -245,11 +230,15 @@ public class MainActivity extends BaseActivity
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        final TextView selectedTextView = view.findViewById(R.id.textviewListItemValue);
-        final String selectedLangCode = String.valueOf(selectedTextView.getText());
-        translateUIComponents(selectedLangCode);
+        final TextView selectedTextView = findViewById(R.id.textviewListItemValue);
+        if (selectedTextView != null) {
+            final String selectedLangCode = String.valueOf(selectedTextView.getText());
+            translateUIComponents(selectedLangCode);
 
-        Settings.savePreferredLanguage(selectedLangCode, this);
+            Settings.savePreferredLanguage(selectedLangCode, this);
+        } else {
+            Log.e(getLocalClassName(), "[onItemSelected()] selectedTextView is null");
+        }
     }
 
     private void requestUserLocation() throws SecurityException {
