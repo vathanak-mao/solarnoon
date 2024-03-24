@@ -44,18 +44,24 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
 
-public class MainActivity extends BaseActivity
+public class MainActivity extends LocationAccessActivity
         implements ActivityCompat.OnRequestPermissionsResultCallback,
         AdapterView.OnItemSelectedListener,
         OnFailureListener, OnSuccessListener {
 
-    public static final int REQUESTCODE__GET_CURRENT_LOCATION = 1;
-    public static final int REQUESTCODE__ENABLE_LOCATION_SERVICES = 2;
-
     private FusedLocationProviderClient fusedLocationProviderClient;
     private SolarNoonCalc solarnoonCalc;
     private Location userLocationCache;
-    private LocationServicesClient locationServiceClient;
+
+    @Override
+    protected Context getContext() {
+        return this;
+    }
+
+    @Override
+    protected Activity getActivity() {
+        return this;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,7 +70,7 @@ public class MainActivity extends BaseActivity
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         solarnoonCalc = new SolarNoonCalc();
-        locationServiceClient = new LocationServicesClient(this, Priority.PRIORITY_BALANCED_POWER_ACCURACY, 60*60*1000, new String[]{ACCESS_COARSE_LOCATION});
+//        locationServiceClient = new LocationServicesClient(this, Priority.PRIORITY_BALANCED_POWER_ACCURACY, 60*60*1000, new String[]{ACCESS_COARSE_LOCATION});
 
         initLanguageSpinner(this);
         initLoadingImage();
@@ -77,22 +83,7 @@ public class MainActivity extends BaseActivity
         // Check if Location Services enabled or location settings satisfied
         // This must be checked in onStart() to make sure
         // it runs everytime the activity comes back to the foreground.
-        locationServiceClient.enableLocationSettingsAndGrantPermissions(REQUESTCODE__ENABLE_LOCATION_SERVICES, REQUESTCODE__GET_CURRENT_LOCATION);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-//        Log.d(getLocalClassName(), String.format("onActivityResult() called: requestCode=%s, resultCode=%s", requestCode, resultCode));
-
-        if (requestCode == REQUESTCODE__ENABLE_LOCATION_SERVICES) { // If callback from ResolvableApiException.startResolutionResult().
-            if (resultCode == Activity.RESULT_OK) { // If resolution successful or location services enabled
-                requestUserPermissionsAndCurrentLocation();
-            } else { // resolution failed or location services still disabled
-                Log.d(getLocalClassName(), "Location Services still disabled.");
-            }
-        }
+        enableLocationSettingsAndGrantPermissions(REQUESTCODE__ENABLE_LOCATION_SERVICES, REQUESTCODE__GET_CURRENT_LOCATION);
     }
 
     @Override
@@ -186,8 +177,8 @@ public class MainActivity extends BaseActivity
 //            ActivityCompat.requestPermissions(this, new String[] {ACCESS_COARSE_LOCATION}, REQUESTCODE__GET_CURRENT_LOCATION);
 //            Log.d(getLocalClassName(), "Permissions have been requested.");
 //        }
-        if (locationServiceClient.permissionsGranted()) {
-            locationServiceClient.promptUserForPermissions(REQUESTCODE__GET_CURRENT_LOCATION);
+        if (!permissionsGranted()) {
+            promptUserForPermissions(REQUESTCODE__GET_CURRENT_LOCATION);
         } else {
             // Otherwise, retrieve the user's location (latitude & longitude)
             // then calculate the corresponding solar noon time
