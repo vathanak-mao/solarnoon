@@ -5,6 +5,8 @@ import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.location.Address;
 import android.location.Geocoder;
@@ -56,7 +58,6 @@ public class MainActivity extends LocationAccessActivity
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         solarnoonCalc = new SolarNoonCalc();
-//        locationServiceClient = new LocationServicesClient(this, Priority.PRIORITY_BALANCED_POWER_ACCURACY, 60*60*1000, new String[]{ACCESS_COARSE_LOCATION});
 
         initLanguageSpinner(this);
         initLoadingImage();
@@ -69,10 +70,11 @@ public class MainActivity extends LocationAccessActivity
         // Check if Location Services enabled or location settings satisfied
         // This must be checked in onStart() to make sure
         // it runs everytime the activity comes back to the foreground.
-        grantAppPermissions(REQUESTCODE__GET_CURRENT_LOCATION);
+        grantAppPermissions(new String[] {Manifest.permission.ACCESS_COARSE_LOCATION}, REQUESTCODE__GET_CURRENT_LOCATION);
     }
 
     @Override
+    @SuppressLint("MissingPermission")
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
@@ -83,7 +85,17 @@ public class MainActivity extends LocationAccessActivity
                 // If a user has granted a permission to access current location
                 if (grantResults.length > 0 && grantResults[0] == PERMISSION_GRANTED) {
                     Log.d(getLocalClassName(), "Permissions have been granted!");
-                    requestUserLocation();
+
+                    Task<Location> task = fusedLocationProviderClient.getCurrentLocation(new CurrentLocationRequest.Builder().build(), null);
+                    Log.d(getLocalClassName(), "fusedLocationProviderClient.getCurrentLocation() called.");
+
+                    // check onSuccess()
+                    task.addOnSuccessListener(this);
+
+                    // check onFailure()
+                    task.addOnFailureListener(this, e -> {
+                        onFailure(new GetCurrentLocationException(e));
+                    });
                 } else {
                     Log.d(getLocalClassName(), "Permissions have been denied!");
                 }
@@ -113,22 +125,8 @@ public class MainActivity extends LocationAccessActivity
 
     @Override
     public void onFailure(@NonNull Exception e) {
-        Log.d(MainActivity.this.getLocalClassName(), String.format("onFailure() called for SettingsClient.checkLocationSettings() - ERROR: %s", StringUtil.getStackTrace(e)));
-
         if (e instanceof GetCurrentLocationException) {
             Log.e(getLocalClassName(), String.format("Error getting current location. Cause: %s", StringUtil.getStackTrace(e)));
-        }
-    }
-
-    private void requestUserPermissionsAndCurrentLocation() {
-        if (!permissionsGranted()) {
-            promptToGrantAppPermissions(REQUESTCODE__GET_CURRENT_LOCATION);
-        } else {
-            // Otherwise, retrieve the user's location (latitude & longitude)
-            // then calculate the corresponding solar noon time
-            // and display it.
-            Log.d(getLocalClassName(), "Permissions were already granted.");
-            requestUserLocation();
         }
     }
 
@@ -174,19 +172,6 @@ public class MainActivity extends LocationAccessActivity
         } else {
             Log.e(getLocalClassName(), "[onItemSelected()] selectedTextView is null");
         }
-    }
-
-    private void requestUserLocation() throws SecurityException {
-        Task<Location> task = fusedLocationProviderClient.getCurrentLocation(new CurrentLocationRequest.Builder().build(), null);
-        Log.d(getLocalClassName(), "fusedLocationProviderClient.getCurrentLocation() called.");
-
-        // check onSuccess()
-        task.addOnSuccessListener(this);
-
-        // check onFailure()
-        task.addOnFailureListener(this, e -> {
-            onFailure(new GetCurrentLocationException(e));
-        });
     }
 
     /**

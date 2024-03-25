@@ -1,6 +1,7 @@
 package com.vathanakmao.solarnoon;
 
 import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
+import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 
 import android.app.Activity;
@@ -19,18 +20,18 @@ import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResponse;
 import com.google.android.gms.location.Priority;
 import com.google.android.gms.location.SettingsClient;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.vathanakmao.solarnoon.util.StringUtil;
 
 public class LocationAccessActivity extends BaseActivity {
     public static final int REQUESTCODE__ENABLE_LOCATION_SERVICES = 1895624173;
 
-    // These properties can be override in onCreated() method.
-    protected int priority = Priority.PRIORITY_BALANCED_POWER_ACCURACY;
-    protected int intervalMillis = 60 * 60 * 1000;
-    protected String[] permissions = new String[] {ACCESS_COARSE_LOCATION};
-
-    private int onRequestPermissionsResultRequestCode = -1;
+    // These properties can be overridden in onCreated() method.
+    private int priority = Priority.PRIORITY_BALANCED_POWER_ACCURACY;
+    private int intervalMillis = 60 * 1000;
+    private String[] permissions = new String[] {ACCESS_COARSE_LOCATION, ACCESS_FINE_LOCATION};
+    private int onRequestPermissionsResultRequestCode = 967583124;
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -54,9 +55,10 @@ public class LocationAccessActivity extends BaseActivity {
      *
      * @param onRequestPermissionsResultRequestCode this will be used to check the user's response in onRequestPermissionsResult()
      */
-    public void grantAppPermissions(int onRequestPermissionsResultRequestCode) {
-        // it is used in onActivityResult()
-        this.onRequestPermissionsResultRequestCode = this.onRequestPermissionsResultRequestCode;
+    public void grantAppPermissions(String[] permissions, int onRequestPermissionsResultRequestCode) {
+        // it is used in onRequestPermissionsResult()
+        this.permissions = permissions;
+        this.onRequestPermissionsResultRequestCode = onRequestPermissionsResultRequestCode;
 
         // Check if Location Services enabled or location settings satisfied
         // This must be checked in onStart() to make sure
@@ -67,16 +69,19 @@ public class LocationAccessActivity extends BaseActivity {
         Task<LocationSettingsResponse> task = client.checkLocationSettings(builder.build());
 
         // Callback from SettingsClient.checkLocationSettings()
-        task.addOnSuccessListener(response -> {
-            if (response != null) {
-                if (response instanceof LocationSettingsResponse) {
-                    // If location access is enabled and settings are satisfied
-                    promptToGrantAppPermissions(this, permissions, onRequestPermissionsResultRequestCode);
+        task.addOnSuccessListener(new OnSuccessListener<LocationSettingsResponse>() {
+            @Override
+            public void onSuccess(LocationSettingsResponse response) {
+                if (response != null) {
+                    if (response instanceof LocationSettingsResponse) {
+                        // If location access is enabled and settings are satisfied
+                        promptToGrantAppPermissions(LocationAccessActivity.this, permissions, onRequestPermissionsResultRequestCode);
+                    } else {
+                        Log.d(LocationAccessActivity.class.getSimpleName(), "[onSuccess()] Callback from SettingsClient.checkLocationSettings(): response=" + response);
+                    }
                 } else {
-                    Log.d(LocationAccessActivity.class.getSimpleName(), "[onSuccess()] Callback from SettingsClient.checkLocationSettings(): response=" + response);
+                    Log.d(LocationAccessActivity.class.getSimpleName(), "[onSuccess()] Callback from SettingsClient.checkLocationSettings(): reponse=" + response);
                 }
-            } else {
-                Log.d(LocationAccessActivity.class.getSimpleName(), "[onSuccess()] Callback from SettingsClient.checkLocationSettings(): reponse=" + response);
             }
         });
 
@@ -90,7 +95,7 @@ public class LocationAccessActivity extends BaseActivity {
                 new AlertDialog.Builder(this)
                         .setTitle("Location Services needed!")
                         .setMessage("Location Services must be enabled to get solar noon's time based on your current location. Please grant access to continue.")
-                        .setPositiveButton("Grant Acccess", (dialog, which) -> promptToEnableLocationAccess(exception, this, permissions, REQUESTCODE__ENABLE_LOCATION_SERVICES))
+                        .setPositiveButton("Grant Acccess", (dialog, which) -> promptToEnableLocationAccess(exception, LocationAccessActivity.this, REQUESTCODE__ENABLE_LOCATION_SERVICES))
                         .setNegativeButton("Dismiss", (dialog, which) -> dialog.dismiss())
                         .create().show();
             } else {
@@ -99,7 +104,7 @@ public class LocationAccessActivity extends BaseActivity {
         });
     }
 
-    private void promptToEnableLocationAccess(Exception e, Activity activity, String[] permissions, int requestCode) {
+    private void promptToEnableLocationAccess(Exception e, Activity activity, int requestCode) {
         try {
             // Show the dialog by calling startResolutionForResult(),
             // and check the result in onActivityResult().
@@ -112,9 +117,10 @@ public class LocationAccessActivity extends BaseActivity {
     }
 
     private void promptToGrantAppPermissions(Activity activity, String[] permissions, int requestCode) {
-        if (!permissionsGranted()) {
+        if (!permissionsGranted(permissions)) {
+            // Prompt user to grant app permissions.
             // Check onRequestPermissionsResult() for response
-            promptToGrantAppPermissions(requestCode);
+            ActivityCompat.requestPermissions(this, permissions, requestCode);
             Log.d(getClass().getSimpleName(), "Permissions have been requested.");
         } else {
             // Otherwise, retrieve the user's location (latitude & longitude)
@@ -123,7 +129,6 @@ public class LocationAccessActivity extends BaseActivity {
             Log.d(getClass().getSimpleName(), "Permissions were already granted.");
             activity.onRequestPermissionsResult(requestCode, permissions, new int[]{PERMISSION_GRANTED});
         }
-
     }
 
     /**
@@ -131,9 +136,9 @@ public class LocationAccessActivity extends BaseActivity {
      *
      * @return
      */
-    public boolean permissionsGranted() {
-        if (permissions.length == 0) {
-            Log.d(getClass().getSimpleName(), "Permissions is empty");
+    private boolean permissionsGranted(String[] permissions) {
+        if (permissions == null || permissions.length == 0) {
+            Log.d(getClass().getSimpleName(), "Permissions is null or empty");
             return false;
         }
         int countGrantedPermissions = 0;
@@ -143,15 +148,5 @@ public class LocationAccessActivity extends BaseActivity {
             }
         }
         return countGrantedPermissions == permissions.length;
-    }
-
-    /**
-     * Prompt a user to grant app permissions to access device's location.
-     * The onRequestPermissionsResult() will be called after user responds.
-     *
-     * @param requestCode it's used on onRequestPermissionsResult() to check if it's callback from this mmethod.
-     */
-    public void promptToGrantAppPermissions(int requestCode) {
-        ActivityCompat.requestPermissions(this, permissions, requestCode);
     }
 }
