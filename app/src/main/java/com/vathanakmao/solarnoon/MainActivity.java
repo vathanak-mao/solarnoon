@@ -73,9 +73,7 @@ public class MainActivity extends LocationAccessActivity
         // Prompt the user to grant app permissions for location access.
         // This must be done in onStart() to make sure
         // it runs everytime the activity comes back to the foreground.
-        grantAppPermissions(this,
-                new String[] {Manifest.permission.ACCESS_COARSE_LOCATION},
-                () -> retrieveCurrentLocation());
+        grantAppPermissions(new String[] {Manifest.permission.ACCESS_COARSE_LOCATION}, () -> retrieveCurrentLocation());
     }
 
     public void retrieveCurrentLocation() {

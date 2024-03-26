@@ -45,27 +45,33 @@ public class LocationAccessActivity extends BaseActivity {
      * Otherwise, prompt the user to enable location service with one tap,
      * then prompt the user to grant app permissions.
      */
-    public void grantAppPermissions(Activity activity,
-            String[] permissions, OnPermissionsGrantedListener callback) {
-
+    protected void grantAppPermissions(String[] permissions, OnPermissionsGrantedListener callback) {
         // it is used in onRequestPermissionsResult()
-        this.activity = activity;
         this.permissions = permissions;
         this.onPermissionsGrantedListener = callback;
 
         if (!permissionsGranted(permissions)) {
             // Prompt user to grant app permissions.
             // Check onRequestPermissionsResult() for response
-            ActivityCompat.requestPermissions(this, permissions, LOCATION_ACCESS_REQUEST_CODE);
+            ActivityCompat.requestPermissions(
+                    this,
+                    permissions,
+                    LOCATION_ACCESS_REQUEST_CODE);
             Log.d(getClass().getSimpleName(), "Permissions have been requested.");
         } else {
             Log.d(getClass().getSimpleName(), "Permissions were already granted.");
-            activity.onRequestPermissionsResult(LOCATION_ACCESS_REQUEST_CODE, permissions, new int[]{PERMISSION_GRANTED});
+            onRequestPermissionsResult(
+                    LOCATION_ACCESS_REQUEST_CODE,
+                    permissions,
+                    new int[]{PERMISSION_GRANTED});
         }
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(
+            int requestCode,
+            @NonNull String[] permissions,
+            @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         // If it's a callback from ActivityCompat.requestPermissions()
@@ -77,21 +83,22 @@ public class LocationAccessActivity extends BaseActivity {
                 // Check if location service is enabled (location settings are satisfied)
                 LocationRequest locationRequest = new LocationRequest.Builder(priority, intervalMillis).build();
                 LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder().addLocationRequest(locationRequest);
-                SettingsClient client = LocationServices.getSettingsClient(activity);
-                Task<LocationSettingsResponse> task = client.checkLocationSettings(builder.build());
+
+                SettingsClient client = LocationServices.getSettingsClient(this);
+                Task task = client.checkLocationSettings(builder.build());
 
                 task.addOnSuccessListener(response -> {
                     // If location service is enabled, proceed with location access task
                     onPermissionsGrantedListener.onPermissionsGranted();
                 });
 
-                task.addOnFailureListener(activity, exception -> {
+                task.addOnFailureListener(this, exception -> {
                     // If location service is disabled
                     if (exception instanceof ResolvableApiException) {
                         new AlertDialog.Builder(this)
                                 .setTitle("Location Service needed!")
                                 .setMessage("Location Service must be enabled for the app to function. Please click Next to start granting access.")
-                                .setPositiveButton("Next", (dialog, which) -> promptToEnableLocationService(exception, activity, requestCode))
+                                .setPositiveButton("Next", (dialog, which) -> promptToEnableLocationService(exception, this, requestCode))
                                 .setNegativeButton("Dismiss", (dialog, which) -> dialog.dismiss())
                                 .create().show();
                     }
