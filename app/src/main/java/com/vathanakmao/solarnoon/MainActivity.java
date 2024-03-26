@@ -8,6 +8,7 @@ import androidx.core.app.ActivityCompat;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.IntentSender;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -22,9 +23,11 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.CurrentLocationRequest;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -67,41 +70,25 @@ public class MainActivity extends LocationAccessActivity
     protected void onStart() {
         super.onStart();
 
-        // Check if Location Services enabled or location settings satisfied
-        // This must be checked in onStart() to make sure
+        // Prompt the user to grant app permissions for location access.
+        // This must be done in onStart() to make sure
         // it runs everytime the activity comes back to the foreground.
-        grantAppPermissions(new String[] {Manifest.permission.ACCESS_COARSE_LOCATION}, REQUESTCODE__GET_CURRENT_LOCATION);
+        grantAppPermissions(this,
+                new String[] {Manifest.permission.ACCESS_COARSE_LOCATION},
+                () -> retrieveCurrentLocation());
     }
 
-    @Override
-    @SuppressLint("MissingPermission")
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    public void retrieveCurrentLocation() {
+        @SuppressLint("MissingPermission") Task<Location> task = fusedLocationProviderClient.getCurrentLocation(new CurrentLocationRequest.Builder().build(), null);
+        Log.d(getLocalClassName(), "fusedLocationProviderClient.getCurrentLocation() called.");
 
-        Log.d(getLocalClassName(), "onRequestPermissionResult() called");
+        // check onSuccess()
+        task.addOnSuccessListener(this);
 
-        switch (requestCode) {
-            case REQUESTCODE__GET_CURRENT_LOCATION: {
-                // If a user has granted a permission to access current location
-                if (grantResults.length > 0 && grantResults[0] == PERMISSION_GRANTED) {
-                    Log.d(getLocalClassName(), "Permissions have been granted!");
-
-                    Task<Location> task = fusedLocationProviderClient.getCurrentLocation(new CurrentLocationRequest.Builder().build(), null);
-                    Log.d(getLocalClassName(), "fusedLocationProviderClient.getCurrentLocation() called.");
-
-                    // check onSuccess()
-                    task.addOnSuccessListener(this);
-
-                    // check onFailure()
-                    task.addOnFailureListener(this, e -> {
-                        onFailure(new GetCurrentLocationException(e));
-                    });
-                } else {
-                    Log.d(getLocalClassName(), "Permissions have been denied!");
-                }
-                return;
-            }
-        }
+        // check onFailure()
+        task.addOnFailureListener(this, e -> {
+            onFailure(new GetCurrentLocationException(e));
+        });
     }
 
     @Override
