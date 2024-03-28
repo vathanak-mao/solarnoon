@@ -29,10 +29,8 @@ public class LocationAccessActivity extends BaseActivity {
     public static final int LOCATION_ACCESS_REQUEST_CODE = 1895624173;
 
     // These properties can be overridden in onCreated() method.
-    private Activity activity;
     private int priority = Priority.PRIORITY_BALANCED_POWER_ACCURACY;
     private int intervalMillis = 60 * 1000;
-    private String[] permissions = new String[] {ACCESS_COARSE_LOCATION, ACCESS_FINE_LOCATION};
     private OnPermissionsGrantedListener onPermissionsGrantedListener;
 
     public interface OnPermissionsGrantedListener {
@@ -47,7 +45,6 @@ public class LocationAccessActivity extends BaseActivity {
      */
     protected void grantAppPermissions(String[] permissions, OnPermissionsGrantedListener callback) {
         // it is used in onRequestPermissionsResult()
-        this.permissions = permissions;
         this.onPermissionsGrantedListener = callback;
 
         if (!permissionsGranted(permissions)) {
