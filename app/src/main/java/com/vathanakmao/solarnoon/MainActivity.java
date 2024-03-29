@@ -3,11 +3,13 @@ package com.vathanakmao.solarnoon;
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.content.IntentSender;
 import android.location.Address;
 import android.location.Geocoder;
@@ -33,6 +35,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.vathanakmao.solarnoon.exception.GetCurrentLocationException;
 import com.vathanakmao.solarnoon.model.LocalTime;
+import com.vathanakmao.solarnoon.service.LocationServiceClient;
 import com.vathanakmao.solarnoon.service.SolarNoonCalc;
 import com.vathanakmao.solarnoon.util.MathUtil;
 import com.vathanakmao.solarnoon.util.StringUtil;
@@ -43,13 +46,12 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
 
-public class MainActivity extends LocationAccessActivity
+public class MainActivity extends BaseActivity
         implements ActivityCompat.OnRequestPermissionsResultCallback,
         AdapterView.OnItemSelectedListener,
         OnFailureListener, OnSuccessListener {
 
-    public static final int REQUESTCODE__GET_CURRENT_LOCATION = 817452369;
-
+    private LocationServiceClient locationServiceClient;
     private FusedLocationProviderClient fusedLocationProviderClient;
     private SolarNoonCalc solarnoonCalc;
     private Location userLocationCache;
@@ -73,7 +75,23 @@ public class MainActivity extends LocationAccessActivity
         // Prompt the user to grant app permissions for location access.
         // This must be done in onStart() to make sure
         // it runs everytime the activity comes back to the foreground.
-        grantAppPermissions(new String[] {Manifest.permission.ACCESS_COARSE_LOCATION}, () -> retrieveCurrentLocation());
+        locationServiceClient = new LocationServiceClient();
+        locationServiceClient.grantAppPermissions(
+                this,
+                new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
+                () -> retrieveCurrentLocation());
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        locationServiceClient.onRequestPermissionsResult(this, requestCode, permissions, grantResults);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        locationServiceClient.onActivityResult(requestCode, resultCode, data);
     }
 
     public void retrieveCurrentLocation() {
