@@ -1,7 +1,5 @@
 package com.vathanakmao.solarnoon;
 
-import static android.content.pm.PackageManager.PERMISSION_GRANTED;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
@@ -10,7 +8,6 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentSender;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -25,11 +22,9 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.CurrentLocationRequest;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -198,7 +193,7 @@ public class MainActivity extends BaseActivity
                 public void run() {
                     try {
                         final List<Address> addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
-                        setCurrentLocationAddress(findViewById(R.id.textviewLocation), addresses);
+                        setCurrentLocationName(findViewById(R.id.textviewLocation), addresses);
                     } catch (IOException e) {
                         Log.e(getLocalClassName(), String.format("Error retrieving addresses for latitude %s and longitude %s. ", location.getLatitude(), location.getLongitude()), e);
                     }
@@ -212,7 +207,7 @@ public class MainActivity extends BaseActivity
                 geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1, new Geocoder.GeocodeListener() {
                     @Override
                     public void onGeocode(List<Address> addresses) {
-                        setCurrentLocationAddress(findViewById(R.id.textviewLocation), addresses);
+                        setCurrentLocationName(findViewById(R.id.textviewLocation), addresses);
                     }
                 });
             } catch (IllegalArgumentException e) {
@@ -221,14 +216,20 @@ public class MainActivity extends BaseActivity
         }
     }
 
-    private void setCurrentLocationAddress(TextView textView, @NonNull List<Address> addresses) {
+    private void setCurrentLocationName(TextView textView, @NonNull List<Address> addresses) {
         if (addresses != null && !addresses.isEmpty()) {
-            if (addresses.get(0).getLocality() != null) {
-                textView.setText(addresses.get(0).getLocality()); // city name
+            final String locationName;
+            final Address address = addresses.get(0);
+            if (address.getSubLocality() != null) {
+                locationName = address.getSubLocality(); // District name (e.g., Chamkarmorn)
+            } else if (address.getLocality() != null) {
+                locationName = address.getLocality(); // City name (e.g., Phnom Penh)
+            } else if (address.getAdminArea() != null) {
+                locationName = address.getAdminArea(); // Province/state
             } else {
-                textView.setText(addresses.get(0).getSubLocality()); // district name
+                locationName = address.getCountryName();
             }
-
+            textView.setText(locationName);
             Log.d(getLocalClassName(), String.format("Set addresses<%s> to the textview <id=%s>", addresses.toString(), textView.getId()));
         } else {
             Log.e(getLocalClassName(), String.format("Unabled to set addresses <%s> for the text view <id=%s>", addresses, textView.getId()));

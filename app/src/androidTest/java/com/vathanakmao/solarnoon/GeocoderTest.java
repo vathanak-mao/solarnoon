@@ -28,10 +28,6 @@ public class GeocoderTest {
 
     public GeocoderTest() {
         context = ApplicationProvider.getApplicationContext();
-    }
-
-    @Before
-    public void setUp() {
         geocoder = new Geocoder(context);
     }
 
@@ -40,7 +36,10 @@ public class GeocoderTest {
         geocoder = new Geocoder(context, new Locale("km"));
         try {
             List<Address> addresses = geocoder.getFromLocation(11.55D, 104.94D, 1);
+            assertEquals("ខណ្ឌចំការមន", addresses.get(0).getSubLocality());
             assertEquals("ភ្នំពេញ", addresses.get(0).getLocality());
+            assertEquals("ភ្នំពេញ", addresses.get(0).getAdminArea());
+            assertEquals("កម្ពុជា", addresses.get(0).getCountryName());
         } catch (IOException e) {
             assertFalse(String.format("Check if there is an internet connection. %s", e.getStackTrace()), false);
         }
