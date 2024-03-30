@@ -45,17 +45,6 @@ public class SolarNoonCalc {
     public static final double TIMEPASTLOCALMIDNIGHT_00_12_00 = TIMEPASTLOCALMIDNIGHT_00_06_00 + 0.1D/24;
     public static final double TIMEPASTLOCALMIDNIGHT_00_18_00 = TIMEPASTLOCALMIDNIGHT_00_12_00 + 0.1D/24;
 
-//    private static SolarNoonCalc instance;
-
-    public SolarNoonCalc() {}
-
-//    public static SolarNoonCalc getInstance() {
-//        if (instance == null) {
-//            instance = new SolarNoonCalc();
-//        }
-//        return instance;
-//    }
-
     /**
      * Get the local time of the specified date and location
      * that the sun is at its highest in the sky.
