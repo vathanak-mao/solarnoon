@@ -28,6 +28,9 @@ android {
     }
 
     testOptions {
+        unitTests {
+            includeAndroidResources = true
+        }
         managedDevices {
             localDevices {
                 smallphoneapi30 {
@@ -38,6 +41,8 @@ android {
             }
         }
     }
+    namespace "com.vathanakmao.solarnoon"
+    testNamespace "com.vathanakmao.solarnoon.test"
 }
 
 dependencies {
@@ -49,6 +54,7 @@ dependencies {
 
     testImplementation 'junit:junit:4.13.2'
 
-    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
-    androidTestImplementation "androidx.test.espresso:espresso-core:3.5.1" // Optional -- UI testing with Espresso
+    androidTestImplementation 'androidx.test.uiautomator:uiautomator:2.3.0-alpha03' // UiDevice, UiObject2
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5' // @RunWith(AndroidJUnit4.class), @Test, Assert.assertNotNull()
+    androidTestImplementation 'androidx.test:runner:1.5.2' // androidx.test.runner.AndroidJUnitRunner
 }
