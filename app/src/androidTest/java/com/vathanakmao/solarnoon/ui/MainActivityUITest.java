@@ -2,6 +2,8 @@ package com.vathanakmao.solarnoon.ui;
 
 import static org.junit.Assert.assertNotNull;
 
+import android.widget.Button;
+
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.uiautomator.By;
 import androidx.test.uiautomator.UiObject2;
