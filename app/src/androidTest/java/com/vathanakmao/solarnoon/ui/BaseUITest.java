@@ -18,20 +18,25 @@ import androidx.test.uiautomator.UiObjectNotFoundException;
 import androidx.test.uiautomator.UiSelector;
 import androidx.test.uiautomator.Until;
 
+import com.google.android.gms.location.LocationServices;
 import com.vathanakmao.solarnoon.util.StringUtil;
 
 import org.junit.Before;
 
+import java.io.IOException;
+
 public class BaseUITest {
     protected static final String APP_PACKAGE = "com.vathanakmao.solarnoon";
     protected static final String BUTTON_CLASS = "android.widget.Button";
-    protected static final String ALERT_DIALOG_CLASS = "android.app.AlertDialog";
     protected static final int LAUNCH_TIMEOUT = 5000;
     protected static final int NEW_WINDOW_TIMEOUT = 3000;
     protected UiDevice device;
 
     @Before
-    public void setUp() {
+    public void setUp() throws IOException {
+        // Initialize UiDevice instance
+        device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
+
         startMainActivityFromHomeScreen();
         clickGrantAppPermissionsIfAsked();
         clickNextIfLocationSeviceNeededAlertAppears();
@@ -39,9 +44,6 @@ public class BaseUITest {
     }
 
     public void startMainActivityFromHomeScreen() {
-        // Initialize UiDevice instance
-        device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
-
         // Start from the home screen
         device.pressHome();
 

@@ -22,6 +22,7 @@ public class ExampleUnitTest {
 
     @Test
     public void testGetTimezone() {
+//        assertFalse(true);
         assertEquals(7, MathUtil.toHours(ZonedDateTime.now().getOffset().getTotalSeconds()), 0.01);
     }
 }

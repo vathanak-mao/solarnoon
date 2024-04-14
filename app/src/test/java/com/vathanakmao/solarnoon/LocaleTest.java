@@ -2,6 +2,9 @@ package com.vathanakmao.solarnoon;
 
 import static junit.framework.TestCase.assertEquals;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import org.junit.Test;
 
 import java.text.NumberFormat;
@@ -24,6 +27,7 @@ public class LocaleTest {
 
     @Test
     public void createLocaleBasedOnLanguageName() {
+        assertFalse(true);
         final Locale fr = Locale.forLanguageTag("English");
         assertEquals("english", fr.getLanguage());
 
