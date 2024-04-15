@@ -15,7 +15,6 @@ import java.io.IOException;
 
 @RunWith(AndroidJUnit4.class)
 public class SettingsUITest extends BaseUITest {
-    private static final String TOGGLE_BUTTON_CLASS = "android.widget.ToggleButton";
 
     @Before
     public void setUp() throws IOException {
