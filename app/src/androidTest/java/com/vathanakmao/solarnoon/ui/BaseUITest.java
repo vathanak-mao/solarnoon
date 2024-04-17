@@ -37,6 +37,7 @@ public class BaseUITest {
         // Initialize UiDevice instance
         device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
 
+        dismissSystemUINotRespondingDialogIfAppears();
         startMainActivityFromHomeScreen();
         clickGrantAppPermissionsIfAsked();
         clickNextIfLocationSeviceNeededAlertAppears();
@@ -83,6 +84,18 @@ public class BaseUITest {
         UiObject2 okBtn = device.wait(Until.findObject(By.text("OK").clazz(BUTTON_CLASS)), NEW_WINDOW_TIMEOUT);
         if (okBtn != null) {
             okBtn.clickAndWait(Until.newWindow(), NEW_WINDOW_TIMEOUT);
+        }
+    }
+
+    /**
+     * After the emulator has started, there is sometimes a dialog appear
+     * saying "System UI is not responding", and it has a Wait button to dismiss.
+     * I don't know why, but just dismiss and the tests can run normally.
+     */
+    private void dismissSystemUINotRespondingDialogIfAppears() {
+        UiObject2 waitBtn = device.findObject(By.text("Wait").clazz(BUTTON_CLASS));
+        if (waitBtn != null) {
+            waitBtn.clickAndWait(Until.newWindow(), LAUNCH_TIMEOUT);
         }
     }
 
