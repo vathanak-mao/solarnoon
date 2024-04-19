@@ -1,12 +1,17 @@
 package com.vathanakmao.solarnoon.ui;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import android.widget.LinearLayout;
+
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.uiautomator.By;
+import androidx.test.uiautomator.BySelector;
+import androidx.test.uiautomator.UiObject;
 import androidx.test.uiautomator.UiObject2;
 import androidx.test.uiautomator.UiObjectNotFoundException;
 import androidx.test.uiautomator.UiSelector;
@@ -20,6 +25,43 @@ import java.io.IOException;
 @RunWith(AndroidJUnit4.class)
 public class MainActivityUITest extends BaseUITest {
     public static final String SUPPORTED_LANGUAGES_SPINNER_ID = "spinnerSupportedLanguages";
+    public static final String DESCRIPTION_TEXTVIEW_ID = "textviewDesc";
+
+    @Test
+    public void changeLanguage() throws UiObjectNotFoundException {
+        startMainActivityFromHomeScreen();
+        clickGrantAppPermissionsIfAsked();
+        clickNextIfDialogToNotifyLocationServicesNeededAppears();
+        clickOkIfDialogToEnableLocationAppears();
+
+        // =========================================================================
+
+        // Open the dropdown
+        UiObject2 languagesDropdown = device.findObject(By.res(APP_PACKAGE, SUPPORTED_LANGUAGES_SPINNER_ID));
+        languagesDropdown.clickAndWait(Until.newWindow(), NEW_WINDOW_TIMEOUT); // Wait until the dropdown appears
+
+        // Select "English"
+        UiObject2 englishItem = device.findObject(By.clazz(LINEAR_LAYOUT_CLASS).hasChild(By.text("English")));
+        englishItem.clickAndWait(Until.newWindow(), NEW_WINDOW_TIMEOUT); // Wait until the dropdown disappears
+
+        // Verify text description
+        UiObject2 descriptionTextview = device.findObject(By.res(APP_PACKAGE, DESCRIPTION_TEXTVIEW_ID));
+        assertEquals("Today's Solar Noon", descriptionTextview.getText());
+
+        // ===========================================================================
+
+        // Open the dropdown again
+        languagesDropdown = device.findObject(By.res(APP_PACKAGE, SUPPORTED_LANGUAGES_SPINNER_ID));
+        languagesDropdown.clickAndWait(Until.newWindow(), NEW_WINDOW_TIMEOUT); // Wait until the dropdown appears
+
+        // Select "ខ្មែរ"
+        UiObject2 khmerItem = device.findObject(By.clazz(LINEAR_LAYOUT_CLASS).hasChild(By.text("ខ្មែរ")));
+        khmerItem.clickAndWait(Until.newWindow(), NEW_WINDOW_TIMEOUT); // Wait until the dropdown disappears
+
+        // Verify text description
+        descriptionTextview = device.findObject(By.res(APP_PACKAGE, DESCRIPTION_TEXTVIEW_ID));
+        assertEquals("ថ្ងៃនេះ ថ្ងៃត្រង់ម៉ោង", descriptionTextview.getText());
+    }
 
     /**
      * The purpose of this test is check whether or not

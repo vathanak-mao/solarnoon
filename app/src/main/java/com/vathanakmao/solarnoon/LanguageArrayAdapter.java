@@ -45,17 +45,21 @@ public class LanguageArrayAdapter extends ArrayAdapter {
             convertView = inflater.inflate(R.layout.list_item, parent, false);
         }
 
-        TextView itemDisplayText = convertView.findViewById(R.id.textviewListItemDisplayText);
-        itemDisplayText.setText(Settings.getLanguageDisplayName(String.valueOf(getItem(position))));
+        // "English", "ខ្មែរ"
+        TextView displayText = convertView.findViewById(R.id.textviewListItemDisplayText);
+        displayText.setText(Settings.getLanguageDisplayName(String.valueOf(getItem(position))));
 
-        TextView itemValue = convertView.findViewById(R.id.textviewListItemValue);
-        ImageView itemCheckmark = convertView.findViewById(R.id.imageviewListItemCheckmark);
+        // "en", "km"
+        TextView hiddenValue = convertView.findViewById(R.id.textviewListItemValue);
+
+        ImageView checkmark = convertView.findViewById(R.id.imageviewListItemCheckmark);
+
         if (String.valueOf(getItem(position)).equals(Settings.getPreferredLanguage(context))) {
-            itemValue.setText(Settings.getPreferredLanguage(context));
-            itemCheckmark.setVisibility(View.VISIBLE);
+            hiddenValue.setText(Settings.getPreferredLanguage(context));
+            checkmark.setVisibility(View.VISIBLE);
         } else {
-            itemValue.setText(String.valueOf(getItem(position)));
-            itemCheckmark.setVisibility(View.INVISIBLE);
+            hiddenValue.setText(String.valueOf(getItem(position)));
+            checkmark.setVisibility(View.INVISIBLE);
         }
         return convertView;
     }
