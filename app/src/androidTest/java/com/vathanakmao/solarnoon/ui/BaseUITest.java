@@ -12,14 +12,8 @@ import androidx.test.core.app.ApplicationProvider;
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.uiautomator.By;
 import androidx.test.uiautomator.UiDevice;
-import androidx.test.uiautomator.UiObject;
 import androidx.test.uiautomator.UiObject2;
-import androidx.test.uiautomator.UiObjectNotFoundException;
-import androidx.test.uiautomator.UiSelector;
 import androidx.test.uiautomator.Until;
-
-import com.google.android.gms.location.LocationServices;
-import com.vathanakmao.solarnoon.util.StringUtil;
 
 import org.junit.Before;
 
@@ -69,14 +63,14 @@ public class BaseUITest {
         }
     }
 
-    protected void clickNextIfLocationSeviceNeededAlertAppears() {
+    protected void clickNextIfDialogToNotifyLocationServicesNeededAppears() {
         UiObject2 nextBtn = device.wait(Until.findObject(By.text("NEXT").clazz(BUTTON_CLASS)), NEW_WINDOW_TIMEOUT);
         if (nextBtn != null) {
             nextBtn.clickAndWait(Until.newWindow(), NEW_WINDOW_TIMEOUT);
         }
     }
 
-    protected void clickOkIfTurnOnDeviceLocationDialogAppears() {
+    protected void clickOkIfDialogToEnableLocationAppears() {
         UiObject2 okBtn = device.wait(Until.findObject(By.text("OK").clazz(BUTTON_CLASS)), NEW_WINDOW_TIMEOUT);
         if (okBtn != null) {
             okBtn.clickAndWait(Until.newWindow(), NEW_WINDOW_TIMEOUT);

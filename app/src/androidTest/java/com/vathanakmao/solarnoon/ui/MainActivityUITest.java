@@ -5,9 +5,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import android.location.Location;
-import android.location.LocationManager;
-
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.uiautomator.By;
 import androidx.test.uiautomator.UiObject2;
@@ -15,16 +12,8 @@ import androidx.test.uiautomator.UiObjectNotFoundException;
 import androidx.test.uiautomator.UiSelector;
 import androidx.test.uiautomator.Until;
 
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
-import com.vathanakmao.solarnoon.MainActivity;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 
 import java.io.IOException;
 
@@ -87,8 +76,8 @@ public class MainActivityUITest extends BaseUITest {
     public void findObjectByResourceId() {
         startMainActivityFromHomeScreen();
         clickGrantAppPermissionsIfAsked();
-        clickNextIfLocationSeviceNeededAlertAppears();
-        clickOkIfTurnOnDeviceLocationDialogAppears();
+        clickNextIfDialogToNotifyLocationServicesNeededAppears();
+        clickOkIfDialogToEnableLocationAppears();
 
         // Using UiSelector to find object by resourceId
         assertFalse(device.findObject(new UiSelector().resourceId("xnbmsueiyiqpdfudfuw")).exists());
@@ -103,8 +92,8 @@ public class MainActivityUITest extends BaseUITest {
     public void findObjectByResourceName() {
         startMainActivityFromHomeScreen();
         clickGrantAppPermissionsIfAsked();
-        clickNextIfLocationSeviceNeededAlertAppears();
-        clickOkIfTurnOnDeviceLocationDialogAppears();
+        clickNextIfDialogToNotifyLocationServicesNeededAppears();
+        clickOkIfDialogToEnableLocationAppears();
 
         // Using BySelector to find object by resourceName
         assertNull(device.findObject(By.res("com.vathanakmao.solarnoon:id/xnbmsueiyiqpdfudfuw")));
