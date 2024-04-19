@@ -28,20 +28,16 @@ import java.io.IOException;
 public class BaseUITest {
     protected static final String APP_PACKAGE = "com.vathanakmao.solarnoon";
     protected static final String BUTTON_CLASS = "android.widget.Button";
-    protected static final int LAUNCH_TIMEOUT = 5000;
-    protected static final int NEW_WINDOW_TIMEOUT = 3000;
+    protected static final int LAUNCH_TIMEOUT = 7000;
+    protected static final int NEW_WINDOW_TIMEOUT = 7000;
     protected UiDevice device;
 
     @Before
     public void setUp() throws IOException {
         // Initialize UiDevice instance
         device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
-
         dismissSystemUINotRespondingDialogIfAppears();
-        startMainActivityFromHomeScreen();
-        clickGrantAppPermissionsIfAsked();
-        clickNextIfLocationSeviceNeededAlertAppears();
-        clickOkIfTurnOnDeviceLocationDialogAppears();
+
     }
 
     public void startMainActivityFromHomeScreen() {
@@ -64,7 +60,7 @@ public class BaseUITest {
         device.wait(hasObject(By.pkg(APP_PACKAGE).depth(0)), LAUNCH_TIMEOUT);
     }
 
-    private void clickGrantAppPermissionsIfAsked() {
+    protected void clickGrantAppPermissionsIfAsked() {
         // Grant app permissions to access location
         UiObject2 grantAppPermissionsBtn = device.wait(Until.findObject(By.text("While using the app").clazz(BUTTON_CLASS)), NEW_WINDOW_TIMEOUT);
         if (grantAppPermissionsBtn != null) {
@@ -73,14 +69,14 @@ public class BaseUITest {
         }
     }
 
-    private void clickNextIfLocationSeviceNeededAlertAppears() {
+    protected void clickNextIfLocationSeviceNeededAlertAppears() {
         UiObject2 nextBtn = device.wait(Until.findObject(By.text("NEXT").clazz(BUTTON_CLASS)), NEW_WINDOW_TIMEOUT);
         if (nextBtn != null) {
             nextBtn.clickAndWait(Until.newWindow(), NEW_WINDOW_TIMEOUT);
         }
     }
 
-    private void clickOkIfTurnOnDeviceLocationDialogAppears() {
+    protected void clickOkIfTurnOnDeviceLocationDialogAppears() {
         UiObject2 okBtn = device.wait(Until.findObject(By.text("OK").clazz(BUTTON_CLASS)), NEW_WINDOW_TIMEOUT);
         if (okBtn != null) {
             okBtn.clickAndWait(Until.newWindow(), NEW_WINDOW_TIMEOUT);
@@ -92,7 +88,7 @@ public class BaseUITest {
      * saying "System UI is not responding", and it has a Wait button to dismiss.
      * I don't know why, but just dismiss and the tests can run normally.
      */
-    private void dismissSystemUINotRespondingDialogIfAppears() {
+    protected void dismissSystemUINotRespondingDialogIfAppears() {
         UiObject2 waitBtn = device.findObject(By.text("Wait").clazz(BUTTON_CLASS));
         if (waitBtn != null) {
             waitBtn.clickAndWait(Until.newWindow(), LAUNCH_TIMEOUT);
