@@ -33,6 +33,25 @@ public class MainActivityUITest extends BaseUITest {
     public static final String SUPPORTED_LANGUAGES_SPINNER_ID = "spinnerSupportedLanguages";
 
     /**
+     * The purpose of this test is check whether or not
+     * certain dialogs appear when the Location is enabled.
+     **/
+    @Test
+    public void launchWhenLocationIsEnabled() throws IOException, UiObjectNotFoundException {
+        // Make sure Location Services is enabled
+        UiAutomatorHelper.enableLocation(true, device);
+
+        // Start app from home screen
+        startMainActivityFromHomeScreen();
+
+        // Click the "While using the app" button to grant app permissions if asked
+        clickGrantAppPermissionsIfAsked();
+
+        // Verify that the dropdown to change language exists
+        assertNotNull(device.findObject(By.res(APP_PACKAGE, SUPPORTED_LANGUAGES_SPINNER_ID)));
+    }
+
+    /**
      * The purpose of this test is verifying that
      * certain dialogs appear one after another
      * when the Location is disabled.
@@ -45,7 +64,7 @@ public class MainActivityUITest extends BaseUITest {
         // Start app from home screen
         startMainActivityFromHomeScreen();
 
-        // Click grant app permissions if asked
+        // Click the "While using the app" button to grant app permissions if asked
         clickGrantAppPermissionsIfAsked();
 
         // Alert dialog appears to notify Location Services is needed
