@@ -24,6 +24,7 @@ public class SolarNoonCalcTest {
 
     @Test
     public void testGetTime() {
+        // Latitude and longitude belongs to Phnom Penh
         final GregorianCalendar february122024 = new GregorianCalendar(2024, 1, 12);
         LocalTime solarNoonTime = calc.getTime(11.57, 104.935913, 7, february122024, SolarNoonCalc.TIMEPASTLOCALMIDNIGHT_00_06_00);
         assertEquals(12, solarNoonTime.getHour());

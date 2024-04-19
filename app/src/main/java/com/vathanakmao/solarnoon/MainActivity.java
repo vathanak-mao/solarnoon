@@ -56,6 +56,7 @@ public class MainActivity extends BaseActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        locationServiceClient = new LocationServiceClient();
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         solarnoonCalc = new SolarNoonCalc();
 
@@ -70,7 +71,6 @@ public class MainActivity extends BaseActivity
         // Prompt the user to grant app permissions for location access.
         // This must be done in onStart() to make sure
         // it runs everytime the activity comes back to the foreground.
-        locationServiceClient = new LocationServiceClient();
         locationServiceClient.grantAppPermissions(
                 this,
                 new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},

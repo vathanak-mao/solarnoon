@@ -54,7 +54,7 @@ public class BaseUITest {
         device.wait(hasObject(By.pkg(launcherPackage).depth(0)), LAUNCH_TIMEOUT);
 
         // Launch the app
-        Context context = ApplicationProvider.getApplicationContext();
+        Context context = getContext();
         final Intent intent = context.getPackageManager().getLaunchIntentForPackage(APP_PACKAGE);
         // Clear out any previous instances
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -97,6 +97,10 @@ public class BaseUITest {
         if (waitBtn != null) {
             waitBtn.clickAndWait(Until.newWindow(), LAUNCH_TIMEOUT);
         }
+    }
+
+    protected Context getContext() {
+        return ApplicationProvider.getApplicationContext();
     }
 
     protected void log(String message) {

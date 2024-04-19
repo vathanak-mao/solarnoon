@@ -35,7 +35,7 @@ public class ExampleInstrumentedTest {
         assertEquals("com.vathanakmao.solarnoon", appContext.getPackageName());
     }
 
-    @Test
+//    @Test
     public void clearSharedPreferences() {
         final String filename = context.getResources().getString(R.string.key_preferences_filename);
         SharedPreferences sharedPref = context.getSharedPreferences(filename, Context.MODE_PRIVATE);

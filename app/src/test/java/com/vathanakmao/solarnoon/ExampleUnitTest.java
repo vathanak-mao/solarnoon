@@ -19,10 +19,4 @@ public class ExampleUnitTest {
     public void addition_isCorrect() {
         assertEquals(4, 2 + 2);
     }
-
-    @Test
-    public void testGetTimezone() {
-//        assertFalse(true);
-        assertEquals(7, MathUtil.toHours(ZonedDateTime.now().getOffset().getTotalSeconds()), 0.01);
-    }
 }
