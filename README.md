@@ -4,23 +4,19 @@
 
 # Instrumented Tests #
 
-### Run all tests ###
-
-<code>
+Run all tests
+```
 $ ./gradlew smallphoneapi30DebugAndroidTest
-</code>
+```
 
-### Run specific test class ###
-
-<code>
+Run specific test class
+```
 $ ./gradlew smallphoneapi30DebugAndroidTest -P android.testInstrumentationRunnerArguments.class=com.vathanakmao.solarnoon.ui.MainActivityUITest
-</code>
-
-### Run specific test method ###
-
-<code>
+```
+Run specific test method
+```
 $ ./gradlew smallphoneapi30DebugAndroidTest -P android.testInstrumentationRunnerArguments.class=com.vathanakmao.solarnoon.ui.MainActivityUITest#changeLanguage
-</code>
+```
 
 
 
