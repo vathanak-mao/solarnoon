@@ -16,11 +16,15 @@ import android.net.NetworkInfo;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
+import com.vathanakmao.solarnoon.util.NetworkUtil;
+import com.vathanakmao.solarnoon.util.StringUtil;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.util.List;
 import java.util.Locale;
 
@@ -34,6 +38,13 @@ public class GeocoderTest {
         geocoder = new Geocoder(context);
     }
 
+    @Before
+    public void setUp() {
+        if (!NetworkUtil.isConnectedToInternet()) {
+            assumeTrue("Skipping test cause there is no internet connection.", false);
+        }
+    }
+
     @Test
     public void getAddressesBasedOnLocale_PhnomPenh() {
         geocoder = new Geocoder(context, new Locale("km"));
@@ -44,7 +55,7 @@ public class GeocoderTest {
             assertEquals("ភ្នំពេញ", addresses.get(0).getAdminArea());
             assertEquals("កម្ពុជា", addresses.get(0).getCountryName());
         } catch (IOException e) {
-            assertFalse(String.format("Check if there is an internet connection. %s", e.getStackTrace()), false);
+            assertFalse(String.format("Check if there is an internet connection. %s", StringUtil.getStackTrace(e)), false);
         }
     }
 
@@ -55,7 +66,7 @@ public class GeocoderTest {
             List<Address> addresses = geocoder.getFromLocation(37.4220D, -122.0840D, 1);
             assertEquals("Mountain View", addresses.get(0).getLocality());
         } catch (IOException e) {
-            assertFalse(String.format("Check if there is an internet connection. %s", e.getStackTrace()), false);
+            assertFalse(String.format("Check if there is an internet connection. %s", StringUtil.getStackTrace(e)), false);
         }
     }
 
@@ -67,7 +78,7 @@ public class GeocoderTest {
             assertNull(addresses.get(0).getLocality());
             assertEquals("Gamle Oslo", addresses.get(0).getSubLocality());
         } catch (IOException e) {
-            assertFalse(String.format("Check if there is an internet connection. %s", e.getStackTrace()), false);
+            assertFalse(String.format("Check if there is an internet connection. %s", StringUtil.getStackTrace(e)), false);
         }
     }
 }

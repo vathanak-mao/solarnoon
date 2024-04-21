@@ -18,6 +18,7 @@ import androidx.test.uiautomator.Until;
 import org.junit.Before;
 
 import java.io.IOException;
+import java.net.InetAddress;
 
 public class BaseUITest {
     protected static final String APP_PACKAGE = "com.vathanakmao.solarnoon";

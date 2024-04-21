@@ -45,7 +45,7 @@ public class HttpUrlConnectionTest {
     }
 
     @Test
-    public void makeGetRequest() throws Exception {
+    public void downloadWebsite() throws Exception {
         String urlString = "https://google.com";
 
         URL url = new URL(urlString);
