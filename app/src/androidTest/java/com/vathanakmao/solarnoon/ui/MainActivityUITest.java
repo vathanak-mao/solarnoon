@@ -28,7 +28,7 @@ public class MainActivityUITest extends BaseUITest {
     public static final String DESCRIPTION_TEXTVIEW_ID = "textviewDesc";
 
     @Test
-    public void changeLanguage() throws UiObjectNotFoundException {
+    public void changeLanguage() throws UiObjectNotFoundException, IOException {
         startMainActivityFromHomeScreen();
         clickGrantAppPermissionsIfAsked();
         clickNextIfDialogToNotifyLocationServicesNeededAppears();

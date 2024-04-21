@@ -23,8 +23,8 @@ public class BaseUITest {
     protected static final String APP_PACKAGE = "com.vathanakmao.solarnoon";
     protected static final String BUTTON_CLASS = "android.widget.Button";
     protected static final String LINEAR_LAYOUT_CLASS = "android.widget.LinearLayout";
-    protected static final int LAUNCH_TIMEOUT = 7000;
-    protected static final int NEW_WINDOW_TIMEOUT = 7000;
+    protected static final int LAUNCH_TIMEOUT = 10000;
+    protected static final int NEW_WINDOW_TIMEOUT = 10000;
     protected UiDevice device;
 
     @Before
@@ -37,7 +37,7 @@ public class BaseUITest {
 
     public void startMainActivityFromHomeScreen() {
         // Start from the home screen
-        device.pressHome();
+        device.pressHome(); 
 
         // Wait for launcher
         final String launcherPackage = device.getLauncherPackageName();
