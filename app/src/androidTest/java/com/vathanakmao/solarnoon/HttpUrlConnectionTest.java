@@ -5,9 +5,13 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
 
 import android.content.Context;
+import android.util.Log;
 
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
+
+import com.vathanakmao.solarnoon.util.NetworkUtil;
+import com.vathanakmao.solarnoon.util.StringUtil;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -29,21 +33,11 @@ public class HttpUrlConnectionTest {
 
     @Before
     public void setUp() {
-        if (isConnectedToInternet()) {
+        if (!NetworkUtil.isConnectedToInternet()) {
             assumeTrue(false);
         }
     }
-
-    private static boolean isConnectedToInternet() {
-        try {
-            InetAddress address = InetAddress.getByAddress(new byte[]{8, 8, 8, 8}); // Google's public DNS server
-            return address.isReachable(1000); // Try pinging for 1 second
-        } catch (Exception e) {
-            // handle exceptions like unreachable host or timeout
-            return false;
-        }
-    }
-
+    
     @Test
     public void downloadWebsite() throws Exception {
         String urlString = "https://google.com";
