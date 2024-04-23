@@ -4,14 +4,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
 
-import android.content.Context;
-import android.util.Log;
-
-import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.vathanakmao.solarnoon.util.NetworkUtil;
-import com.vathanakmao.solarnoon.util.StringUtil;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -20,16 +15,10 @@ import org.junit.runner.RunWith;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.InetAddress;
 import java.net.URL;
 
 @RunWith(AndroidJUnit4.class)
 public class HttpUrlConnectionTest {
-    private Context context;
-
-    public HttpUrlConnectionTest() {
-        context = ApplicationProvider.getApplicationContext();
-    }
 
     @Before
     public void setUp() {
@@ -37,7 +26,7 @@ public class HttpUrlConnectionTest {
             assumeTrue(false);
         }
     }
-    
+
     @Test
     public void downloadWebsite() throws Exception {
         String urlString = "https://google.com";
