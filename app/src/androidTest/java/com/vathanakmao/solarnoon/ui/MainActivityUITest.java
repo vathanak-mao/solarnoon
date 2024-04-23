@@ -17,11 +17,18 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 @RunWith(AndroidJUnit4.class)
 public class MainActivityUITest extends BaseUITest {
     public static final String SUPPORTED_LANGUAGES_SPINNER_ID = "spinnerSupportedLanguages";
     public static final String DESCRIPTION_TEXTVIEW_ID = "textviewDesc";
+    public static final String SOLAR_TIME_TEXTVIEW_ID = "textviewSolarnoonTime";
+
+    public static final long FIND_OBJECT_TIMEOUT = 10000;
+
+    public static final String TEXTVIEW_CLASS = "android.widget.TextView";
 
     @Test
     public void changeLanguage() throws UiObjectNotFoundException, IOException {
@@ -33,16 +40,21 @@ public class MainActivityUITest extends BaseUITest {
         // =========================================================================
 
         // Open the dropdown
-        UiObject2 languagesDropdown = device.findObject(By.res(APP_PACKAGE, SUPPORTED_LANGUAGES_SPINNER_ID));
+        UiObject2 languagesDropdown = device.wait(Until.findObject(By.res(APP_PACKAGE, SUPPORTED_LANGUAGES_SPINNER_ID)), FIND_OBJECT_TIMEOUT);
         languagesDropdown.clickAndWait(Until.newWindow(), NEW_WINDOW_TIMEOUT); // Wait until the dropdown appears
 
         // Select "English"
-        UiObject2 englishItem = device.findObject(By.clazz(LINEAR_LAYOUT_CLASS).hasChild(By.text("English")));
+        UiObject2 englishItem = device.wait(Until.findObject(By.clazz(LINEAR_LAYOUT_CLASS).hasChild(By.text("English"))), FIND_OBJECT_TIMEOUT);
         englishItem.clickAndWait(Until.newWindow(), NEW_WINDOW_TIMEOUT); // Wait until the dropdown disappears
 
         // Verify text description
         UiObject2 descriptionTextview = device.findObject(By.res(APP_PACKAGE, DESCRIPTION_TEXTVIEW_ID));
         assertEquals("Today's Solar Noon", descriptionTextview.getText());
+
+        // Verify solar time
+        UiObject2 solarTimeTxt = device.wait(Until.findObject(By.res(APP_PACKAGE, SOLAR_TIME_TEXTVIEW_ID).textContains(":")), FIND_OBJECT_TIMEOUT);
+        assertTrue(solarTimeTxt.getText().length() > 0);
+        assertTrue(isSubset(solarTimeTxt.getText().toCharArray(), ":", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"));
 
         // ===========================================================================
 
@@ -57,6 +69,21 @@ public class MainActivityUITest extends BaseUITest {
         // Verify text description
         descriptionTextview = device.findObject(By.res(APP_PACKAGE, DESCRIPTION_TEXTVIEW_ID));
         assertEquals("ថ្ងៃនេះ ថ្ងៃត្រង់ម៉ោង", descriptionTextview.getText());
+
+        // Verify solar time
+        solarTimeTxt = device.wait(Until.findObject(By.res(APP_PACKAGE, SOLAR_TIME_TEXTVIEW_ID).textContains(":")), FIND_OBJECT_TIMEOUT);
+        assertTrue(solarTimeTxt.getText().length() > 0);
+        assertTrue(isSubset(solarTimeTxt.getText().toCharArray(), ":", "០", "១", "២", "៣", "៤", "៥", "៦", "៧", "៨", "៩"));
+    }
+
+    private boolean isSubset(char[] childSet, String ...parentSet) {
+        final List parentList = Arrays.asList(parentSet);
+        for (char ch : childSet) {
+            if (!parentList.contains("" + ch)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
