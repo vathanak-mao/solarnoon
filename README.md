@@ -6,20 +6,20 @@
 
 ## Instrumented Tests ##
 
-The Android Virtual Device (AVD) "Small Phone API 30" will automatically be downloaded, installed, and started before running the tests.
+The Android Virtual Device (AVD) "Small Phone API 31" will automatically be downloaded, installed, and started before running the tests.
 
 **Run all tests:**
 ```
-$ ./gradlew smallphoneapi30DebugAndroidTest
+$ ./gradlew smallphoneapi31DebugAndroidTest
 ```
 
 **Run specific test class:**
 ```
-$ ./gradlew smallphoneapi30DebugAndroidTest -P android.testInstrumentationRunnerArguments.class=com.vathanakmao.solarnoon.ui.MainActivityUITest
+$ ./gradlew smallphoneapi31DebugAndroidTest -P android.testInstrumentationRunnerArguments.class=com.vathanakmao.solarnoon.ui.MainActivityUITest
 ```
 **Run specific test method:**
 ```
-$ ./gradlew smallphoneapi30DebugAndroidTest -P android.testInstrumentationRunnerArguments.class=com.vathanakmao.solarnoon.ui.MainActivityUITest#changeLanguage
+$ ./gradlew smallphoneapi31DebugAndroidTest -P android.testInstrumentationRunnerArguments.class=com.vathanakmao.solarnoon.ui.MainActivityUITest#changeLanguage
 ```
 
 

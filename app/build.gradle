@@ -33,9 +33,9 @@ android {
         }
         managedDevices {
             localDevices {
-                smallphoneapi30 {
+                smallphoneapi31 {
                     device = "Small Phone"
-                    apiLevel = 30
+                    apiLevel = 31
                     systemImageSource = "google_apis_playstore"
                 }
             }
