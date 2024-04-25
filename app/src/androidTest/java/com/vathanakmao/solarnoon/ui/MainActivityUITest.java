@@ -23,10 +23,11 @@ import java.util.List;
 @RunWith(AndroidJUnit4.class)
 public class MainActivityUITest extends BaseUITest {
     public static final String SUPPORTED_LANGUAGES_SPINNER_ID = "spinnerSupportedLanguages";
+    public static final String SUPPORTED_LANGUAGES_SPINNER_RESOURCEID = "com.vathanakmao.solarnoon:id/spinnerSupportedLanguages";
     public static final String DESCRIPTION_TEXTVIEW_ID = "textviewDesc";
     public static final String SOLAR_TIME_TEXTVIEW_ID = "textviewSolarnoonTime";
 
-    public static final long FIND_OBJECT_TIMEOUT = 10000;
+    public static final long FIND_OBJECT_TIMEOUT = 15000;
 
     public static final String TEXTVIEW_CLASS = "android.widget.TextView";
 
@@ -40,8 +41,13 @@ public class MainActivityUITest extends BaseUITest {
         // =========================================================================
 
         // Open the dropdown
+//        Espresso.onView(withId(R.id.spinnerSupportedLanguages)).perform(click());
+
+//        UiObject languagesDropdown = device.findObject(new UiSelector().resourceId(SUPPORTED_LANGUAGES_SPINNER_RESOURCEID));
         UiObject2 languagesDropdown = device.wait(Until.findObject(By.res(APP_PACKAGE, SUPPORTED_LANGUAGES_SPINNER_ID)), FIND_OBJECT_TIMEOUT);
         languagesDropdown.clickAndWait(Until.newWindow(), NEW_WINDOW_TIMEOUT); // Wait until the dropdown appears
+//        languagesDropdown.waitForExists(10000); // Wait until the dropdown appears
+//        languagesDropdown.clickAndWaitForNewWindow(NEW_WINDOW_TIMEOUT);
 
         // Select "English"
         UiObject2 englishItem = device.wait(Until.findObject(By.clazz(LINEAR_LAYOUT_CLASS).hasChild(By.text("English"))), FIND_OBJECT_TIMEOUT);
@@ -52,6 +58,9 @@ public class MainActivityUITest extends BaseUITest {
         assertEquals("Today's Solar Noon", descriptionTextview.getText());
 
         // Verify solar time
+        // Sometimes the internet is slow and the request to get location takes longer than normal
+        // so the solar time might not show up on time and this test might fail.
+        // The timeout to wait for it to show is set to longer than 10 seconds.
         UiObject2 solarTimeTxt = device.wait(Until.findObject(By.res(APP_PACKAGE, SOLAR_TIME_TEXTVIEW_ID).textContains(":")), FIND_OBJECT_TIMEOUT);
         assertTrue(solarTimeTxt.getText().length() > 0);
         assertTrue(isSubset(solarTimeTxt.getText().toCharArray(), ":", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"));
@@ -59,8 +68,8 @@ public class MainActivityUITest extends BaseUITest {
         // ===========================================================================
 
         // Open the dropdown again
-        languagesDropdown = device.findObject(By.res(APP_PACKAGE, SUPPORTED_LANGUAGES_SPINNER_ID));
-        languagesDropdown.clickAndWait(Until.newWindow(), NEW_WINDOW_TIMEOUT); // Wait until the dropdown appears
+        UiObject2 languagesDropdown2 = device.findObject(By.res(APP_PACKAGE, SUPPORTED_LANGUAGES_SPINNER_ID));
+        languagesDropdown2.clickAndWait(Until.newWindow(), NEW_WINDOW_TIMEOUT); // Wait until the dropdown appears
 
         // Select "ខ្មែរ"
         UiObject2 khmerItem = device.findObject(By.clazz(LINEAR_LAYOUT_CLASS).hasChild(By.text("ខ្មែរ")));
@@ -71,6 +80,9 @@ public class MainActivityUITest extends BaseUITest {
         assertEquals("ថ្ងៃនេះ ថ្ងៃត្រង់ម៉ោង", descriptionTextview.getText());
 
         // Verify solar time
+        // Sometimes the internet is slow and the request to get location takes longer than normal
+        // so the solar time might not show up on time and this test might fail.
+        // The timeout to wait for it to show is set to longer than 10 seconds.
         solarTimeTxt = device.wait(Until.findObject(By.res(APP_PACKAGE, SOLAR_TIME_TEXTVIEW_ID).textContains(":")), FIND_OBJECT_TIMEOUT);
         assertTrue(solarTimeTxt.getText().length() > 0);
         assertTrue(isSubset(solarTimeTxt.getText().toCharArray(), ":", "០", "១", "២", "៣", "៤", "៥", "៦", "៧", "៨", "៩"));
@@ -96,10 +108,11 @@ public class MainActivityUITest extends BaseUITest {
         UiAutomatorHelper.enableLocation(true, device);
 
         // Start app from home screen
-        startMainActivityFromHomeScreen();
+//        startMainActivityFromHomeScreen();
+        device.executeShellCommand("am start -n com.vathanakmao.solarnoon/.MainActivity");
 
         // Click the "While using the app" button to grant app permissions if asked
-        clickGrantAppPermissionsIfAsked();
+        UiAutomatorHelper.clickGrantAppPermissionsIfAsked(device);
 
         // Verify that the dropdown to change language exists
         assertNotNull(device.findObject(By.res(APP_PACKAGE, SUPPORTED_LANGUAGES_SPINNER_ID)));

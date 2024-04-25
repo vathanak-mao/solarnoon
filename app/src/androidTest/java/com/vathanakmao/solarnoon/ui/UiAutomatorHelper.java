@@ -13,6 +13,7 @@ import android.util.Log;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.uiautomator.By;
 import androidx.test.uiautomator.UiDevice;
+import androidx.test.uiautomator.UiObject;
 import androidx.test.uiautomator.UiObject2;
 import androidx.test.uiautomator.UiObjectNotFoundException;
 import androidx.test.uiautomator.UiScrollable;
@@ -24,12 +25,17 @@ import java.io.IOException;
 public class UiAutomatorHelper {
     public static final String SETTINGSAPP_CLASS = "com.android.settings.Settings";
     public static final String SETTINGSAPP_PACKAGE = "com.android.settings";
-    public static final String SWITCH_WIDGET_RESOURCENAME = "com.android.settings:id/switch_widget";
+    public static final String GOOGLE_SWITCH_WIDGET_RESOURCENAME = "com.android.settings:id/switch_widget";
+    public static final String XIAOMI_SWITCH_WIDGET_RESOURCENAME = "android:id/switch_widget";
+
+    public static final String XIAOMI_MANUFACTURER = "xiaomi";
+    public static final String GOOGLE_MANUFACTURER = "google";
 
     private static final String BUTTON_CLASS = "android.widget.Button";
 
-    private static final int LAUNCH_TIMEOUT = 5000;
-    private static final int NEW_WINDOW_TIMEOUT = 3000;
+    private static final int LAUNCH_TIMEOUT = 10000;
+    private static final int NEW_WINDOW_TIMEOUT = 10000;
+    private static final int FIND_OBJECT_TIMEOUT = 10000;
 
     /**
      * Automate launching Settings app and navigate to find Location switch
@@ -42,19 +48,18 @@ public class UiAutomatorHelper {
      */
     public static final void enableLocation(boolean enable, UiDevice device) throws IOException, UiObjectNotFoundException {
         // Open Settings app
-        launchSettingsApp(device);
+        launchSettingsAppV2(device);
 
-        final String locationSwitchLabel;
+        final UiObject2 locationSwitch;
         final String manufacturer = Build.MANUFACTURER;
         if (manufacturer.equalsIgnoreCase("xiaomi")) {
-            locationSwitchLabel = "Location access";
+            locationSwitch = navigateAndFindLocationSwitch(device, "Location access", XIAOMI_SWITCH_WIDGET_RESOURCENAME);
         } else if (manufacturer.equalsIgnoreCase("google")) {
-            locationSwitchLabel = "Use location";
+            locationSwitch = navigateAndFindLocationSwitch(device, "Use location", GOOGLE_SWITCH_WIDGET_RESOURCENAME);
         } else {
             throw new UnsupportedOperationException(String.format("Couldn't navigate through Settings app to find the Location switch for unsupported device's manufacturer %s", manufacturer));
         }
 
-        UiObject2 locationSwitch = navigateAndFindLocationSwitch(device, locationSwitchLabel);
         if (locationSwitch != null) {
             Log.d(UiAutomatorHelper.class.getSimpleName(),
                     String.format("> enable=%s, locationToggle<isChecked()=%s>", enable, locationSwitch.isChecked()));
@@ -62,12 +67,10 @@ public class UiAutomatorHelper {
             if (locationSwitch.isChecked() != enable) {
                 locationSwitch.click();
             }
-        } else {
-            throw new UiObjectNotFoundException(String.format("Couldn't find the Location switch by label '%s'", locationSwitchLabel));
         }
     }
 
-    private static UiObject2 navigateAndFindLocationSwitch(UiDevice device, String switchText) throws UiObjectNotFoundException {
+    private static UiObject2 navigateAndFindLocationSwitch(UiDevice device, String switchText, String resourceName) throws UiObjectNotFoundException {
         // Scroll down to see Location
         UiScrollable settingsLandingPage = new UiScrollable(new UiSelector().scrollable(true));
         settingsLandingPage.scrollIntoView(new UiSelector().text("Location"));
@@ -80,51 +83,102 @@ public class UiAutomatorHelper {
             throw new UiObjectNotFoundException("Couldn't find an option with the text 'Location' in Settings app.");
         }
 
-        // Scroll down to see the Location switch
+        // Scroll down/up to see the Location switch
         UiScrollable locationPage = new UiScrollable(new UiSelector().scrollable(true));
         locationPage.scrollIntoView(new UiSelector().text(switchText));
 
         // Find Location switch by text
-        return getSwitchWidget(device, switchText);
+        UiObject2 result = findSwitchWidgetByTitle(device, switchText, resourceName);
+        if (result == null) {
+            logD("Couldn't find the Location switch by title '%s'", switchText);
+        }
+        return result;
     }
 
     /**
-     * The toggle button to switch on/off location service in the Settings app is a switch widget.
-     * The toggle button is of type "android.widget.Switch" with ID "switch_widget".
-     * It has a parent view, which is of type "android.widget.LinearLayout" with ID "switch_bar".
-     * It also a sibling view, which is of type "android.widget.TextView" with ID "switch_text",
-     * to display text like "Location access",
+     * The resourceName of the switch widget can be the same as
+     * of the other switch widget in the same screen/page.
+     * Hence, starting by finding its title (TextView)
+     * then traverse from the top of the view tree of the UI component
+     * to find the switch widget view by its resourceName to reduce
+     * the chance of getting the wrong one.
      *
      * @param device
-     * @param switchText
+     * @param title
+     * @param resourceName
      * @return
+     * @throws UiObjectNotFoundException
      */
-    private static UiObject2 getSwitchWidget(UiDevice device, String switchText) throws UiObjectNotFoundException {
-        // resourceName=com.android.settings:id/switch_text, className=android.widget.TextView
-        UiObject2 switchTextView = device.wait(Until.findObject(By.text(switchText)), NEW_WINDOW_TIMEOUT);
-        if (switchTextView != null) {
-            UiObject2 parent = switchTextView.getParent(); // resourceName=com.android.settings:id/switch_bar, className=android.widget.LinearLayout
+    private static UiObject2 findSwitchWidgetByTitle(UiDevice device, String title, String resourceName) throws UiObjectNotFoundException {
+        UiObject2 switchWidgetTitle = device.findObject(By.text(title));
+        if (switchWidgetTitle != null) {
+            logD("> Found view with the given text '%s'", title);
+
+            UiObject2 parent = switchWidgetTitle.getParent();
             if (parent != null) {
-                for (UiObject2 child : parent.getChildren()) {
-                    if (SWITCH_WIDGET_RESOURCENAME.equals(child.getResourceName())) {
-                        // Switch widget found
-                        return child; // resourceName=com.android.settings:id/switch_widget, className=android.widget.Switch
-                    }
+                if (parent.getParent() != null) {
+                    logD("> The view with text '%s' have a grandparent.", title);
+                    return findChildByResourceName(parent.getParent(), resourceName);
+                } else {
+                    logD("> The view with text '%s' does not have a grandparent.", title);
+                    return findChildByResourceName(parent, resourceName);
                 }
-                Log.d(UiAutomatorHelper.class.getSimpleName(),
-                        String.format("The view <className=%s, resourceName=%s> with the given text '%s' does not have a sibling with resourceName '%s'"
-                        , switchTextView.getClassName(), switchTextView.getResourceName(), switchText, SWITCH_WIDGET_RESOURCENAME));
             } else {
-                Log.d(UiAutomatorHelper.class.getSimpleName(),
-                        String.format("The view <className=%s, resourceName=%s> with the given text '%s' does not have parent view", switchTextView.getClassName(), switchTextView.getResourceName(), switchText));
+                logD("> The view with text '%s' does not have a parent.", title);
             }
         } else {
-            throw new UiObjectNotFoundException(String.format("Couldn't find a view with the given text '%s'", switchText));
+            logD("> Couldn't find any view with text '%s'", title);
         }
-
         return null;
     }
 
+    private static UiObject2 findChildByResourceName(UiObject2 parent, String resourceName) throws UiObjectNotFoundException {
+        UiObject2 result = null;
+
+        if (parent != null) {
+            logD(parent, "parent");
+
+            if (parent.getChildCount() == 0) {
+                return null;
+            }
+
+            for (UiObject2 child : parent.getChildren()) {
+                logD(child, "child");
+
+                if (resourceName.equals(child.getResourceName())) {
+                    result = child;
+                } else {
+                    result = findChildByResourceName(child, resourceName);
+                }
+            }
+        }
+        return result;
+    }
+
+    /**
+     * This works on both emulator and real device.
+     *
+     * @param device
+     * @throws IOException
+     */
+    private static void launchSettingsAppV2(UiDevice device) throws IOException {
+        // Press Home button
+        device.pressHome();
+
+        // Wait for launcher (a system app to manage Home screen and start other apps).
+        final String launcherPackage = device.getLauncherPackageName();
+        assertThat(launcherPackage, notNullValue());
+        device.wait(hasObject(By.pkg(launcherPackage).depth(0)), LAUNCH_TIMEOUT);
+
+        // Launch the Settings app
+        device.executeShellCommand("am start -n com.android.settings/.Settings");
+    }
+
+    /**
+     * This works only on emulator, not on real device.
+     *
+     * @param device
+     */
     private static void launchSettingsApp(UiDevice device) {
         device.pressHome();
 
@@ -143,7 +197,54 @@ public class UiAutomatorHelper {
         device.wait(hasObject(By.pkg(SETTINGSAPP_PACKAGE).depth(0)), LAUNCH_TIMEOUT);
     }
 
+
+    // =============================================================================================
+    // =============================================================================================
+    // =============================================================================================
+
+
+    public static boolean isEmulator() {
+        logD("> Build.FINGERPRINT=" + Build.FINGERPRINT);
+        return Build.FINGERPRINT.contains("emulator");
+    }
+    public static void clickGrantAppPermissionsIfAsked(UiDevice device) {
+        final String buttonText;
+
+        if (isEmulator()) {
+            buttonText = "While using the app";
+        } else {
+            final String manufacturer = Build.MANUFACTURER;
+            if (manufacturer.equalsIgnoreCase(XIAOMI_MANUFACTURER)) {
+                buttonText = "WHILE USING THE APP";
+            } else if (manufacturer.equalsIgnoreCase(GOOGLE_MANUFACTURER)) {
+                buttonText = "WHILE USING THE APP";
+            } else {
+                throw new UnsupportedOperationException(String.format("Couldn't navigate through Settings app to find the Location switch for unsupported device's manufacturer %s", manufacturer));
+            }
+        }
+
+        // Grant app permissions to access location
+        UiObject2 grantAppPermissionsBtn = device.wait(Until.findObject(By.text(buttonText).clazz(BUTTON_CLASS)), FIND_OBJECT_TIMEOUT);
+        if (grantAppPermissionsBtn != null) {
+            logD(grantAppPermissionsBtn.getText() + " clicked.");
+            grantAppPermissionsBtn.clickAndWait(Until.newWindow(), NEW_WINDOW_TIMEOUT);
+        }
+    }
+
+
+    // =============================================================================================
+    // =============================================================================================
+    // =============================================================================================
+
+
     private static Context getContext() {
         return ApplicationProvider.getApplicationContext();
+    }
+
+    private static void logD(UiObject2 obj, String label) {
+        Log.d(UiAutomatorHelper.class.getSimpleName(), String.format("> %s: className=%s, resourceName=%s", label, obj.getClassName(), obj.getResourceName()));
+    }
+    private static void logD(String message, Object... placeholders) {
+        Log.d(UiAutomatorHelper.class.getSimpleName(), String.format(message, placeholders));
     }
 }

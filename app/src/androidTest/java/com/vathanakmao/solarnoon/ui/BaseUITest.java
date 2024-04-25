@@ -35,6 +35,26 @@ public class BaseUITest {
 
     }
 
+    public void startMainActivityFromHomeScreen2() {
+        // Start from the home screen
+        device.pressHome();
+
+        // Wait for a common launcher element (optional)
+        // device.wait(Until.findObject(By.res(commonLauncherResourceId)), LAUNCH_TIMEOUT);
+
+        // Get launcher package dynamically
+        String launcherPackage = device.getLauncherPackageName();
+        assertThat(launcherPackage, notNullValue());
+
+        // Launch the app
+        Context context = getContext();
+        Intent intent = context.getPackageManager().getLaunchIntentForPackage(APP_PACKAGE);
+        context.startActivity(intent);
+
+        // Wait for the app to appear (consider generic wait conditions)
+        device.wait(hasObject(By.pkg(launcherPackage).depth(0)), LAUNCH_TIMEOUT);
+    }
+
     public void startMainActivityFromHomeScreen() {
         // Start from the home screen
         device.pressHome(); 
@@ -57,7 +77,7 @@ public class BaseUITest {
 
     protected void clickGrantAppPermissionsIfAsked() {
         // Grant app permissions to access location
-        UiObject2 grantAppPermissionsBtn = device.wait(Until.findObject(By.text("While using the app").clazz(BUTTON_CLASS)), NEW_WINDOW_TIMEOUT);
+        UiObject2 grantAppPermissionsBtn = device.wait(Until.findObject(By.text("WHILE USING THE APP").clazz(BUTTON_CLASS)), NEW_WINDOW_TIMEOUT);
         if (grantAppPermissionsBtn != null) {
             log(grantAppPermissionsBtn.getText() + " clicked.");
             grantAppPermissionsBtn.clickAndWait(Until.newWindow(), NEW_WINDOW_TIMEOUT);

@@ -3,5 +3,4 @@
 
     <!-- It's needed for GeocoderTest to programmatically skip the tests if no network connection -->
     <uses-permission android:name="android.permission.INTERNET" />
-
 </manifest>
