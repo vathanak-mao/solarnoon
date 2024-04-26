@@ -19,6 +19,8 @@ import androidx.test.uiautomator.UiScrollable;
 import androidx.test.uiautomator.UiSelector;
 import androidx.test.uiautomator.Until;
 
+import com.vathanakmao.solarnoon.util.StringUtil;
+
 import java.io.IOException;
 
 public class UiAutomatorHelper {
@@ -37,6 +39,26 @@ public class UiAutomatorHelper {
     private static final int LAUNCH_TIMEOUT = 10000;
     private static final int NEW_WINDOW_TIMEOUT = 10000;
     private static final int FIND_OBJECT_TIMEOUT = 10000;
+
+    /**
+     * Start app with its main activity from Home screen.
+     *
+     * @param device
+     * @param appPackage For example, "com.vathanakmao.solarnoon".
+     * @param mainActivityClass For example, "MainActivity".
+     */
+    public static void startMainActivityFromHomeScreen(UiDevice device, String appPackage, String mainActivityClass) {
+        // Start from the home screen
+        device.pressHome();
+
+        try {
+            device.executeShellCommand(String.format("am start -n %s/.%s", appPackage, mainActivityClass));
+        } catch (IOException e) {
+            logD(StringUtil.getStackTrace(e));
+        }
+
+        device.wait(hasObject(By.pkg(appPackage).depth(0)), LAUNCH_TIMEOUT);
+    }
 
     /**
      * Automate launching Settings app and navigate to find Location switch

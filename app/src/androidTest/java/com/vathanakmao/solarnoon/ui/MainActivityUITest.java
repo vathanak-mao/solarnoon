@@ -32,7 +32,7 @@ public class MainActivityUITest extends BaseUITest {
 
     @Test
     public void changeLanguage() throws UiObjectNotFoundException, IOException {
-        startMainActivityFromHomeScreenV2();
+        UiAutomatorHelper.startMainActivityFromHomeScreen(device, APP_PACKAGE, MAIN_ACTIVITY_CLASS);
         UiAutomatorHelper.clickGrantAppPermissionsIfAsked(device);
         clickNextIfDialogToNotifyLocationServicesNeededAppears();
         clickOkIfDialogToEnableLocationAppears();
@@ -102,7 +102,7 @@ public class MainActivityUITest extends BaseUITest {
         UiAutomatorHelper.enableLocation(true, device);
 
         // Start app from home screen
-        startMainActivityFromHomeScreenV2();
+        UiAutomatorHelper.startMainActivityFromHomeScreen(device, APP_PACKAGE, MAIN_ACTIVITY_CLASS);
 
         // Click the "While using the app" button to grant app permissions if asked
         UiAutomatorHelper.clickGrantAppPermissionsIfAsked(device);
@@ -122,7 +122,7 @@ public class MainActivityUITest extends BaseUITest {
         UiAutomatorHelper.enableLocation(false, device);
 
         // Start app from home screen
-        startMainActivityFromHomeScreenV2();
+        UiAutomatorHelper.startMainActivityFromHomeScreen(device, APP_PACKAGE, MAIN_ACTIVITY_CLASS);
 
         // Click the "While using the app" button to grant app permissions if asked
         UiAutomatorHelper.clickGrantAppPermissionsIfAsked(device);
@@ -145,7 +145,7 @@ public class MainActivityUITest extends BaseUITest {
 
     @Test
     public void findObjectByResourceId() {
-        startMainActivityFromHomeScreenV2();
+        UiAutomatorHelper.startMainActivityFromHomeScreen(device, APP_PACKAGE, MAIN_ACTIVITY_CLASS);
         UiAutomatorHelper.clickGrantAppPermissionsIfAsked(device);
         clickNextIfDialogToNotifyLocationServicesNeededAppears();
         clickOkIfDialogToEnableLocationAppears();
@@ -161,7 +161,7 @@ public class MainActivityUITest extends BaseUITest {
 
     @Test
     public void findObjectByResourceName() {
-        startMainActivityFromHomeScreenV2();
+        UiAutomatorHelper.startMainActivityFromHomeScreen(device, APP_PACKAGE, MAIN_ACTIVITY_CLASS);
         UiAutomatorHelper.clickGrantAppPermissionsIfAsked(device);
         clickNextIfDialogToNotifyLocationServicesNeededAppears();
         clickOkIfDialogToEnableLocationAppears();

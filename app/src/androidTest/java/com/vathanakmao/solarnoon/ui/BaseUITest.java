@@ -23,7 +23,7 @@ import java.io.IOException;
 
 public class BaseUITest {
     protected static final String APP_PACKAGE = "com.vathanakmao.solarnoon";
-    protected static final String MAIN_ACTIVITY = "MainActivity";
+    protected static final String MAIN_ACTIVITY_CLASS = "MainActivity";
     protected static final String BUTTON_CLASS = "android.widget.Button";
     protected static final String LINEAR_LAYOUT_CLASS = "android.widget.LinearLayout";
     protected static final int LAUNCH_TIMEOUT = 10000;
@@ -36,17 +36,6 @@ public class BaseUITest {
         device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
         dismissSystemUINotRespondingDialogIfAppears();
 
-    }
-
-    public void startMainActivityFromHomeScreenV2() {
-        // Start from the home screen
-        device.pressHome();
-
-        try {
-            device.executeShellCommand(String.format("am start -n %s/.%s", APP_PACKAGE, MAIN_ACTIVITY));
-        } catch (IOException e) {
-            log(StringUtil.getStackTrace(e));
-        }
     }
 
     public void startMainActivityFromHomeScreen() {
