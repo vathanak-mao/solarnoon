@@ -33,7 +33,7 @@ public class MainActivityUITest extends BaseUITest {
 
     @Test
     public void changeLanguage() throws UiObjectNotFoundException, IOException {
-        startMainActivityFromHomeScreen();
+        startMainActivityFromHomeScreenV2();
         clickGrantAppPermissionsIfAsked();
         clickNextIfDialogToNotifyLocationServicesNeededAppears();
         clickOkIfDialogToEnableLocationAppears();
@@ -108,8 +108,8 @@ public class MainActivityUITest extends BaseUITest {
         UiAutomatorHelper.enableLocation(true, device);
 
         // Start app from home screen
-//        startMainActivityFromHomeScreen();
-        device.executeShellCommand("am start -n com.vathanakmao.solarnoon/.MainActivity");
+        startMainActivityFromHomeScreenV2();
+//        device.executeShellCommand("am start -n com.vathanakmao.solarnoon/.MainActivity");
 
         // Click the "While using the app" button to grant app permissions if asked
         UiAutomatorHelper.clickGrantAppPermissionsIfAsked(device);
@@ -129,7 +129,7 @@ public class MainActivityUITest extends BaseUITest {
         UiAutomatorHelper.enableLocation(false, device);
 
         // Start app from home screen
-        startMainActivityFromHomeScreen();
+        startMainActivityFromHomeScreenV2();
 
         // Click the "While using the app" button to grant app permissions if asked
         clickGrantAppPermissionsIfAsked();
@@ -152,7 +152,7 @@ public class MainActivityUITest extends BaseUITest {
 
     @Test
     public void findObjectByResourceId() {
-        startMainActivityFromHomeScreen();
+        startMainActivityFromHomeScreenV2();
         clickGrantAppPermissionsIfAsked();
         clickNextIfDialogToNotifyLocationServicesNeededAppears();
         clickOkIfDialogToEnableLocationAppears();
@@ -168,7 +168,7 @@ public class MainActivityUITest extends BaseUITest {
 
     @Test
     public void findObjectByResourceName() {
-        startMainActivityFromHomeScreen();
+        startMainActivityFromHomeScreenV2();
         clickGrantAppPermissionsIfAsked();
         clickNextIfDialogToNotifyLocationServicesNeededAppears();
         clickOkIfDialogToEnableLocationAppears();

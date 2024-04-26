@@ -13,7 +13,6 @@ import android.util.Log;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.uiautomator.By;
 import androidx.test.uiautomator.UiDevice;
-import androidx.test.uiautomator.UiObject;
 import androidx.test.uiautomator.UiObject2;
 import androidx.test.uiautomator.UiObjectNotFoundException;
 import androidx.test.uiautomator.UiScrollable;
@@ -25,6 +24,8 @@ import java.io.IOException;
 public class UiAutomatorHelper {
     public static final String SETTINGSAPP_CLASS = "com.android.settings.Settings";
     public static final String SETTINGSAPP_PACKAGE = "com.android.settings";
+    public static final String SETTINGSAPP_LOCATION = "Location";
+
     public static final String GOOGLE_SWITCH_WIDGET_RESOURCENAME = "com.android.settings:id/switch_widget";
     public static final String XIAOMI_SWITCH_WIDGET_RESOURCENAME = "android:id/switch_widget";
 
@@ -51,13 +52,17 @@ public class UiAutomatorHelper {
         launchSettingsAppV2(device);
 
         final UiObject2 locationSwitch;
-        final String manufacturer = Build.MANUFACTURER;
-        if (manufacturer.equalsIgnoreCase("xiaomi")) {
-            locationSwitch = navigateAndFindLocationSwitch(device, "Location access", XIAOMI_SWITCH_WIDGET_RESOURCENAME);
-        } else if (manufacturer.equalsIgnoreCase("google")) {
+        if (isEmulator()) {
             locationSwitch = navigateAndFindLocationSwitch(device, "Use location", GOOGLE_SWITCH_WIDGET_RESOURCENAME);
         } else {
-            throw new UnsupportedOperationException(String.format("Couldn't navigate through Settings app to find the Location switch for unsupported device's manufacturer %s", manufacturer));
+            final String manufacturer = Build.MANUFACTURER.toLowerCase();
+            switch (manufacturer) {
+                case XIAOMI_MANUFACTURER:
+                    locationSwitch = navigateAndFindLocationSwitch(device, "Location access", XIAOMI_SWITCH_WIDGET_RESOURCENAME);
+                    break;
+                default:
+                    throw new UnsupportedOperationException(String.format("Couldn't navigate through Settings app to find the Location switch for unsupported device's manufacturer %s", manufacturer));
+            }
         }
 
         if (locationSwitch != null) {
@@ -72,11 +77,10 @@ public class UiAutomatorHelper {
 
     private static UiObject2 navigateAndFindLocationSwitch(UiDevice device, String switchText, String resourceName) throws UiObjectNotFoundException {
         // Scroll down to see Location
-        UiScrollable settingsLandingPage = new UiScrollable(new UiSelector().scrollable(true));
-        settingsLandingPage.scrollIntoView(new UiSelector().text("Location"));
+        scrollTo(device, SETTINGSAPP_LOCATION);
 
         // Click Location option
-        UiObject2 locationOption = device.findObject(By.text("Location"));
+        UiObject2 locationOption = device.findObject(By.text(SETTINGSAPP_LOCATION));
         if (locationOption != null) {
             locationOption.clickAndWait(Until.newWindow(), NEW_WINDOW_TIMEOUT);
         } else {
@@ -84,8 +88,7 @@ public class UiAutomatorHelper {
         }
 
         // Scroll down/up to see the Location switch
-        UiScrollable locationPage = new UiScrollable(new UiSelector().scrollable(true));
-        locationPage.scrollIntoView(new UiSelector().text(switchText));
+        scrollTo(device, switchText);
 
         // Find Location switch by text
         UiObject2 result = findSwitchWidgetByTitle(device, switchText, resourceName);
@@ -93,6 +96,15 @@ public class UiAutomatorHelper {
             logD("Couldn't find the Location switch by title '%s'", switchText);
         }
         return result;
+    }
+
+    public static void scrollTo(UiDevice device, String text) {
+        UiScrollable page = new UiScrollable(new UiSelector().scrollable(true));
+        try {
+            page.scrollIntoView(new UiSelector().text(text));
+        } catch (UiObjectNotFoundException e) {
+            logD("Couldn't scroll to text '%s' because the page is not scrollable.", text);
+        }
     }
 
     /**
@@ -213,13 +225,11 @@ public class UiAutomatorHelper {
         if (isEmulator()) {
             buttonText = "While using the app";
         } else {
-            final String manufacturer = Build.MANUFACTURER;
-            if (manufacturer.equalsIgnoreCase(XIAOMI_MANUFACTURER)) {
-                buttonText = "WHILE USING THE APP";
-            } else if (manufacturer.equalsIgnoreCase(GOOGLE_MANUFACTURER)) {
-                buttonText = "WHILE USING THE APP";
-            } else {
-                throw new UnsupportedOperationException(String.format("Couldn't navigate through Settings app to find the Location switch for unsupported device's manufacturer %s", manufacturer));
+            final String manufacturer = Build.MANUFACTURER.toLowerCase();
+            switch (manufacturer) {
+                case XIAOMI_MANUFACTURER: buttonText = "WHILE USING THE APP"; break;
+                case GOOGLE_MANUFACTURER: buttonText = "WHILE USING THE APP"; break;
+                default: throw new UnsupportedOperationException(String.format("Couldn't navigate through Settings app to find the Location switch for unsupported device's manufacturer %s", manufacturer));
             }
         }
 

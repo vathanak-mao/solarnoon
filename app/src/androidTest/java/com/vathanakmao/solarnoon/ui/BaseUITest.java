@@ -15,12 +15,15 @@ import androidx.test.uiautomator.UiDevice;
 import androidx.test.uiautomator.UiObject2;
 import androidx.test.uiautomator.Until;
 
+import com.vathanakmao.solarnoon.util.StringUtil;
+
 import org.junit.Before;
 
 import java.io.IOException;
 
 public class BaseUITest {
     protected static final String APP_PACKAGE = "com.vathanakmao.solarnoon";
+    protected static final String MAIN_ACTIVITY = "MainActivity";
     protected static final String BUTTON_CLASS = "android.widget.Button";
     protected static final String LINEAR_LAYOUT_CLASS = "android.widget.LinearLayout";
     protected static final int LAUNCH_TIMEOUT = 10000;
@@ -35,24 +38,15 @@ public class BaseUITest {
 
     }
 
-    public void startMainActivityFromHomeScreen2() {
+    public void startMainActivityFromHomeScreenV2() {
         // Start from the home screen
         device.pressHome();
 
-        // Wait for a common launcher element (optional)
-        // device.wait(Until.findObject(By.res(commonLauncherResourceId)), LAUNCH_TIMEOUT);
-
-        // Get launcher package dynamically
-        String launcherPackage = device.getLauncherPackageName();
-        assertThat(launcherPackage, notNullValue());
-
-        // Launch the app
-        Context context = getContext();
-        Intent intent = context.getPackageManager().getLaunchIntentForPackage(APP_PACKAGE);
-        context.startActivity(intent);
-
-        // Wait for the app to appear (consider generic wait conditions)
-        device.wait(hasObject(By.pkg(launcherPackage).depth(0)), LAUNCH_TIMEOUT);
+        try {
+            device.executeShellCommand(String.format("am start -n %s/.%s", APP_PACKAGE, MAIN_ACTIVITY));
+        } catch (IOException e) {
+            log(StringUtil.getStackTrace(e));
+        }
     }
 
     public void startMainActivityFromHomeScreen() {
