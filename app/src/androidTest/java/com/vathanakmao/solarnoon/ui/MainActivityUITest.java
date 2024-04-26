@@ -23,7 +23,6 @@ import java.util.List;
 @RunWith(AndroidJUnit4.class)
 public class MainActivityUITest extends BaseUITest {
     public static final String SUPPORTED_LANGUAGES_SPINNER_ID = "spinnerSupportedLanguages";
-    public static final String SUPPORTED_LANGUAGES_SPINNER_RESOURCEID = "com.vathanakmao.solarnoon:id/spinnerSupportedLanguages";
     public static final String DESCRIPTION_TEXTVIEW_ID = "textviewDesc";
     public static final String SOLAR_TIME_TEXTVIEW_ID = "textviewSolarnoonTime";
 
@@ -41,13 +40,8 @@ public class MainActivityUITest extends BaseUITest {
         // =========================================================================
 
         // Open the dropdown
-//        Espresso.onView(withId(R.id.spinnerSupportedLanguages)).perform(click());
-
-//        UiObject languagesDropdown = device.findObject(new UiSelector().resourceId(SUPPORTED_LANGUAGES_SPINNER_RESOURCEID));
         UiObject2 languagesDropdown = device.wait(Until.findObject(By.res(APP_PACKAGE, SUPPORTED_LANGUAGES_SPINNER_ID)), FIND_OBJECT_TIMEOUT);
         languagesDropdown.clickAndWait(Until.newWindow(), NEW_WINDOW_TIMEOUT); // Wait until the dropdown appears
-//        languagesDropdown.waitForExists(10000); // Wait until the dropdown appears
-//        languagesDropdown.clickAndWaitForNewWindow(NEW_WINDOW_TIMEOUT);
 
         // Select "English"
         UiObject2 englishItem = device.wait(Until.findObject(By.clazz(LINEAR_LAYOUT_CLASS).hasChild(By.text("English"))), FIND_OBJECT_TIMEOUT);
