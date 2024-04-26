@@ -69,15 +69,6 @@ public class BaseUITest {
         device.wait(hasObject(By.pkg(APP_PACKAGE).depth(0)), LAUNCH_TIMEOUT);
     }
 
-    protected void clickGrantAppPermissionsIfAsked() {
-        // Grant app permissions to access location
-        UiObject2 grantAppPermissionsBtn = device.wait(Until.findObject(By.text("WHILE USING THE APP").clazz(BUTTON_CLASS)), NEW_WINDOW_TIMEOUT);
-        if (grantAppPermissionsBtn != null) {
-            log(grantAppPermissionsBtn.getText() + " clicked.");
-            grantAppPermissionsBtn.clickAndWait(Until.newWindow(), NEW_WINDOW_TIMEOUT);
-        }
-    }
-
     protected void clickNextIfDialogToNotifyLocationServicesNeededAppears() {
         UiObject2 nextBtn = device.wait(Until.findObject(By.text("NEXT").clazz(BUTTON_CLASS)), NEW_WINDOW_TIMEOUT);
         if (nextBtn != null) {
