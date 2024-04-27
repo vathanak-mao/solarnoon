@@ -57,7 +57,7 @@ public class UiAutomatorHelper {
             logD(StringUtil.getStackTrace(e));
         }
 
-        device.wait(hasObject(By.pkg(appPackage).depth(0)), LAUNCH_TIMEOUT);
+//        device.wait(hasObject(By.pkg(appPackage).depth(0)), LAUNCH_TIMEOUT);
     }
 
     /**
@@ -143,7 +143,7 @@ public class UiAutomatorHelper {
      * @return
      * @throws UiObjectNotFoundException
      */
-    private static UiObject2 findSwitchWidgetByTitle(UiDevice device, String title, String resourceName) throws UiObjectNotFoundException {
+    public static UiObject2 findSwitchWidgetByTitle(UiDevice device, String title, String resourceName) throws UiObjectNotFoundException {
         UiObject2 switchWidgetTitle = device.findObject(By.text(title));
         if (switchWidgetTitle != null) {
             logD("> Found view with the given text '%s'", title);
@@ -250,7 +250,6 @@ public class UiAutomatorHelper {
             final String manufacturer = Build.MANUFACTURER.toLowerCase();
             switch (manufacturer) {
                 case XIAOMI_MANUFACTURER: buttonText = "WHILE USING THE APP"; break;
-                case GOOGLE_MANUFACTURER: buttonText = "WHILE USING THE APP"; break;
                 default: throw new UnsupportedOperationException(String.format("Couldn't navigate through Settings app to find the Location switch for unsupported device's manufacturer %s", manufacturer));
             }
         }
@@ -258,7 +257,7 @@ public class UiAutomatorHelper {
         // Grant app permissions to access location
         UiObject2 grantAppPermissionsBtn = device.wait(Until.findObject(By.text(buttonText).clazz(BUTTON_CLASS)), FIND_OBJECT_TIMEOUT);
         if (grantAppPermissionsBtn != null) {
-            logD(grantAppPermissionsBtn.getText() + " clicked.");
+            logD("Button '%s' clicked.", grantAppPermissionsBtn.getText());
             grantAppPermissionsBtn.clickAndWait(Until.newWindow(), NEW_WINDOW_TIMEOUT);
         }
     }
