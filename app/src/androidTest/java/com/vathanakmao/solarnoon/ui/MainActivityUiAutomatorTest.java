@@ -21,12 +21,12 @@ import java.util.Arrays;
 import java.util.List;
 
 @RunWith(AndroidJUnit4.class)
-public class MainActivityUITest extends BaseUITest {
+public class MainActivityUiAutomatorTest extends BaseUITest {
     public static final String SUPPORTED_LANGUAGES_SPINNER_ID = "spinnerSupportedLanguages";
     public static final String DESCRIPTION_TEXTVIEW_ID = "textviewDesc";
     public static final String SOLAR_TIME_TEXTVIEW_ID = "textviewSolarnoonTime";
 
-    public static final long FIND_OBJECT_TIMEOUT = 15000;
+    public static final long FIND_OBJECT_TIMEOUT = 1000;
 
     public static final String TEXTVIEW_CLASS = "android.widget.TextView";
 

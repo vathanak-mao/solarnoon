@@ -53,6 +53,8 @@ public class MainActivity extends BaseActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d(getLocalClassName(), "> onCreated() called.");
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -66,6 +68,7 @@ public class MainActivity extends BaseActivity
 
     @Override
     protected void onStart() {
+        Log.d(getLocalClassName(), "> onStart() called.");
         super.onStart();
 
         // Prompt the user to grant app permissions for location access.

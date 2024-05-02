@@ -27,7 +27,6 @@ public class LocaleTest {
 
     @Test
     public void createLocaleBasedOnLanguageName() {
-        assertFalse(true);
         final Locale fr = Locale.forLanguageTag("English");
         assertEquals("english", fr.getLanguage());
 

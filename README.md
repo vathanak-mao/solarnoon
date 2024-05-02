@@ -15,11 +15,11 @@ $ ./gradlew smallphoneapi31DebugAndroidTest
 
 **Run specific test class:**
 ```
-$ ./gradlew smallphoneapi31DebugAndroidTest -P android.testInstrumentationRunnerArguments.class=com.vathanakmao.solarnoon.ui.MainActivityUITest
+$ ./gradlew smallphoneapi31DebugAndroidTest -P android.testInstrumentationRunnerArguments.class=com.vathanakmao.solarnoon.ui.MainActivityUiAutomatorTest
 ```
 **Run specific test method:**
 ```
-$ ./gradlew smallphoneapi31DebugAndroidTest -P android.testInstrumentationRunnerArguments.class=com.vathanakmao.solarnoon.ui.MainActivityUITest#changeLanguage
+$ ./gradlew smallphoneapi31DebugAndroidTest -P android.testInstrumentationRunnerArguments.class=com.vathanakmao.solarnoon.ui.MainActivityUiAutomatorTest#changeLanguage
 ```
 
 

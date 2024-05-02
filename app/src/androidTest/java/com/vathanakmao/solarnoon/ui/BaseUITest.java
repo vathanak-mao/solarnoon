@@ -15,8 +15,6 @@ import androidx.test.uiautomator.UiDevice;
 import androidx.test.uiautomator.UiObject2;
 import androidx.test.uiautomator.Until;
 
-import com.vathanakmao.solarnoon.util.StringUtil;
-
 import org.junit.Before;
 
 import java.io.IOException;
@@ -35,7 +33,6 @@ public class BaseUITest {
         // Initialize UiDevice instance
         device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
         dismissSystemUINotRespondingDialogIfAppears();
-
     }
 
     public void startMainActivityFromHomeScreen() {
