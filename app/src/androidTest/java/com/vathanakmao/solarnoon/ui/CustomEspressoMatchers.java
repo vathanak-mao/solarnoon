@@ -4,19 +4,22 @@ import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 
-import java.util.Arrays;
-import java.util.List;
-
 public final class CustomEspressoMatchers {
 
-    public static Matcher<String> containsOnlyCharsIn(char... expectedValues) {
+    public static Matcher<String> containsOnlyChars(char... expectedValues) {
         return new TypeSafeMatcher<String>() {
 
             @Override
             protected boolean matchesSafely(String actualValue) {
-                final List expectedList = Arrays.asList(expectedValues);
-                for (char ch : actualValue.toCharArray()) {
-                    if (!expectedList.contains(ch)) {
+                for (char ac : actualValue.toCharArray()) {
+                    boolean exists = false;
+                    for (char ex : expectedValues) {
+                        if (ac == ex) {
+                            exists = true;
+                            break;
+                        }
+                    }
+                    if (!exists) {
                         return false;
                     }
                 }

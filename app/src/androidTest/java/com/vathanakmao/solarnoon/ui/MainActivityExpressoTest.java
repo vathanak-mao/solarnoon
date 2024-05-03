@@ -7,8 +7,7 @@ import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
-import static com.vathanakmao.solarnoon.ui.CustomEspressoMatchers.containsOnlyCharsIn;
-import static org.hamcrest.CoreMatchers.containsString;
+import static com.vathanakmao.solarnoon.ui.CustomEspressoMatchers.containsOnlyChars;
 import static org.hamcrest.CoreMatchers.not;
 
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
@@ -58,7 +57,7 @@ public class MainActivityExpressoTest extends BaseUITest {
 
         // Assert that the solar time is displayed and translated
         onView(withId(R.id.textviewSolarnoonTime))
-                .check(matches(withText(containsOnlyCharsIn(':', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'))))
+                .check(matches(withText(containsOnlyChars(':', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'))))
                 .check(matches(isDisplayed()));
 
         // Assert that the loading image is not displayed
@@ -80,7 +79,7 @@ public class MainActivityExpressoTest extends BaseUITest {
 
         // Assert that the solar time is displayed and translated
         onView(withId(R.id.textviewSolarnoonTime))
-                .check(matches(withText(containsOnlyCharsIn(':', '០', '១', '២', '៣', '៤', '៥', '៦', '៧', '៨', '៩'))))
+                .check(matches(withText(containsOnlyChars(':', '០', '១', '២', '៣', '៤', '៥', '៦', '៧', '៨', '៩'))))
                 .check(matches(isDisplayed()));
 
         // Assert that the loading image exists but invisible
