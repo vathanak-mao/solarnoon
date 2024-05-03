@@ -60,9 +60,9 @@ public class MainActivityExpressoTest extends BaseUITest {
                 .check(matches(withText(containsOnlyChars(':', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'))))
                 .check(matches(isDisplayed()));
 
-        // Assert that the loading image is not displayed
-        onView(withId(R.id.imageviewLoading)).check(matches(not(isDisplayed())));
+        // Assert that the loading image exists but invisible
         onView(withId(R.id.imageviewLoading)).check(matches(not(doesNotExist())));
+        onView(withId(R.id.imageviewLoading)).check(matches(not(isDisplayed())));
 
         // ==================================================================
 
