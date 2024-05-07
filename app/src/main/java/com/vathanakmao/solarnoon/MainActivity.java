@@ -40,6 +40,8 @@ import java.time.ZonedDateTime;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class MainActivity extends BaseActivity
         implements ActivityCompat.OnRequestPermissionsResultCallback,
@@ -50,6 +52,7 @@ public class MainActivity extends BaseActivity
     private FusedLocationProviderClient fusedLocationProviderClient;
     private SolarNoonCalc solarnoonCalc;
     private Location userLocationCache;
+    private ExecutorService executorService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -186,37 +189,48 @@ public class MainActivity extends BaseActivity
      * @param langCode
      */
     private void showUserLocation(Location location, String langCode) {
-        Geocoder geocoder = new Geocoder(this, new Locale(langCode));
+        final Geocoder geocoder = new Geocoder(this, new Locale(langCode));
+        final Handler handler = new Handler();
 
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-            Log.d(getLocalClassName(), String.format("The API level of the running system is %s so falling back to the deprecated method Geocoder.getFromLocation(latitude, longitude, maxResults)", Build.VERSION.SDK_INT));
+        final Runnable runnable = new Runnable() {
+            public void run() {
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                    Log.d(getLocalClassName(), String.format("The API level of the running system is %s so falling back to the deprecated method Geocoder.getFromLocation(latitude, longitude, maxResults)", Build.VERSION.SDK_INT));
 
-            Handler handler = new Handler();
-            handler.post(new Runnable() {
-                public void run() {
                     try {
                         final List<Address> addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
-                        setCurrentLocationName(findViewById(R.id.textviewLocation), addresses);
+                        handler.post(new Runnable() {
+                            public void run() {
+                                setCurrentLocationName(findViewById(R.id.textviewLocation), addresses);
+                            }
+                        });
                     } catch (IOException e) {
                         Log.e(getLocalClassName(), String.format("Error retrieving addresses for latitude %s and longitude %s. ", location.getLatitude(), location.getLongitude()), e);
                     }
-                }
-            });
-        } else {
-            try {
-                Log.d(getLocalClassName(), String.format("The API level of the running system is %s so calling Geocoder.getFromLocation(latitude, longitude, maxResults, Geocoder.GeocoderListeneer).", Build.VERSION.SDK_INT));
+                } else {
+                    try {
+                        Log.d(getLocalClassName(), String.format("The API level of the running system is %s so calling Geocoder.getFromLocation(latitude, longitude, maxResults, Geocoder.GeocoderListeneer).", Build.VERSION.SDK_INT));
 
-                // this method is only supported by API level 34
-                geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1, new Geocoder.GeocodeListener() {
-                    @Override
-                    public void onGeocode(List<Address> addresses) {
-                        setCurrentLocationName(findViewById(R.id.textviewLocation), addresses);
+                        // this method is only supported by API level 34
+                        geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1, new Geocoder.GeocodeListener() {
+                            @Override
+                            public void onGeocode(List<Address> addresses) {
+                                handler.post(new Runnable() {
+                                   public void run() {
+                                       setCurrentLocationName(findViewById(R.id.textviewLocation), addresses);
+                                   }
+                                });
+                            }
+                        });
+                    } catch (IllegalArgumentException e) {
+                        Log.e(getLocalClassName(), String.format("Error retrieving addresses based on latitude %s and longitude %. \n%s", location.getLatitude(), location.getLongitude(), e.getStackTrace().toString()));
                     }
-                });
-            } catch (IllegalArgumentException e) {
-                Log.e(getLocalClassName(), String.format("Error retrieving addresses based on latitude %s and longitude %. \n%s", location.getLatitude(), location.getLongitude(), e.getStackTrace().toString()));
+                }
             }
-        }
+        };
+
+        executorService = Executors.newSingleThreadExecutor();
+        executorService.execute(runnable);
     }
 
     private void setCurrentLocationName(TextView textView, @NonNull List<Address> addresses) {
