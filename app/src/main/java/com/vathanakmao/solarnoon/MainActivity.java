@@ -52,7 +52,7 @@ public class MainActivity extends BaseActivity
     private FusedLocationProviderClient fusedLocationProviderClient;
     private SolarNoonCalc solarnoonCalc;
     private Location userLocationCache;
-    private ExecutorService executorService;
+    private ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -229,7 +229,6 @@ public class MainActivity extends BaseActivity
             }
         };
 
-        executorService = Executors.newSingleThreadExecutor();
         executorService.execute(runnable);
     }
 
