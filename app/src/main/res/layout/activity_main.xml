@@ -11,7 +11,7 @@
         android:id="@+id/spinnerSupportedLanguages"
         android:layout_width="35dp"
         android:layout_height="35dp"
-        android:background="@drawable/language_icon"
+        android:background="@drawable/language_24px"
         android:spinnerMode="dropdown"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
