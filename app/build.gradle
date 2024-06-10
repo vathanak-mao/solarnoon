@@ -52,14 +52,15 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'com.github.bumptech.glide:glide:4.14.2'
     implementation 'androidx.test:runner:1.5.2' // androidx.test.runner.AndroidJUnitRunner
-
-//    implementation 'junit:junit:4.12'
+    implementation 'com.google.android.gms:play-services-ads:23.1.0'
 
     testImplementation 'junit:junit:4.13.2'
 
+    // Espresso
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
     androidTestImplementation 'androidx.test:rules:1.5.0'
 
+    // UiAutomator
     androidTestImplementation 'androidx.test.uiautomator:uiautomator:2.3.0-alpha03' // UiDevice, UiObject2
     androidTestImplementation 'androidx.test.ext:junit:1.1.5' // @RunWith(AndroidJUnit4.class), @Test, Assert.assertNotNull()
     androidTestImplementation 'androidx.test:runner:1.5.2' // androidx.test.runner.AndroidJUnitRunner
