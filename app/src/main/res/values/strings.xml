@@ -3,6 +3,7 @@
     <string name="key_preferences_filename" translatable="false">solarnoon.pref</string>
     <string name="key_preferred_language" translatable="false">preflang</string>
     <string name="default_preferred_language" translatable="false">en</string>
+    <string name="admob_app_id" translatable="false"></string>
     <string name="solarnoon_desc">Today\'s Solar Noon</string>
     <string-array name="digits">
         <item>0</item>

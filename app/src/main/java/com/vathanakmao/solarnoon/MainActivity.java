@@ -18,7 +18,6 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
 import android.view.View;
-import android.view.WindowMetrics;
 import android.widget.AdapterView;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -57,7 +56,8 @@ public class MainActivity extends BaseActivity
         OnFailureListener, OnSuccessListener {
 
     // Ad unit ID for test ads (REF: https://developers.google.com/admob/android/banner/)
-    static final String AD_UNIT = "ca-app-pub-3940256099942544/9214589741";
+//    static final String AD_UNIT = "ca-app-pub-3940256099942544/9214589741";
+    static final String AD_UNIT_ID = BuildConfig.ADMOB_AD_UNIT_ID;
 
     private LocationServiceClient locationServiceClient;
     private FusedLocationProviderClient fusedLocationProviderClient;
@@ -114,7 +114,7 @@ public class MainActivity extends BaseActivity
         // Create a new ad view.
         AdView adView = new AdView(this);
         adView.setAdSize(getAdSize());
-        adView.setAdUnitId(AD_UNIT);
+        adView.setAdUnitId(AD_UNIT_ID);
 
         // Replace ad container with new ad view.
         adContainerView.removeAllViews();

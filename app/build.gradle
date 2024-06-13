@@ -13,14 +13,28 @@ android {
         versionCode 1
         versionName "1.0"
 
+        buildFeatures {
+            buildConfig true
+        }
+
+        manifestPlaceholders.admob_app_id = 'ca-app-pub-3955028215857102~6476470240'
+        buildConfigField "String", "ADMOB_AD_UNIT_ID", "\"ca-app-pub-3940256099942544/9214589741\""
+
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
         release {
+            try {
+                buildConfigField "String", "ADMOB_AD_UNIT_ID", rootProject.properties['admob_ad_unit_id']
+            } catch (Exception e) {
+                println "Warning: release variant requires 'admob_ad_unit_id' defined in gradle.properties but not found."
+            }
+
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
+
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
