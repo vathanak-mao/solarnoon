@@ -8,16 +8,20 @@ android {
 
     defaultConfig {
         applicationId "com.vathanakmao.solarnoon"
+        applicationIdSuffix ".debug"
         minSdk 26
-        targetSdk 34
+        targetSdk 33
         versionCode 1
         versionName "1.0"
 
         buildFeatures {
-            buildConfig true
+            buildConfig true // enable generating BuildConfig
         }
 
+        // AdMob app ID can be the same for both debug and release build types
         manifestPlaceholders.admob_app_id = 'ca-app-pub-3955028215857102~6476470240'
+
+        // Use test ad unit ID of adaptive banner ad from Google
         buildConfigField "String", "ADMOB_AD_UNIT_ID", "\"ca-app-pub-3940256099942544/9214589741\""
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -25,7 +29,9 @@ android {
 
     buildTypes {
         release {
+            applicationIdSuffix ".release"
             try {
+                // Use ad unit ID created from my AdMob account
                 buildConfigField "String", "ADMOB_AD_UNIT_ID", rootProject.properties['admob_ad_unit_id']
             } catch (Exception e) {
                 println "Warning: release variant requires 'admob_ad_unit_id' defined in gradle.properties but not found."
@@ -34,7 +40,6 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
-
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
