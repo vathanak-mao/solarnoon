@@ -8,10 +8,9 @@ android {
 
     defaultConfig {
         applicationId "com.vathanakmao.solarnoon"
-        applicationIdSuffix ".debug"
         minSdk 26
         targetSdk 33
-        versionCode 1
+        versionCode 2
         versionName "1.0"
 
         buildFeatures {
@@ -21,20 +20,36 @@ android {
         // AdMob app ID can be the same for both debug and release build types
         manifestPlaceholders.admob_app_id = 'ca-app-pub-3955028215857102~6476470240'
 
-        // Use test ad unit ID of adaptive banner ad from Google
-        buildConfigField "String", "ADMOB_AD_UNIT_ID", "\"ca-app-pub-3940256099942544/9214589741\""
-
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    task releaseTask(type: Exec) {
+        doLast {
+            if (System.getenv("admob_ad_unit_id3") == null) {
+                throw GradleException("> Warning: The admob_ad_unit_id2 environment variable is not defined.")
+            }
+        }
+    }
+
     buildTypes {
+        def testAdUnitId = "\"ca-app-pub-3940256099942544/9214589741\""
+        debug {
+            applicationIdSuffix ".debug"
+
+            // Use test ad unit ID of adaptive banner ad from Google
+            buildConfigField "String", "ADMOB_AD_UNIT_ID", testAdUnitId
+        }
+        closedTesting {
+            // Use test ad unit ID of adaptive banner ad from Google
+            buildConfigField "String", "ADMOB_AD_UNIT_ID", testAdUnitId
+        }
         release {
-            applicationIdSuffix ".release"
-            try {
-                // Use ad unit ID created from my AdMob account
-                buildConfigField "String", "ADMOB_AD_UNIT_ID", rootProject.properties['admob_ad_unit_id']
-            } catch (Exception e) {
-                println "Warning: release variant requires 'admob_ad_unit_id' defined in gradle.properties but not found."
+            // Use production ad unit ID, obtained from environment variable
+            def productionAdUnitId= System.getenv("admob_ad_unit_id")
+            if (productionAdUnitId != null) {
+                buildConfigField "String", "ADMOB_AD_UNIT_ID", "\"" + productionAdUnitId + "\""
+            } else {
+                println ">> [WARN] The 'admob_ad_unit_id' environment variable is not defined for 'release' build type."
             }
 
             minifyEnabled false
