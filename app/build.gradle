@@ -16,6 +16,8 @@ android {
         buildFeatures {
             buildConfig true // enable generating BuildConfig
         }
+        // Use test ad unit ID of adaptive banner ad from Google
+        buildConfigField "String", "ADMOB_AD_UNIT_ID", "\"ca-app-pub-3940256099942544/9214589741\""
 
         // AdMob app ID can be the same for both debug and release build types
         manifestPlaceholders.admob_app_id = 'ca-app-pub-3955028215857102~6476470240'
@@ -32,24 +34,23 @@ android {
     }
 
     buildTypes {
-        def testAdUnitId = "\"ca-app-pub-3940256099942544/9214589741\""
         debug {
             applicationIdSuffix ".debug"
-
-            // Use test ad unit ID of adaptive banner ad from Google
-            buildConfigField "String", "ADMOB_AD_UNIT_ID", testAdUnitId
         }
         closedTesting {
-            // Use test ad unit ID of adaptive banner ad from Google
-            buildConfigField "String", "ADMOB_AD_UNIT_ID", testAdUnitId
+            // 1. Must not have applicationIdSuffix
+            // 2. Must use test ad unit ID
         }
         release {
-            // Use production ad unit ID, obtained from environment variable
+            debuggable false
+
+            // Use production ad unit ID, obtained from the environment variable
             def productionAdUnitId= System.getenv("admob_ad_unit_id")
             if (productionAdUnitId != null) {
                 buildConfigField "String", "ADMOB_AD_UNIT_ID", "\"" + productionAdUnitId + "\""
             } else {
-                println ">> [WARN] The 'admob_ad_unit_id' environment variable is not defined for 'release' build type."
+                // This will trigger compile-time error to stop the build
+                buildConfigField "String", "ADMOB_AD_UNIT_ID", ""
             }
 
             minifyEnabled false
