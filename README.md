@@ -2,7 +2,47 @@
 
 <img src="https://github.com/vathanak-mao/solarnoon/blob/main/.github/demo.jpg" width="30%"/>
 
-# Testing #
+
+# Build
+
+
+**Output Directory**
+```
+<project-root>/app/build/outputs
+```
+
+**Remove build directory**
+```
+$ ./gradlew clean
+```
+
+
+## Compile
+
+**Debug variant**
+```
+$ ./gradlew buildDebug
+```
+
+## Compile & Generate APK
+
+**Debug variant**
+```
+$ ./gradlew assembleDebug
+```
+
+**ClosedTesting variant**
+```
+$ ./gradlew assembleClosedTesting
+```
+
+**Release variant**
+```
+$ export admob_ad_unit_id=<ADMOB_AD_UNIT_ID>
+$ ./gradlew assembleRelease
+```
+
+# Run Tests #
 
 ## Instrumented Tests ##
 
